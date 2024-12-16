@@ -35,39 +35,66 @@ CREATE TABLE almacen (
     capacidad INT
 );
 go
+CREATE TABLE UnidadMedida (
+    idunidadMedida INT IDENTITY(1,1) PRIMARY KEY,
+    nomUnidad VARCHAR(15)
+);
+go
+CREATE TABLE equipo (
+    idequipo INT IDENTITY(1,1) PRIMARY KEY,
+    nomEquipo VARCHAR(15)
+);
+go
+CREATE TABLE uso (
+    iduso INT IDENTITY(1,1) PRIMARY KEY,
+    nomUso VARCHAR(15)
+);
+go
 -- Tabla producto
 CREATE TABLE producto (
     idproducto INT IDENTITY(1,1) PRIMARY KEY,
     partname VARCHAR(100),
     descripcion VARCHAR(100),
     idmarca INT,
-    undMedida VARCHAR(100),
+    idunidadMedida int,
     cantidad INT,
     idproveedor INT,
     idalmacen INT,
-    uso VARCHAR(50),
-    equipo VARCHAR(50),
+    iduso int,
+    idequipo int,
     precio DECIMAL(10, 2),
     FOREIGN KEY (idmarca) REFERENCES marca(idmarca) ON DELETE SET NULL,
     FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE SET NULL,
-    FOREIGN KEY (idalmacen) REFERENCES almacen(idalmacen) ON DELETE SET NULL
+    FOREIGN KEY (idalmacen) REFERENCES almacen(idalmacen) ON DELETE SET NULL,
+	FOREIGN KEY (idUnidadMedida) REFERENCES UnidadMedida(idUnidadMedida) ON DELETE SET NULL,
+    FOREIGN KEY (idUso) REFERENCES Uso(idUso) ON DELETE SET NULL,                 
+    FOREIGN KEY (idEquipo) REFERENCES Equipo(idEquipo) ON DELETE SET NULL  
 );
 go
+
+select * from UnidadMedida
+
+select * from producto
 -- Consulta para obtener detalles de los productos
 SELECT 
     p.idproducto,
     p.partname,
     p.descripcion,
-    m.nombre AS marca,
-    pr.nombre AS proveedor,
+    m.nombre AS marca,            -- Esta tabla debe existir
+    pr.nombre AS proveedor,       -- Esta tabla debe existir
     a.nombre AS almacen,
-    p.undMedida,
+    u.nomUnidad AS UndMedida,
     p.cantidad
 FROM producto p
-JOIN marca m ON p.idmarca = m.idmarca
-JOIN proveedor pr ON p.idproveedor = pr.idproveedor
-JOIN almacen a ON p.idalmacen = a.idalmacen;
+-- Se debe asegurar que las tablas marca y proveedor existan
+LEFT JOIN marca m ON p.idmarca = m.idmarca  -- O INNER JOIN si la tabla existe
+LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor -- O INNER JOIN si la tabla existe
+INNER JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
+INNER JOIN almacen a ON p.idalmacen = a.idalmacen;
+
 go
+
+select * from salidaDetalle
 -- Tabla solicitador
 CREATE TABLE solicitador (
     idsolicitador INT IDENTITY(1,1) PRIMARY KEY,
@@ -86,13 +113,15 @@ CREATE TABLE entrada (
     fecha DATE
 );
 go
+select*from entrada;
+go
 -- Tabla entradaDetalle
 CREATE TABLE entradaDetalle (
     identradaDetalle INT IDENTITY(1,1) PRIMARY KEY,
-    idientrada INT,
+    identrada INT,
     idproducto INT,
     cantidad INT,
-    FOREIGN KEY (idientrada) REFERENCES entrada(identrada),
+    FOREIGN KEY (identrada) REFERENCES entrada(identrada),
     FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
 );
 go
@@ -120,7 +149,7 @@ CREATE TABLE salida (
 );
 go
 CREATE TABLE salidaDetalle (
-    idisalidaDetalle INT IDENTITY(1,1) PRIMARY KEY,
+    idsalidaDetalle INT IDENTITY(1,1) PRIMARY KEY,
     idsalida INT,
     idproducto INT,
     cantidad INT,
@@ -175,12 +204,29 @@ INSERT INTO proveedor (nombre, direccion, telefono, correo) VALUES
 INSERT INTO almacen (nombre, direccion, capacidad) VALUES
 ('Almacen 1', 'Kilometro 26 Ant. Pan. Sur', 500);
 
+go
+
+INSERT INTO UnidadMedida (nomUnidad) VALUES ('Kilogramo');
+INSERT INTO UnidadMedida (nomUnidad) VALUES ('Metro');
+INSERT INTO UnidadMedida (nomUnidad) VALUES ('Cilindro');
+INSERT INTO UnidadMedida (nomUnidad) VALUES ('Und');
+
+INSERT INTO equipo (nomEquipo) VALUES ('Equipos');
+INSERT INTO equipo (nomEquipo) VALUES ('Personal');
+INSERT INTO equipo (nomEquipo) VALUES ('Oficina');
+INSERT INTO equipo (nomEquipo) VALUES ('Excavadora');
+INSERT INTO equipo (nomEquipo) VALUES ('Limpieza');
+INSERT INTO uso (nomUso) VALUES ('Consumible');
+INSERT INTO uso (nomUso) VALUES ('Comercial');
+INSERT INTO uso (nomUso) VALUES ('Doméstico');
+
 -- Insertar productos
-INSERT INTO producto (partname, descripcion, idmarca, undMedida, cantidad, idproveedor, idalmacen, uso, equipo, precio) VALUES
-('20SF1.70', 'STRETCH FILM 20'' x 2 KG', 1, 'UND', 100, 1, 1, 'CONSUMIBLES', '-', 3.98),
-('446', 'LOCTITE COD 620 X 50 ML', 2, 'UND', 200, 2, 1, 'CONSUMIBLES', 'EQUIPOS', 13.26),
-('S/N', 'PQTE ,LIJA AL AGUA 180', 3, 'UND', 150, 3, 1, 'CONSUMIBLES', 'EQUIPOS', 12.20),
-('S/N', 'Paño Industrial Suelto Color', 4, 'KG', 250, 4, 1, 'CONSUMIBLES', 'LIMPIEZA', 12.30);
+INSERT INTO producto (partname, descripcion, idmarca, idUnidadMedida, cantidad, idproveedor, idalmacen, iduso, idequipo, precio) 
+VALUES
+('20SF1.70', 'STRETCH FILM 20'' x 2 KG', 1, 4, 100, 1, 1, 1, NULL, 3.98),
+('446', 'LOCTITE COD 620 X 50 ML', 2, 4, 200, 2, 1, 1, 1, 13.26),
+('S/N', 'PQTE ,LIJA AL AGUA 180', 3, 4, 150, 3, 1, 1, 1, 12.20),
+('S/N', 'Paño Industrial Suelto Color', 4, 1, 250, 4, 1, 1, NULL, 12.30);
 go
 -- Insertar entrada
 INSERT INTO entrada (fecha) VALUES
@@ -189,14 +235,32 @@ INSERT INTO entrada (fecha) VALUES
 ('2024-03-01'),
 ('2024-04-01'),
 ('2024-05-01');
-
+select * from entrada
 -- Insertar entradaDetalle
-INSERT INTO entradaDetalle (idientrada, idproducto, cantidad) VALUES
+INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES
 (1, 1, 10),
 (2, 2, 20),
 (3, 3, 15),
-(4, 4, 25);
+(4, 4, 25),
+(5, 1, 15);
 go
+-- Insertar entrada
+INSERT INTO salida (fecha) VALUES
+('2024-01-01'),
+('2024-02-01'),
+('2024-03-01'),
+('2024-04-01'),
+('2024-05-01');
+select * from salidaDetalle
+-- Insertar entradaDetalle
+INSERT INTO salidaDetalle(idsalida, idproducto, cantidad) VALUES
+(1, 1, 10),
+(2, 2, 20),
+(3, 3, 15),
+(4, 4, 25),
+(5, 1, 15);
+go
+select * from entradaDetalle
 -- Insertar maquinaria
 INSERT INTO maquinaria (idmarca, descripcion) VALUES
 (1, 'Excavadora'),
@@ -226,25 +290,30 @@ INSERT INTO Requerimiento (fechaRequerimiento, total, critero, idsolicitador, id
 ('2024-04-01', 500.25, 'Normal', 1, 1),
 ('2024-05-01', 1200.60, 'Urgente', 1, 1);
 go
+select * from Requerimiento
+select * from requerimientoDetalle
+select * from producto
 -- Insertar requerimientoDetalle
 INSERT INTO requerimientoDetalle (idrequerimiento, idproducto, cantidad, idproveedor, precioUnitario) VALUES
-(1,1, 10, 1, 25.50),
-(1,2, 20, 2, 30.75),
-(2,3, 15, 3, 45.00),
-(3,4, 15, 3, 45.00),
-(4,4, 25, 4, 12.30);
+(1,2, 10, 1, 25.50),
+(1,3, 20, 2, 30.75),
+(2,4, 15, 3, 45.00),
+(3,1, 15, 3, 45.00),
+(4,1, 25, 4, 12.30);
 go
+
+select * from producto
 -- Seleccionar todos los productos con información de marca, proveedor y almacén (JOIN)
 SELECT 
-    ed.identradaDetalle,
-    ed.idientrada,
+	p.idproducto as CodProducto,
     e.fecha AS fecha_entrada,
-    ed.idproducto,
+    p.descripcion,
     p.partname,
-    ed.cantidad
+    ed.cantidad as CantidadEntrada
 FROM entradaDetalle ed
-JOIN entrada e ON ed.idientrada = e.identrada
-JOIN producto p ON ed.idproducto = p.idproducto;
+JOIN entrada e ON ed.identrada = e.identrada
+JOIN producto p ON ed.idproducto = p.idproducto
+where p.idproducto=1
 go
 -- Seleccionar todas las maquinarias con sus marcas (JOIN)
 SELECT 

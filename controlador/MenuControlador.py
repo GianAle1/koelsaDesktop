@@ -3,12 +3,19 @@ from controlador.ControladorMarca import ControladorMarca
 from controlador.ControladorProveedor import ControladorProveedor
 from controlador.ControladorProducto import ControladorProducto
 from controlador.ControladorAlmacen import ControladorAlmacen
+from controlador.ControladorUso import ControladorUso
+from controlador.ControladorUnidadMedida import ControladorUnidadMedida
+from controlador.ControladorEquipo import ControladorEquipo
 class MenuControlador:
     def __init__(self):
         self.controlador_marca = ControladorMarca()
         self.controlador_proveedor = ControladorProveedor()
         self.controlador_producto = ControladorProducto()
         self.controlador_almacen = ControladorAlmacen()
+        self.controlador_uso = ControladorUso()
+        self.controlador_unidadMedidas = ControladorUnidadMedida()
+        self.controlador_equipo = ControladorEquipo()
+
     def registrar_marca(self, nombre_marca):
         """Método para registrar una nueva marca"""
         # Delegamos el registro al ControladorMarca
@@ -36,9 +43,17 @@ class MenuControlador:
     def listar_almacenes(self):
         """Obtener las marcas a través del controlador de marcas"""
         return self.controlador_almacen.listar_almacenes()  # Delegar la obtención de marcas al controlador de marcas
-    # En VistaProducto.py
+    
+    def listar_usos(self):
+        return self.controlador_uso.listar_usos() 
+    
+    def listar_unidadMedidas(self):
+        return self.controlador_unidadMedidas.listar_unidadMedidas()
+    
+    def listar_equipos(self):
+        return self.controlador_equipo.listar_equipos() 
+    
     def registrar_producto(self, nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo):
-        # Validación (si es necesario)
         if not nombre or not descripcion or not cantidad or not precio:
             return False  # Retorna false si no hay datos válidos
         

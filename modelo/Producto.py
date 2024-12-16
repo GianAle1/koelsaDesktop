@@ -11,7 +11,7 @@ class Producto:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 # Consulta SQL para insertar el producto
-                query = "INSERT INTO producto (partname, descripcion, cantidad, precio, idproveedor, idmarca, idalmacen, undMedida, uso, equipo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                query = "INSERT INTO producto (partname, descripcion, cantidad, precio, idproveedor, idmarca, idalmacen, idunidadMedida, iduso, idequipo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 cursor.execute(query, (nombre, descripcion, cantidad, precio,proveedor_id,marca_id,almacen_id,und_medida,uso,equipo))
                 connection.commit()  # Confirmar los cambios                
                 return True 
