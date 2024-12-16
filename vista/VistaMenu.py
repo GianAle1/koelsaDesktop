@@ -2,7 +2,9 @@ import tkinter as tk
 from vista.VistaUnificadaMarcas import VistaUnificadaMarcas
 from vista.VistaUnificadaProveedores import VistaUnificadaProveedores
 from vista.VistaProducto import VistaProducto 
-from controlador.ControladorProveedor import ControladorProveedor  # I
+from vista.VistaUnificadaAlamacenes import  VistaUnificadaAlamacenes
+#from controlador.ControladorProveedor import ControladorProveedor  # I
+
 class VistaMenu:
     def __init__(self, root, controlador):
         self.root = root
@@ -33,6 +35,11 @@ class VistaMenu:
                                             bg="#2196F3", fg="white", command=self.abrir_ventana_proveedores, relief="flat")
         self.proveedores_button.grid(row=2, column=0, pady=15, padx=10)
 
+        # Botón de gestión de Almacenes
+        self.proveedores_button = tk.Button(self.frame, text="Gestionar Almacenes", width=25, height=2, font=("Arial", 12), 
+                                            bg="#2196F3", fg="white", command=self.abrir_ventana_proveedores, relief="flat")
+        self.proveedores_button.grid(row=2, column=0, pady=15, padx=10)
+        
         # Botón de gestión de Productos
         self.productos_button = tk.Button(self.frame, text="Gestionar Productos", width=25, height=2, font=("Arial", 12), 
                                           bg="#FF5722", fg="white", command=self.abrir_ventana_productos, relief="flat")
@@ -61,7 +68,13 @@ class VistaMenu:
     def abrir_ventana_productos(self):
         ventana_productos = tk.Toplevel(self.root)
         vista_productos = VistaProducto(ventana_productos, self.controlador)  # Crear vista de productos
-        vista_productos.mostrar_producto() 
+        vista_productos.mostrar_producto()
+
+    def abrir_ventana_almacenes(self):
+        ventana_almacenes = tk.Toplevel(self.root)
+        vista_almacenes= VistaUnificadaAlamacenes(ventana_almacenes, self.controlador)  # Crear vista de productos
+        vista_almacenes.mostrar_almacenes() 
+
     def cerrar_sesion(self):
         """Cerrar sesión y volver al login"""
         self.root.withdraw()  # Ocultamos la ventana principal

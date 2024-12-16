@@ -284,8 +284,8 @@ JOIN producto p ON rd.idproducto = p.idproducto
 JOIN proveedor pr ON rd.idproveedor = pr.idproveedor;
 go
 
+select * from producto
 select * from usuario
-
 DELETE FROM marca 
     WHERE idmarca >= 100 
 select * from usuario

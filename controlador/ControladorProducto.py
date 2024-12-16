@@ -5,7 +5,6 @@ class ControladorProducto:
     def __init__(self):
         self.modelo_producto = Producto()
 
-    def registrar_producto(self, partname, descripcion, idmarca, undMedida, cantidad, idproveedor, idalmacen, uso, equipo, precio):
-        """Método para registrar un nuevo producto usando el modelo"""
-        exito = self.modelo_producto.registrar_producto(partname, descripcion, idmarca, undMedida, cantidad, idproveedor, idalmacen, uso, equipo, precio)
-        return exito
+    def registrar_producto(self, nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo):
+        # Llamar al modelo para registrar el producto
+        return self.modelo_producto.registrar_producto(nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo)

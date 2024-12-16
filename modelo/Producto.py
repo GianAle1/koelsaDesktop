@@ -5,19 +5,16 @@ class Producto:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def registrar_producto(self, partname, descripcion, idmarca, undMedida, cantidad, idproveedor, idalmacen, uso, equipo, precio):
-        """Registra un nuevo producto en la base de datos."""
+    def registrar_producto(self, nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = """
-                    INSERT INTO producto (partname, descripcion, idmarca, undMedida, cantidad, idproveedor, idalmacen, uso, equipo, precio)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """
-                cursor.execute(query, (partname, descripcion, idmarca, undMedida, cantidad, idproveedor, idalmacen, uso, equipo, precio))
-                connection.commit()
-                return True  # Retornamos True si el producto se registró correctamente
+                # Consulta SQL para insertar el producto
+                query = "INSERT INTO producto (partname, descripcion, cantidad, precio, idproveedor, idmarca, idalmacen, undMedida, uso, equipo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                cursor.execute(query, (nombre, descripcion, cantidad, precio,proveedor_id,marca_id,almacen_id,und_medida,uso,equipo))
+                connection.commit()  # Confirmar los cambios                
+                return True 
             except Exception as e:
                 print(f"Error al registrar el producto: {e}")
                 self.conexion_db.cerrar_conexion()  # Aseguramos cerrar la conexión

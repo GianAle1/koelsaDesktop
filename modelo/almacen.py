@@ -1,0 +1,65 @@
+# modelo/marca.py
+from modelo.conexion import ConexionDB
+
+class Almacen:
+    def __init__(self):
+        self.conexion_db = ConexionDB()
+
+    def registrar_almacen(self, nombre_almacen,direccion,capacidad):
+        """Registra una nueva almacen en la base de datos."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                query = "INSERT INTO almacen (nombre) VALUES (?)"
+                cursor.execute(query, (nombre_almacen,direccion,capacidad))
+                connection.commit()  # Confirmar los cambios
+                # Ahora, cerrar la conexión después de la operación
+                #self.conexion_db.cerrar_conexion()
+                return True  # Retornamos True si la alamcen se registró correctamente
+            except Exception as e:
+                print(f"Error al registrar la almacen: {e}")
+                self.conexion_db.cerrar_conexion()  # Aseguramos cerrar la conexión
+                return False
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return False
+
+    def listar_almacenes(self):
+        """Obtiene la lista de alamcenes desde la base de datos."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            if cursor:
+                try:
+                    query = "SELECT * FROM almacen"
+                    cursor.execute(query)
+                    almacenes = cursor.fetchall()
+                    return almacenes
+                except Exception as e:
+                    print(f"Error al listar almacen: {e}")
+                    return []
+            else:
+                print("No se pudo obtener el cursor para la consulta.")
+                return []
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return []
+    def eliminar_alamcen(self, id_alamcen):
+        """Elimina una alamcen de la base de datos."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                query = "DELETE FROM almacen WHERE idalmacen = ?"
+                cursor.execute(query, (id_alamcen,))
+                connection.commit()  # Confirmar los cambios
+                # self.conexion_db.cerrar_conexion()  # Cerrar la conexión después de la operación
+                return True  # Retornamos True si la alamcen se eliminó correctamente
+            except Exception as e:
+                print(f"Error al eliminar almacen: {e}")
+                self.conexion_db.cerrar_conexion()  # Aseguramos cerrar la conexión
+                return False
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return False
