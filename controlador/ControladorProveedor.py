@@ -2,17 +2,22 @@
 from modelo.Proveedor import Proveedor
 
 class ControladorProveedor:
-    def __init__(self, conexion_db):
-        self.modelo_proveedor = Proveedor(conexion_db)
+    def __init__(self):
+        self.modelo_proveedor = Proveedor()
 
     def registrar_proveedor(self, nombre, direccion, telefono, correo):
-        """Registra un nuevo proveedor a través del modelo."""
-        return self.modelo_proveedor.registrar_proveedor(nombre, direccion, telefono, correo)
+        """Método para registrar una nueva proveedor usando el modelo"""
+        exito = self.modelo_proveedor.registrar_proveedor(nombre,direccion,telefono,correo)
+        if exito:
+            return self.listar_proveedores()  # Solo retornamos las marcas si la inserción fue exitosa
+        else:
+            return None  # En caso de error, retornamos None
 
     def eliminar_proveedor(self, id_proveedor):
         """Elimina un proveedor a través del modelo."""
         return self.modelo_proveedor.eliminar_proveedor(id_proveedor)
 
-    def obtener_proveedores(self):
-        """Obtiene la lista de proveedores a través del modelo."""
-        return self.modelo_proveedor.obtener_proveedores()
+    def listar_proveedores(self):
+        """Obtiene las marcas del modelo y las pasa a la vista"""
+        return self.modelo_proveedor.listar_proveedores()
+    

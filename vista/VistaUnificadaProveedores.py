@@ -1,4 +1,3 @@
-# vista/VistaUnificadaProveedores.py
 import tkinter as tk
 from tkinter import simpledialog, messagebox, ttk
 
@@ -9,9 +8,10 @@ class VistaUnificadaProveedores:
         self.root.title("Gestión de Proveedores")
         self.root.geometry("800x600")
         self.root.resizable(False, False)
+        self.root.config(bg="#f0f0f0")  # Fondo claro para toda la ventana
 
         # Frame para organizar el contenido
-        self.frame = tk.Frame(self.root)
+        self.frame = tk.Frame(self.root, bg="#f0f0f0")
         self.frame.pack(pady=30)
 
         # Título
@@ -45,6 +45,10 @@ class VistaUnificadaProveedores:
         self.tree.column("Correo", width=150, anchor=tk.W)
         self.tree.grid(row=5, column=0, columnspan=2, pady=10)
 
+    def mostrar_proveedores(self):
+        """Muestra la ventana para gestionar proveedores"""
+        self.root.mainloop()
+
     def registrar_proveedor(self):
         """Método para registrar un nuevo proveedor"""
         nombre = simpledialog.askstring("Registrar Proveedor", "Ingrese el nombre del proveedor:")
@@ -77,13 +81,25 @@ class VistaUnificadaProveedores:
             messagebox.showwarning("Advertencia", "Debe ingresar un ID válido.")
 
     def listar_proveedores(self):
-        """Método para listar los proveedores en la tabla"""
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-        
-        proveedores = self.controlador.obtener_proveedores()
-        for proveedor in proveedores:
-            self.tree.insert("", "end", values=proveedor)
+        """Método para listar todos los proveedor"""
+        proveedores = self.controlador.listar_proveedores()
+        if proveedores:
+            self.actualizar_lista_proveedores(proveedores)
+    
+    def actualizar_lista_proveedores(self, proveedores):
+        """Actualizar la lista de marcas en el Treeview"""
+        # Limpiar las filas de la tabla antes de agregar nuevas
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
+        if proveedores:
+            # Insertar cada marca como una fila en la tabla
+            for index, proveedor in enumerate(proveedores):
+                tag = "oddrow" if index % 2 == 0 else "evenrow"
+                self.tree.insert("", tk.END, values=(proveedor[0], proveedor[1], proveedor[2], proveedor[3], proveedor[4]), tags=(tag,))
+        else:
+            # Si no hay marcas, mostrar un mensaje en la tabla
+            self.tree.insert("", tk.END, values=("No se encontraron marcas", ""), tags=("oddrow",))
 
     def salir(self):
         """Método para cerrar la ventana de proveedores"""

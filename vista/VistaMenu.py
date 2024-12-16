@@ -1,6 +1,8 @@
 import tkinter as tk
 from vista.VistaUnificadaMarcas import VistaUnificadaMarcas
 from vista.VistaUnificadaProveedores import VistaUnificadaProveedores
+from vista.VistaProducto import VistaProducto 
+from controlador.ControladorProveedor import ControladorProveedor  # I
 class VistaMenu:
     def __init__(self, root, controlador):
         self.root = root
@@ -52,15 +54,14 @@ class VistaMenu:
         vista_marcas.mostrar_marcas()
 
     def abrir_ventana_proveedores(self):
-        """Abre la ventana de gestión de proveedores"""
         ventana_proveedores = tk.Toplevel(self.root)
         vista_proveedores = VistaUnificadaProveedores(ventana_proveedores, self.controlador)  # Crear vista de proveedores
-        vista_proveedores.mostrar_proveedores()  # Llamamos al método para mostrar los proveedores
+        vista_proveedores.mostrar_proveedores() # Llamamos al método para mostrar los proveedores
 
     def abrir_ventana_productos(self):
-        """Abre la ventana de gestión de productos"""
-        print("Ventana de Productos (pendiente de implementación)")  # Aquí agregarías la lógica de productos.
-
+        ventana_productos = tk.Toplevel(self.root)
+        vista_productos = VistaProducto(ventana_productos, self.controlador)  # Crear vista de productos
+        vista_productos.mostrar_producto() 
     def cerrar_sesion(self):
         """Cerrar sesión y volver al login"""
         self.root.withdraw()  # Ocultamos la ventana principal

@@ -1,4 +1,3 @@
-
 from modelo.conexion import ConexionDB
 
 class Proveedor:
@@ -22,6 +21,23 @@ class Proveedor:
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return False
+    def listar_proveedores(self):
+        """Obtiene todos los proveedores registrados en la base de datos."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                query = "SELECT * FROM proveedor"
+                cursor.execute(query)
+                proveedores = cursor.fetchall()
+                return proveedores  # Retorna la lista de proveedores
+            except Exception as e:
+                print(f"Error al obtener proveedores: {e}")
+               # self.conexion_db.cerrar_conexion()
+                return []
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return []
 
     def eliminar_proveedor(self, id_proveedor):
         """Elimina un proveedor por ID."""
@@ -40,21 +56,5 @@ class Proveedor:
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return False
-
-    def obtener_proveedores(self):
-        """Obtiene todos los proveedores registrados en la base de datos."""
-        connection = self.conexion_db.conectar()
-        if connection:
-            cursor = self.conexion_db.obtener_cursor()
-            try:
-                query = "SELECT * FROM proveedor"
-                cursor.execute(query)
-                proveedores = cursor.fetchall()
-                return proveedores  # Retorna la lista de proveedores
-            except Exception as e:
-                print(f"Error al obtener proveedores: {e}")
-                self.conexion_db.cerrar_conexion()
-                return []
-        else:
-            print("No se pudo establecer una conexión a la base de datos.")
-            return []
+    
+    
