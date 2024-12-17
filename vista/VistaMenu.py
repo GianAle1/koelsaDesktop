@@ -3,6 +3,7 @@ from vista.VistaUnificadaMarcas import VistaUnificadaMarcas
 from vista.VistaUnificadaProveedores import VistaUnificadaProveedores
 from vista.VistaProducto import VistaProducto 
 from vista.VistaUnificadaAlamacenes import  VistaUnificadaAlamacenes
+#from controlador.ControladorProveedor import ControladorProveedor  # I
 
 class VistaMenu:
     def __init__(self, root, controlador):
@@ -35,7 +36,7 @@ class VistaMenu:
         self.proveedores_button.grid(row=2, column=0, pady=15, padx=10)
 
         # Botón de gestión de Almacenes
-        self.proveedores_button = tk.Button(self.frame, text="Gestionar Proveedores", width=25, height=2, font=("Arial", 12), 
+        self.proveedores_button = tk.Button(self.frame, text="Gestionar Almacenes", width=25, height=2, font=("Arial", 12), 
                                             bg="#2196F3", fg="white", command=self.abrir_ventana_proveedores, relief="flat")
         self.proveedores_button.grid(row=2, column=0, pady=15, padx=10)
         

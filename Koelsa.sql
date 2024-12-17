@@ -245,21 +245,20 @@ INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES
 (5, 1, 15);
 go
 -- Insertar entrada
-INSERT INTO salida (idmaquinaria,fecha,responsable) VALUES
-(1,'2024-01-01','Henrry'),
-(1,'2024-02-01','Alex'),
-(1,'2024-03-01','Henrry'),
-(3,'2024-04-01','Alex'),
-(1,'2024-05-01','Alex');
-
-select * from salida
+INSERT INTO salida (fecha) VALUES
+('2024-01-01'),
+('2024-02-01'),
+('2024-03-01'),
+('2024-04-01'),
+('2024-05-01');
+select * from salidaDetalle
 -- Insertar entradaDetalle
 INSERT INTO salidaDetalle(idsalida, idproducto, cantidad) VALUES
-(6, 1, 5),
-(6, 2, 20),
-(7, 3, 15),
-(8, 4, 25),
-(9, 1, 7);
+(1, 1, 10),
+(2, 2, 20),
+(3, 3, 15),
+(4, 4, 25),
+(5, 1, 15);
 go
 select * from entradaDetalle
 -- Insertar maquinaria
@@ -306,20 +305,15 @@ go
 select * from producto
 -- Seleccionar todos los productos con información de marca, proveedor y almacén (JOIN)
 SELECT 
-    p.idproducto as CodProducto,
+	p.idproducto as CodProducto,
     e.fecha AS fecha_entrada,
     p.descripcion,
     p.partname,
-    ed.cantidad as CantidadEntrada,
-    sd.cantidad as CantidadSalida
-FROM producto p
-LEFT JOIN entradaDetalle ed ON p.idproducto = ed.idproducto
-LEFT JOIN entrada e ON ed.identrada = e.identrada
-LEFT JOIN salidaDetalle sd ON p.idproducto = sd.idproducto
-LEFT JOIN salida s ON sd.idsalida = s.idsalida
-WHERE p.idproducto = 1
-ORDER BY e.fecha, s.fecha;
-
+    ed.cantidad as CantidadEntrada
+FROM entradaDetalle ed
+JOIN entrada e ON ed.identrada = e.identrada
+JOIN producto p ON ed.idproducto = p.idproducto
+where p.idproducto=1
 go
 -- Seleccionar todas las maquinarias con sus marcas (JOIN)
 SELECT 
@@ -344,36 +338,20 @@ go
 select * from  requerimientoDetalle;
 -- Seleccionar todos los detalles de requerimientos (con JOIN para producto y proveedor)
 go
--- Entradas
-SELECT 
-    p.idproducto AS CodProducto,
-    e.fecha AS fecha_transaccion,
-    p.descripcion,
+SELECT
+    rd.idrequerimientoDetalle,
+    rd.idrequerimiento,
+    r.fechaRequerimiento,
     p.partname,
-    ed.cantidad AS cantidad,
-    'Entrada' AS tipo_movimiento
-FROM producto p
-JOIN entradaDetalle ed ON p.idproducto = ed.idproducto
-JOIN entrada e ON ed.identrada = e.identrada
-WHERE p.idproducto = 1
-
-UNION ALL
-
--- Salidas
-SELECT 
-    p.idproducto AS CodProducto,
-    s.fecha AS fecha_transaccion,
-    p.descripcion,
-    p.partname,
-    sd.cantidad AS cantidad,
-    'Salida' AS tipo_movimiento
-FROM producto p
-JOIN salidaDetalle sd ON p.idproducto = sd.idproducto
-JOIN salida s ON sd.idsalida = s.idsalida
-WHERE p.idproducto = 1
-
-ORDER BY fecha_transaccion;
-
+    p.descripcion AS producto,
+    rd.cantidad,
+    pr.nombre AS proveedor,
+    rd.precioUnitario
+FROM requerimientoDetalle rd
+JOIN Requerimiento r ON rd.idrequerimiento = r.idrequerimiento
+JOIN producto p ON rd.idproducto = p.idproducto
+JOIN proveedor pr ON rd.idproveedor = pr.idproveedor;
+go
 
 select * from producto
 select * from usuario
