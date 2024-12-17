@@ -22,7 +22,7 @@ class VistaProducto:
         self.partname_label.grid(row=1, column=0, sticky="w", padx=15, pady=5)
         self.partname_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.partname_entry.grid(row=1, column=1, pady=5)
-
+        
         self.descripcion_label = tk.Label(self.frame, text="Descripción:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.descripcion_label.grid(row=2, column=0, sticky="w", padx=15, pady=5)
         self.descripcion_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
@@ -43,30 +43,40 @@ class VistaProducto:
         self.precio_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.precio_entry.grid(row=5, column=1, pady=5)
 
+        # Las siguientes categorías están bien organizadas
+        self.familia_label = tk.Label(self.frame, text="Familia:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.familia_label.grid(row=6, column=0, sticky="w", padx=15, pady=5)
+        self.familia_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")
+        self.familia_combobox.grid(row=6, column=1, pady=5)
+
         self.proveedor_label = tk.Label(self.frame, text="Proveedor:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.proveedor_label.grid(row=6, column=0, sticky="w", padx=15, pady=5)
+        self.proveedor_label.grid(row=7, column=0, sticky="w", padx=15, pady=5)
         self.proveedor_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.proveedor_combobox.grid(row=6, column=1, pady=5)
+        self.proveedor_combobox.grid(row=7, column=1, pady=5)
 
         self.marca_label = tk.Label(self.frame, text="Marca:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.marca_label.grid(row=7, column=0, sticky="w", padx=15, pady=5)
+        self.marca_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
         self.marca_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.marca_combobox.grid(row=7, column=1, pady=5)
+        self.marca_combobox.grid(row=8, column=1, pady=5)
 
         self.uso_label = tk.Label(self.frame, text="Uso:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.uso_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
+        self.uso_label.grid(row=9, column=0, sticky="w", padx=15, pady=5)
         self.uso_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.uso_combobox.grid(row=8, column=1, pady=5)
+        self.uso_combobox.grid(row=9, column=1, pady=5)
 
         self.equipo_label = tk.Label(self.frame, text="Equipo:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.equipo_label.grid(row=9, column=0, sticky="w", padx=15, pady=5)
+        self.equipo_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
         self.equipo_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.equipo_combobox.grid(row=9, column=1, pady=5)
+        self.equipo_combobox.grid(row=10, column=1, pady=5)
 
         self.almacen_label = tk.Label(self.frame, text="Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.almacen_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
+        self.almacen_label.grid(row=11, column=0, sticky="w", padx=15, pady=5)
         self.almacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.almacen_combobox.grid(row=10, column=1, pady=5)
+        self.almacen_combobox.grid(row=11, column=1, pady=5)
+
+        # Botón de registrar
+        self.registrar_button = tk.Button(self.frame, text="Registrar", font=("Arial", 12), bg="#4CAF50", fg="white", relief="solid", bd=2)
+        self.registrar_button.grid(row=12, column=0, columnspan=2, pady=20)
 
         # Llamar para listar proveedores y marcas
         self.listar_proveedores()
@@ -75,10 +85,8 @@ class VistaProducto:
         self.listar_usos()
         self.listar_unidadMedidas()
         self.listar_equipos()
+        self.listar_familias()
         
-        # Botón para registrar el producto
-        self.registrar_button = tk.Button(self.frame, text="Registrar Producto", font=("Arial", 14), command=self.registrar_producto, bg="#4CAF50", fg="white", relief="raised", bd=4)
-        self.registrar_button.grid(row=11, column=0, columnspan=2, pady=20)
 
     def mostrar_producto(self):
         """Muestra la ventana para gestionar producto"""
@@ -123,6 +131,12 @@ class VistaProducto:
         almacen_nombres = [almacen[1] for almacen in almacenes]
         self.almacen_combobox['values'] = almacen_nombres
         self.almacen_combobox.current(0)
+    def listar_familias(self):
+        """Carga la lista de almacenes en el ComboBox"""
+        familias = self.controlador.listar_familias()
+        familia_nombres = [familia[1] for familia in familias]
+        self.familia_combobox['values'] = familia_nombres
+        self.familia_combobox.current(0)
 
     def registrar_producto(self):
         nombre = self.partname_entry.get()
@@ -134,6 +148,7 @@ class VistaProducto:
         und_medida = self.unidadMedida_combobox.get()  # Unidad de medida
         uso = self.uso_combobox.get()  # Uso
         equipo = self.equipo_combobox.get()  # Equipo
+        familia = self.familia_combobox.get() 
         almacen_seleccionado = self.almacen_combobox.get()  # Almacén seleccionado
 
         # Validación de campos
@@ -149,37 +164,25 @@ class VistaProducto:
             messagebox.showwarning("Advertencia", "La cantidad debe ser un número entero y el precio debe ser un número válido.")
             return
 
-        # Obtener los IDs correspondientes a proveedor, marca, almacén, unidad de medida, uso y equipo
-        proveedores = self.controlador.listar_proveedores()
-        proveedor_id = next((proveedor[0] for proveedor in proveedores if proveedor[1] == proveedor_seleccionado), None)
-        
-        marcas = self.controlador.listar_marcas()
-        marca_id = next((marca[0] for marca in marcas if marca[1] == marca_seleccionada), None)
+        # Obtener los IDs de los elementos seleccionados
+        proveedor_id = self.obtener_id(self.controlador.listar_proveedores(), proveedor_seleccionado)
+        marca_id = self.obtener_id(self.controlador.listar_marcas(), marca_seleccionada)
+        almacen_id = self.obtener_id(self.controlador.listar_almacenes(), almacen_seleccionado)
+        unidad_id = self.obtener_id(self.controlador.listar_unidadMedidas(), und_medida)
+        uso_id = self.obtener_id(self.controlador.listar_usos(), uso)
+        equipo_id = self.obtener_id(self.controlador.listar_equipos(), equipo)
+        familia_id = self.obtener_id(self.controlador.listar_familias(), familia)
 
-        almacenes = self.controlador.listar_almacenes()
-        almacen_id = next((almacen[0] for almacen in almacenes if almacen[1] == almacen_seleccionado), None)
-
-        # Obtener los ID de la unidad de medida
-        unidades = self.controlador.listar_unidadMedidas()
-        unidad_id = next((unidad[0] for unidad in unidades if unidad[1] == und_medida), None)
-
-        # Obtener el ID del uso
-        usos = self.controlador.listar_usos()
-        uso_id = next((uso_item[0] for uso_item in usos if uso_item[1] == uso), None)
-
-        # Obtener el ID del equipo
-        equipos = self.controlador.listar_equipos()
-        equipo_id = next((equipo_item[0] for equipo_item in equipos if equipo_item[1] == equipo), None)
-
-        # Validar que todos los IDs sean encontrados
-        if not all([proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id]):
+        # Validar si todos los IDs son válidos
+        if not all([proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id, familia_id]):
             messagebox.showerror("Error", "Uno o más de los valores seleccionados no son válidos.")
             return
 
-        # Si los IDs son válidos, llamar al controlador para registrar el producto
+        # Llamar al controlador para registrar el producto
         exito = self.controlador.registrar_producto(
-            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id
+            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id, familia_id
         )
+        
         if exito:
             messagebox.showinfo("Éxito", "Producto registrado con éxito.")
         else:
