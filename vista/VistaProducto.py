@@ -69,9 +69,9 @@ class VistaProducto:
         self.almacen_combobox.grid(row=10, column=1, pady=5)
 
         self.familia_label = tk.Label(self.frame, text="Familia:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.familia_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
+        self.familia_label.grid(row=11, column=0, sticky="w", padx=15, pady=5)
         self.familia_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.familia_combobox.grid(row=10, column=1, pady=5)
+        self.familia_combobox.grid(row=11, column=1, pady=5)
 
         self.listar_proveedores()
         self.listar_marcas()
@@ -82,7 +82,7 @@ class VistaProducto:
         self.listar_familias()
 
         self.registrar_button = tk.Button(self.frame, text="Registrar Producto", font=("Arial", 14), command=self.registrar_producto, bg="#4CAF50", fg="white", relief="raised", bd=4)
-        self.registrar_button.grid(row=11, column=0, columnspan=2, pady=20)
+        self.registrar_button.grid(row=12, column=0, columnspan=2, pady=20)
 
     def mostrar_producto(self):
         self.root.mainloop()

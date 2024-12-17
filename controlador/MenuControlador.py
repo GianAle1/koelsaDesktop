@@ -59,4 +59,6 @@ class MenuControlador:
         exito = self.controlador_producto.registrar_producto(nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo,familia)
         return exito
     
+    def listar_productos(self):
+        return self.controlador_producto.listar_productos() 
     
