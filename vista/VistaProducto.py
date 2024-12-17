@@ -68,38 +68,38 @@ class VistaProducto:
         self.almacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
         self.almacen_combobox.grid(row=10, column=1, pady=5)
 
-        # Llamar para listar proveedores y marcas
+        self.familia_label = tk.Label(self.frame, text="Familia:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.familia_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
+        self.familia_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
+        self.familia_combobox.grid(row=10, column=1, pady=5)
+
         self.listar_proveedores()
         self.listar_marcas()
         self.listar_almacenes()
         self.listar_usos()
         self.listar_unidadMedidas()
         self.listar_equipos()
-        
-        # Botón para registrar el producto
+        self.listar_familias()
+
         self.registrar_button = tk.Button(self.frame, text="Registrar Producto", font=("Arial", 14), command=self.registrar_producto, bg="#4CAF50", fg="white", relief="raised", bd=4)
         self.registrar_button.grid(row=11, column=0, columnspan=2, pady=20)
 
     def mostrar_producto(self):
-        """Muestra la ventana para gestionar producto"""
         self.root.mainloop()
 
     def listar_proveedores(self):
-        """Carga la lista de proveedores en el ComboBox"""
         proveedores = self.controlador.listar_proveedores()
         proveedor_nombres = [proveedor[1] for proveedor in proveedores]
         self.proveedor_combobox['values'] = proveedor_nombres
         self.proveedor_combobox.current(0)
 
     def listar_marcas(self):
-        """Carga la lista de marcas en el ComboBox"""
         marcas = self.controlador.listar_marcas()
         marca_nombres = [marca[1] for marca in marcas]
         self.marca_combobox['values'] = marca_nombres
         self.marca_combobox.current(0)
 
     def listar_usos(self):
-        """Carga la lista de marcas en el ComboBox"""
         usos = self.controlador.listar_usos()
         uso_nombres = [uso[1] for uso in usos]
         self.uso_combobox['values'] = uso_nombres
@@ -118,11 +118,16 @@ class VistaProducto:
         self.unidadMedida_combobox.current(0)
 
     def listar_almacenes(self):
-        """Carga la lista de almacenes en el ComboBox"""
         almacenes = self.controlador.listar_almacenes()
         almacen_nombres = [almacen[1] for almacen in almacenes]
         self.almacen_combobox['values'] = almacen_nombres
         self.almacen_combobox.current(0)
+
+    def listar_familias(self):
+        familias = self.controlador.listar_familias()
+        familia_nombres = [familia[1] for familia in familias]
+        self.familia_combobox['values'] = familia_nombres
+        self.familia_combobox.current(0)
 
     def registrar_producto(self):
         nombre = self.partname_entry.get()
@@ -135,9 +140,9 @@ class VistaProducto:
         uso = self.uso_combobox.get()  # Uso
         equipo = self.equipo_combobox.get()  # Equipo
         almacen_seleccionado = self.almacen_combobox.get()  # Almacén seleccionado
-
+        familia_seleccionado = self.familia_combobox.get()
         # Validación de campos
-        if not nombre or not descripcion or not cantidad or not precio or not proveedor_seleccionado or not marca_seleccionada or not und_medida or not uso or not equipo or not almacen_seleccionado:
+        if not nombre or not descripcion or not cantidad or not precio or not proveedor_seleccionado or not marca_seleccionada or not und_medida or not uso or not equipo or not almacen_seleccionado or not familia_seleccionado:
             messagebox.showwarning("Advertencia", "Todos los campos deben ser completados.")
             return
 
@@ -148,8 +153,6 @@ class VistaProducto:
         except ValueError:
             messagebox.showwarning("Advertencia", "La cantidad debe ser un número entero y el precio debe ser un número válido.")
             return
-
-        # Obtener los IDs correspondientes a proveedor, marca, almacén, unidad de medida, uso y equipo
         proveedores = self.controlador.listar_proveedores()
         proveedor_id = next((proveedor[0] for proveedor in proveedores if proveedor[1] == proveedor_seleccionado), None)
         
@@ -159,26 +162,26 @@ class VistaProducto:
         almacenes = self.controlador.listar_almacenes()
         almacen_id = next((almacen[0] for almacen in almacenes if almacen[1] == almacen_seleccionado), None)
 
-        # Obtener los ID de la unidad de medida
         unidades = self.controlador.listar_unidadMedidas()
         unidad_id = next((unidad[0] for unidad in unidades if unidad[1] == und_medida), None)
 
-        # Obtener el ID del uso
         usos = self.controlador.listar_usos()
         uso_id = next((uso_item[0] for uso_item in usos if uso_item[1] == uso), None)
 
-        # Obtener el ID del equipo
         equipos = self.controlador.listar_equipos()
         equipo_id = next((equipo_item[0] for equipo_item in equipos if equipo_item[1] == equipo), None)
 
+        familias = self.controlador.listar_familias()
+        familia_id = next((familia_item[0] for familia_item in familias if familia_item[1] == familia_seleccionado), None)
+
         # Validar que todos los IDs sean encontrados
-        if not all([proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id]):
+        if not all([proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id,familia_id]):
             messagebox.showerror("Error", "Uno o más de los valores seleccionados no son válidos.")
             return
 
         # Si los IDs son válidos, llamar al controlador para registrar el producto
         exito = self.controlador.registrar_producto(
-            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id
+            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id,familia_id
         )
         if exito:
             messagebox.showinfo("Éxito", "Producto registrado con éxito.")
