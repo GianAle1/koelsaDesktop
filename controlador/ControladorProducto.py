@@ -8,3 +8,8 @@ class ControladorProducto:
     def registrar_producto(self, nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo,familia):
         # Llamar al modelo para registrar el producto
         return self.modelo_producto.registrar_producto(nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo,familia)
+
+    def listar_productos(self):
+        """Obtiene las marcas del modelo y las pasa a la vista"""
+        return self.modelo_producto.listar_productos()
+    
