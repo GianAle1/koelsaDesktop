@@ -72,27 +72,38 @@ CREATE TABLE producto (
 );
 go
 
-select * from UnidadMedida
+
 
 select * from producto
 -- Consulta para obtener detalles de los productos
 SELECT 
-    p.idproducto,
-    p.partname,
-    p.descripcion,
-    m.nombre AS marca,            -- Esta tabla debe existir
-    pr.nombre AS proveedor,       -- Esta tabla debe existir
-    a.nombre AS almacen,
-    u.nomUnidad AS UndMedida,
-    p.cantidad
+    p.idproducto AS ID,
+    p.partname AS PartName,
+    p.descripcion AS Descripción,
+    m.nombre AS Marca,
+    pr.nombre AS Proveedor,
+	f.nomfamilia as Familia,
+    u.nomUnidad AS "Unidad de Medida",
+    p.cantidad AS Cantidad,
+    p.precio AS Precio,
+    a.nombre AS Almacén
 FROM producto p
--- Se debe asegurar que las tablas marca y proveedor existan
-LEFT JOIN marca m ON p.idmarca = m.idmarca  -- O INNER JOIN si la tabla existe
-LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor -- O INNER JOIN si la tabla existe
+LEFT JOIN marca m ON p.idmarca = m.idmarca
+LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor
 INNER JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
+INNER JOIN familia  f ON p.idfamilia = f.idfamilia
 INNER JOIN almacen a ON p.idalmacen = a.idalmacen;
 
 go
+select * from usuario 
+select * from familia 
+select * from marca 
+insert into marca(nombre) values ('Solpack')
+select * from proveedor 
+select * from UnidadMedida
+select * FROM  producto
+-- Insertar productos
+
 
 select * from salidaDetalle
 -- Tabla solicitador
@@ -220,14 +231,7 @@ INSERT INTO uso (nomUso) VALUES ('Consumible');
 INSERT INTO uso (nomUso) VALUES ('Comercial');
 INSERT INTO uso (nomUso) VALUES ('Doméstico');
 
--- Insertar productos
-INSERT INTO producto (partname, descripcion, idmarca, idUnidadMedida, cantidad, idproveedor, idalmacen, iduso, idequipo, precio) 
-VALUES
-('20SF1.70', 'STRETCH FILM 20'' x 2 KG', 1, 4, 100, 1, 1, 1, NULL, 3.98),
-('446', 'LOCTITE COD 620 X 50 ML', 2, 4, 200, 2, 1, 1, 1, 13.26),
-('S/N', 'PQTE ,LIJA AL AGUA 180', 3, 4, 150, 3, 1, 1, 1, 12.20),
-('S/N', 'Paño Industrial Suelto Color', 4, 1, 250, 4, 1, 1, NULL, 12.30);
-go
+
 -- Insertar entrada
 INSERT INTO entrada (fecha) VALUES
 ('2024-01-01'),
@@ -353,9 +357,16 @@ JOIN producto p ON rd.idproducto = p.idproducto
 JOIN proveedor pr ON rd.idproveedor = pr.idproveedor;
 go
 
-select * from producto
-select * from usuario
-DELETE FROM marca 
-    WHERE idmarca >= 100 
+select * from usuario;
+go
+INSERT INTO marca (nombre) VALUES
+('Loctite')
+INSERT INTO familia (nomfamilia) VALUES
+('Embalaje')
+select * from familia
+DELETE FROM familia 
+    WHERE idfamilia = 5
 select * from usuario
 DBCC CHECKIDENT ('marca', RESEED, 5);
+UPDATE producto		
+    SET idfamilia = 7 where idproducto=4

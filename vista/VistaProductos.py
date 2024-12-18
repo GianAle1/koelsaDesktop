@@ -10,6 +10,33 @@ class VistaProductos:
         self.root.resizable(False, False)
         self.root.configure(bg="#f4f4f9")
 
+        ##De aca
+        self.titulo_label.pack(fill=tk.X)
+
+        # Frame para Filtros
+        self.frame_filtros = tk.Frame(self.root, bg="#f4f4f9")
+        self.frame_filtros.pack(fill=tk.X, padx=10, pady=5)
+
+        # Filtro por familia
+        tk.Label(self.frame_filtros, text="Filtrar por Familia:", font=("Arial", 12), bg="#f4f4f9").pack(side=tk.LEFT, padx=5)
+        self.familia_combobox = ttk.Combobox(self.frame_filtros, state="readonly", font=("Arial", 12), width=30)
+        self.familia_combobox.pack(side=tk.LEFT, padx=5)
+
+        # Botón para aplicar filtro
+        self.boton_filtrar = tk.Button(
+            self.frame_filtros, text="Filtrar", font=("Arial", 12), bg="#4CAF50", fg="white", command=self.filtrar_por_familia
+        )
+        self.boton_filtrar.pack(side=tk.LEFT, padx=10)
+
+        # Botón para limpiar el filtro
+        self.boton_limpiar = tk.Button(
+            self.frame_filtros, text="Limpiar Filtro", font=("Arial", 12), bg="#f44336", fg="white", command=self.cargar_todos_los_productos
+        )
+        self.boton_limpiar.pack(side=tk.LEFT, padx=5)
+
+
+        ##Hasta aca
+
         # Título estilizado
         self.titulo_label = tk.Label(
             self.root, text="Inventario de Productos", 
@@ -17,7 +44,7 @@ class VistaProductos:
         )
         self.titulo_label.pack(fill=tk.X)
 
-        # Frame contenedor para la tabla
+         # Frame contenedor para la tabla
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
@@ -41,7 +68,7 @@ class VistaProductos:
         # Configurar las columnas (solo Descripción más grande)
         self.tree.column("ID", anchor="center", width=60)
         self.tree.column("Part Name", anchor="center", width=150)
-        self.tree.column("Descripción", anchor="w", width=200)  
+        self.tree.column("Descripción", anchor="w", width=300)  
         self.tree.column("Marca", anchor="center", width=120)
         self.tree.column("Proveedor", anchor="center", width=150)
         self.tree.column("Familia", anchor="center", width=120)
