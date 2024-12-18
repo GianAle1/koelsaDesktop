@@ -8,67 +8,71 @@ class VistaProductos:
         self.root.title("Inventario de Productos")
         self.root.geometry("1400x700")
         self.root.resizable(False, False)
-        self.root.configure(bg="#f4f4f9")
-
-        ##De aca
-        self.titulo_label.pack(fill=tk.X)
-
-        # Frame para Filtros
-        self.frame_filtros = tk.Frame(self.root, bg="#f4f4f9")
-        self.frame_filtros.pack(fill=tk.X, padx=10, pady=5)
-
-        # Filtro por familia
-        tk.Label(self.frame_filtros, text="Filtrar por Familia:", font=("Arial", 12), bg="#f4f4f9").pack(side=tk.LEFT, padx=5)
-        self.familia_combobox = ttk.Combobox(self.frame_filtros, state="readonly", font=("Arial", 12), width=30)
-        self.familia_combobox.pack(side=tk.LEFT, padx=5)
-
-        # Botón para aplicar filtro
-        self.boton_filtrar = tk.Button(
-            self.frame_filtros, text="Filtrar", font=("Arial", 12), bg="#4CAF50", fg="white", command=self.filtrar_por_familia
-        )
-        self.boton_filtrar.pack(side=tk.LEFT, padx=10)
-
-        # Botón para limpiar el filtro
-        self.boton_limpiar = tk.Button(
-            self.frame_filtros, text="Limpiar Filtro", font=("Arial", 12), bg="#f44336", fg="white", command=self.cargar_todos_los_productos
-        )
-        self.boton_limpiar.pack(side=tk.LEFT, padx=5)
-
-
-        ##Hasta aca
+        self.root.configure(bg="#e8f4f8")  # Fondo más claro
 
         # Título estilizado
         self.titulo_label = tk.Label(
-            self.root, text="Inventario de Productos", 
-            font=("Arial", 18, "bold"), bg="#4CAF50", fg="white", pady=10
+            self.root, text="Inventario de Productos",
+            font=("Arial", 18, "bold"), bg="#007ACC", fg="white", pady=10
         )
         self.titulo_label.pack(fill=tk.X)
 
-         # Frame contenedor para la tabla
-        self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
+        # Frame para Filtros
+        self.frame_filtros = tk.Frame(self.root, bg="#e8f4f8")
+        self.frame_filtros.pack(fill=tk.X, padx=10, pady=10)
+
+        # Filtro por familia
+        tk.Label(
+            self.frame_filtros, text="Filtrar por Familia:",
+            font=("Arial", 12, "bold"), bg="#e8f4f8", fg="#333333"
+        ).pack(side=tk.LEFT, padx=5)
+
+        self.familia_combobox = ttk.Combobox(
+            self.frame_filtros, state="readonly",
+            font=("Arial", 12), width=30
+        )
+        self.familia_combobox.pack(side=tk.LEFT, padx=10)
+
+        # Botón de Filtrar
+        self.boton_filtrar = tk.Button(
+            self.frame_filtros, text="Filtrar", font=("Arial", 12, "bold"),
+            bg="#4CAF50", fg="white", command=self.listar_productos,
+            relief="groove", bd=2
+        )
+        self.boton_filtrar.pack(side=tk.LEFT, padx=10)
+
+        # Botón de Restablecer
+        self.boton_resetear = tk.Button(
+            self.frame_filtros, text="Restablecer", font=("Arial", 12, "bold"),
+            bg="#f44336", fg="white", command=self.listar_productos,
+            relief="groove", bd=2
+        )
+        self.boton_resetear.pack(side=tk.LEFT, padx=10)
+
+        # Frame contenedor para la tabla
+        self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="ridge")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         # Configuración de la tabla
-        columnas = ("ID", "Part Name", "Descripción", "Marca", "Proveedor", "Familia",
-                    "Unidad de Medida", "Cantidad", "Precio", "Almacén")
-        self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=24)
+        columnas = (
+            "ID", "Part Name", "Descripción", "Marca", "Proveedor", "Familia",
+            "Unidad de Medida", "Cantidad", "Precio", "Almacén"
+        )
+        self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=20)
+
+        # Estilo de encabezados de la tabla
+        style = ttk.Style()
+        style.configure("Treeview.Heading", font=("Arial", 12, "bold"), foreground="#007ACC")
+        style.configure("Treeview", font=("Arial", 11), rowheight=25)
 
         # Encabezados de la tabla
-        self.tree.heading("ID", text="ID")
-        self.tree.heading("Part Name", text="Part Name")
-        self.tree.heading("Descripción", text="Descripción")
-        self.tree.heading("Marca", text="Marca")
-        self.tree.heading("Proveedor", text="Proveedor")
-        self.tree.heading("Familia", text="Familia")
-        self.tree.heading("Unidad de Medida", text="Unidad de Medida")
-        self.tree.heading("Cantidad", text="Cantidad")
-        self.tree.heading("Precio", text="Precio")
-        self.tree.heading("Almacén", text="Almacén")
+        for col in columnas:
+            self.tree.heading(col, text=col)
 
-        # Configurar las columnas (solo Descripción más grande)
+        # Configurar las columnas
         self.tree.column("ID", anchor="center", width=60)
         self.tree.column("Part Name", anchor="center", width=150)
-        self.tree.column("Descripción", anchor="w", width=300)  
+        self.tree.column("Descripción", anchor="w", width=300)
         self.tree.column("Marca", anchor="center", width=120)
         self.tree.column("Proveedor", anchor="center", width=150)
         self.tree.column("Familia", anchor="center", width=120)
@@ -84,9 +88,11 @@ class VistaProductos:
 
         scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
         scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
-        self.tree.pack(fill=tk.BOTH, expand=True)
+        self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        self.listar_productos()    
+        # Cargar productos
+        self.listar_productos()
+
     def mostrar_inventario(self):
         self.root.mainloop()
 
@@ -100,7 +106,12 @@ class VistaProductos:
             self.tree.delete(row)
         if productos:
             for index, producto in enumerate(productos):
+                # Asegurarse de que los valores sean cadenas y no causen errores
+                valores = tuple(str(valor) if valor is not None else "" for valor in producto)
                 tag = "oddrow" if index % 2 == 0 else "evenrow"
-                self.tree.insert("", tk.END, values=(producto[0], producto[1], producto[2], producto[3], producto[4], producto[5], producto[6], producto[7], producto[8],producto[9]), tags=(tag,))
+                try:
+                    self.tree.insert("", tk.END, values=valores, tags=(tag,))
+                except Exception as e:
+                    print(f"Error insertando el producto en la tabla: {e}")
         else:
-            self.tree.insert("", tk.END, values=("No se encontraron productos", ""), tags=("oddrow",))
+            self.tree.insert("", tk.END, values=("No se encontraron productos",), tags=("oddrow",))

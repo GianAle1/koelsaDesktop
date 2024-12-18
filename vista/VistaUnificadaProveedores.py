@@ -6,41 +6,106 @@ class VistaUnificadaProveedores:
         self.root = root
         self.controlador = controlador
         self.root.title("Gestión de Proveedores")
-        self.root.geometry("800x600")
+        self.root.geometry("900x700")
         self.root.resizable(False, False)
-        self.root.config(bg="#f0f0f0")  
+        self.root.config(bg="#e8f4f8")  # Fondo azul claro
 
-        self.frame = tk.Frame(self.root, bg="#f0f0f0")
-        self.frame.pack(pady=30)
+        # Frame principal
+        self.frame = tk.Frame(self.root, bg="#e8f4f8", pady=20)
+        self.frame.pack(fill=tk.BOTH, expand=True, padx=20)
 
-        
-        self.titulo_label = tk.Label(self.frame, text="Gestión de Proveedores", font=("Arial", 16, "bold"))
-        self.titulo_label.grid(row=0, column=0, columnspan=2, pady=10)
+        # Título estilizado
+        self.titulo_label = tk.Label(
+            self.frame, 
+            text="Gestión de Proveedores", 
+            font=("Arial", 18, "bold"), 
+            bg="#007ACC", 
+            fg="white", 
+            pady=10
+        )
+        self.titulo_label.pack(fill=tk.X, pady=(0, 20))
 
-        self.registrar_proveedor_button = tk.Button(self.frame, text="Registrar Proveedor", width=20, height=2, font=("Arial", 12), command=self.registrar_proveedor)
-        self.registrar_proveedor_button.grid(row=1, column=0, pady=10)
+        # Frame para botones
+        self.frame_botones = tk.Frame(self.frame, bg="#e8f4f8")
+        self.frame_botones.pack(pady=10)
 
-        self.eliminar_proveedor_button = tk.Button(self.frame, text="Eliminar Proveedor", width=20, height=2, font=("Arial", 12), command=self.eliminar_proveedor)
-        self.eliminar_proveedor_button.grid(row=2, column=0, pady=10)
+        # Botones estilizados
+        boton_estilo = {
+            "width": 20,
+            "height": 2,
+            "font": ("Arial", 12),
+            "bg": "#007ACC",
+            "fg": "white",
+            "relief": "groove",
+            "bd": 2
+        }
 
-        self.listar_proveedor_button = tk.Button(self.frame, text="Listar Proveedores", width=20, height=2, font=("Arial", 12), command=self.listar_proveedores)
-        self.listar_proveedor_button.grid(row=3, column=0, pady=10)
+        self.registrar_proveedor_button = tk.Button(
+            self.frame_botones, 
+            text="Registrar Proveedor", 
+            command=self.registrar_proveedor,
+            **boton_estilo
+        )
+        self.registrar_proveedor_button.grid(row=0, column=0, padx=10, pady=10)
 
-        self.salir_button = tk.Button(self.frame, text="Salir", width=20, height=2, font=("Arial", 12), command=self.salir)
-        self.salir_button.grid(row=4, column=0, pady=20)
+        self.eliminar_proveedor_button = tk.Button(
+            self.frame_botones, 
+            text="Eliminar Proveedor", 
+            command=self.eliminar_proveedor,
+            **boton_estilo
+        )
+        self.eliminar_proveedor_button.grid(row=0, column=1, padx=10, pady=10)
 
-        self.tree = ttk.Treeview(self.frame, columns=("ID", "Nombre", "Dirección", "Teléfono", "Correo"), show="headings", height=6)
+        self.listar_proveedor_button = tk.Button(
+            self.frame_botones, 
+            text="Listar Proveedores", 
+            command=self.listar_proveedores,
+            **boton_estilo
+        )
+        self.listar_proveedor_button.grid(row=0, column=2, padx=10, pady=10)
+
+        self.salir_button = tk.Button(
+            self.frame_botones, 
+            text="Salir", 
+            command=self.salir,
+            **boton_estilo
+        )
+        self.salir_button.grid(row=0, column=3, padx=10, pady=10)
+
+        # Frame para la tabla
+        self.frame_tabla = tk.Frame(self.frame, bg="white", bd=2, relief="ridge")
+        self.frame_tabla.pack(fill=tk.BOTH, expand=True, pady=20)
+
+        # Tabla de proveedores
+        self.tree = ttk.Treeview(
+            self.frame_tabla, 
+            columns=("ID", "Nombre", "Dirección", "Teléfono", "Correo"), 
+            show="headings", 
+            height=10
+        )
+
+        # Encabezados
         self.tree.heading("ID", text="Código")
         self.tree.heading("Nombre", text="Nombre")
         self.tree.heading("Dirección", text="Dirección")
         self.tree.heading("Teléfono", text="Teléfono")
         self.tree.heading("Correo", text="Correo")
-        self.tree.column("ID", width=100, anchor=tk.CENTER)
+
+        # Configurar columnas
+        self.tree.column("ID", width=80, anchor=tk.CENTER)
         self.tree.column("Nombre", width=200, anchor=tk.W)
-        self.tree.column("Dirección", width=200, anchor=tk.W)
-        self.tree.column("Teléfono", width=100, anchor=tk.CENTER)
-        self.tree.column("Correo", width=150, anchor=tk.W)
-        self.tree.grid(row=5, column=0, columnspan=2, pady=10)
+        self.tree.column("Dirección", width=250, anchor=tk.W)
+        self.tree.column("Teléfono", width=150, anchor=tk.CENTER)
+        self.tree.column("Correo", width=200, anchor=tk.W)
+
+        # Scrollbars para la tabla
+        scroll_y = ttk.Scrollbar(self.frame_tabla, orient="vertical", command=self.tree.yview)
+        scroll_x = ttk.Scrollbar(self.frame_tabla, orient="horizontal", command=self.tree.xview)
+        self.tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+
+        scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
+        self.tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
     def mostrar_proveedores(self):
         """Muestra la ventana para gestionar proveedores"""
