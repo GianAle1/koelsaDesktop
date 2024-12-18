@@ -55,3 +55,30 @@ class Producto:
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return []
+    
+    def listar_productos_por_familia(self, familia):
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                query = """
+                    SELECT p.idproducto, p.partname, p.descripcion, m.nombre AS Marca,
+                        pr.nombre AS Proveedor, f.nomfamilia AS Familia,
+                        u.nomUnidad AS UnidadMedida, p.cantidad, p.precio, a.nombre AS Almacen
+                    FROM producto p
+                    LEFT JOIN marca m ON p.idmarca = m.idmarca
+                    LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
+                    LEFT JOIN almacen a ON p.idalmacen = a.idalmacen
+                    WHERE f.nomfamilia = ?
+                """
+                cursor.execute(query, (familia,))
+                productos = cursor.fetchall()
+                return productos
+            except Exception as e:
+                print(f"Error al obtener productos por familia: {e}")
+                return []
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return []

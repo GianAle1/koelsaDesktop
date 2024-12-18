@@ -62,3 +62,6 @@ class MenuControlador:
     def listar_productos(self):
         return self.controlador_producto.listar_productos() 
     
+    def listar_productos_por_familia(self, familia):
+        return self.controlador_producto.listar_productos_por_familia(familia)
+    

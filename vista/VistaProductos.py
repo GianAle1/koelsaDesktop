@@ -36,7 +36,7 @@ class VistaProductos:
         # Botón de Filtrar
         self.boton_filtrar = tk.Button(
             self.frame_filtros, text="Filtrar", font=("Arial", 12, "bold"),
-            bg="#4CAF50", fg="white", command=self.listar_productos,
+            bg="#4CAF50", fg="white", command=self.filtrar_por_familia,
             relief="groove", bd=2
         )
         self.boton_filtrar.pack(side=tk.LEFT, padx=10)
@@ -92,7 +92,7 @@ class VistaProductos:
 
         # Cargar productos
         self.listar_productos()
-
+        self.cargar_familias()
     def mostrar_inventario(self):
         self.root.mainloop()
 
@@ -100,6 +100,26 @@ class VistaProductos:
         productos = self.controlador.listar_productos()
         if productos:
             self.actualizar_lista_productos(productos)
+    def cargar_familias(self):
+        """Carga las familias en el ComboBox."""
+        familias = self.controlador.listar_familias()
+        nombres_familias = [familia[1] for familia in familias]  # Suponiendo que el nombre está en el índice 1
+        self.familia_combobox["values"] = nombres_familias
+        if nombres_familias:
+            self.familia_combobox.current(0)
+            
+   
+    def filtrar_por_familia(self):
+        """Filtra los productos por la familia seleccionada."""
+        familia_seleccionada = self.familia_combobox.get()
+        if familia_seleccionada:
+            productos = self.controlador.listar_productos_por_familia(familia_seleccionada)
+            if productos:
+                self.actualizar_lista_productos(productos)
+            else:
+                self.tree.delete(*self.tree.get_children())  # Limpia la tabla si no hay productos
+                self.tree.insert("", tk.END, values=("No se encontraron productos para la familia seleccionada",))
+
 
     def actualizar_lista_productos(self, productos):
         for row in self.tree.get_children():
