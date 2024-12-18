@@ -5,10 +5,10 @@ from controlador.MenuControlador import MenuControlador
 import tkinter as tk
 class LoginControlador:
     def __init__(self, root):
-        # Vista de login y controlador
+   
         self.vista_login = VistaLogin(root, self)
-        self.usuario = Usuario()  # Instancia del modelo Usuario
-        self.menu_ventana = None  # Esto ayudará a evitar crear la ventana de menú varias veces
+        self.usuario = Usuario()  
+        self.menu_ventana = None  
 
     def iniciar_sesion(self, username, password):
         """Método que se llama cuando el usuario intenta iniciar sesión."""

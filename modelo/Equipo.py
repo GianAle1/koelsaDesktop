@@ -1,4 +1,3 @@
-# modelo/marca.py
 from modelo.conexion import ConexionDB
 
 class Equipo:

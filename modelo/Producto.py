@@ -1,4 +1,3 @@
-# modelo/Producto.py
 from modelo.conexion import ConexionDB
 
 class Producto:
