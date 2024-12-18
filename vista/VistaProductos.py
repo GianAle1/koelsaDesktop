@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog, messagebox
+import openpyxl
 
 class VistaProductos:
     def __init__(self, root, controlador):
@@ -48,6 +49,14 @@ class VistaProductos:
             relief="groove", bd=2
         )
         self.boton_resetear.pack(side=tk.LEFT, padx=10)
+
+         # Botón de Exportar
+        self.boton_exportar = tk.Button(
+            self.frame_filtros, text="Exportar a Excel", font=("Arial", 12, "bold"),
+            bg="#007ACC", fg="white", command=self.exportar_a_excel,
+            relief="groove", bd=2
+        )
+        self.boton_exportar.pack(side=tk.LEFT, padx=10)
 
         # Frame contenedor para la tabla
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="ridge")
@@ -135,3 +144,32 @@ class VistaProductos:
                     print(f"Error insertando el producto en la tabla: {e}")
         else:
             self.tree.insert("", tk.END, values=("No se encontraron productos",), tags=("oddrow",))
+    
+    def exportar_a_excel(self):
+        productos = [self.tree.item(child)["values"] for child in self.tree.get_children()]
+        if not productos:
+            messagebox.showwarning("Advertencia", "No hay datos para exportar.")
+            return
+
+        filepath = filedialog.asksaveasfilename(
+            defaultextension=".xlsx",
+            filetypes=[("Archivos de Excel", "*.xlsx")],
+        )
+        if not filepath:
+            return
+
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.title = "Inventario de Productos"
+
+        # Escribir encabezados
+        headers = [col for col in self.tree["columns"]]
+        sheet.append(headers)
+
+        # Escribir datos
+        for producto in productos:
+            sheet.append(producto)
+
+        # Guardar archivo
+        workbook.save(filepath)
+        messagebox.showinfo("Éxito", f"Datos exportados exitosamente a {filepath}")

@@ -16,10 +16,10 @@ class ConexionDB:
                 # Establece la conexión a la base de datos SQL Server
                 self.connection = pyodbc.connect(
                     'DRIVER={ODBC Driver 17 for SQL Server};'
-                    'SERVER=DESKTOP-DG21939;'  # Cambia a tu servidor
-                    'DATABASE=koelsa;'         # Cambia a tu base de datos
-                    'UID=sa;'                  # Cambia al usuario
-                    'PWD=080322'               # Cambia a la contraseña
+                    'SERVER=38.253.136.195,1433;'  
+                    'DATABASE=koelsa;'
+                    'UID=sa;'
+                    'PWD=080322'
                 )
                 self.cursor = self.connection.cursor()
                 print("Conexión exitosa a la base de datos")

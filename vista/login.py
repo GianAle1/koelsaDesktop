@@ -1,6 +1,16 @@
+import os
+import sys
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk  # Usaremos Pillow para redimensionar la imagen
+
+def resource_path(relative_path):
+    """Obtenemos la ruta correcta al recurso dentro del ejecutable"""
+    try:
+        base_path = sys._MEIPASS  # Si el script es empaquetado
+    except Exception:
+        base_path = os.path.abspath(".")  # Si estamos ejecutando desde el código fuente
+    return os.path.join(base_path, relative_path)
 
 class VistaLogin:
     def __init__(self, root, controlador):
@@ -12,7 +22,8 @@ class VistaLogin:
         self.root.config(bg="#f0f0f0")  # Fondo claro
 
         # Cargar y redimensionar la imagen (logo)
-        self.logo = Image.open("vista/imagen/login.png")  # Cargar la imagen usando PIL
+        image_path = resource_path("vista/imagen/login.png")  # Usamos resource_path para obtener la ruta correcta
+        self.logo = Image.open(image_path)  # Cargar la imagen usando PIL
         self.logo = self.logo.resize((150, 150))  # Redimensionamos la imagen
         self.logo = ImageTk.PhotoImage(self.logo)  # Convertimos la imagen para usar en Tkinter
 

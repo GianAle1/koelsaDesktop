@@ -371,7 +371,7 @@ DBCC CHECKIDENT ('marca', RESEED, 5);
 UPDATE producto		
     SET idfamilia = 7 where idproducto=4
 
-	SELECT p.idproducto, p.partname, p.descripcion, m.nombre AS Marca,
+SELECT p.idproducto, p.partname, p.descripcion, m.nombre AS Marca,
                         pr.nombre AS Proveedor, f.nomfamilia AS Familia,
                         u.nomUnidad AS UnidadMedida, p.cantidad, p.precio, a.nombre AS Almacen
                     FROM producto p
@@ -392,3 +392,4 @@ select * from producto
 select * from usuario
 
 SELECT idproducto FROM producto WHERE partname
+

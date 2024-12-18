@@ -57,6 +57,12 @@ class VistaEntrada:
 
         self.tree.pack(fill=tk.BOTH, expand=True)
 
+        # Botón para eliminar producto
+        self.eliminar_button = tk.Button(
+            self.root, text="Eliminar Producto", font=("Arial", 12), bg="#f44336", fg="white", command=self.eliminar_producto
+        )
+        self.eliminar_button.pack(pady=10)
+
         # Botón para guardar la entrada
         self.guardar_button = tk.Button(
             self.root, text="Guardar Entrada", font=("Arial", 12), bg="#4CAF50", fg="white", command=self.guardar_entrada
@@ -73,6 +79,26 @@ class VistaEntrada:
         ventana_entrada = tk.Toplevel(self.root)  # Usa Toplevel para ventanas secundarias
         ventana_entrada = VistaEntrada(ventana_entrada, self.controlador)
 
+    def eliminar_producto(self):
+        # Obtener el producto seleccionado en la tabla
+        selected_item = self.tree.selection()
+        if selected_item:
+            for item in selected_item:
+                # Extraer los valores del producto seleccionado
+                values = self.tree.item(item, "values")
+                producto, cantidad = values[0], int(values[1])
+
+                # Eliminar el producto de la lista temporal
+                self.productos_temporales = [
+                    prod for prod in self.productos_temporales if not (prod[0] == producto and prod[1] == cantidad)
+                ]
+
+                # Eliminar el producto de la tabla visual
+                self.tree.delete(item)
+
+            messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
+        else:
+            messagebox.showwarning("Advertencia", "Debe seleccionar un producto para eliminar.")
 
     def cargar_productos(self):
         productos = self.controlador.listar_productos()
