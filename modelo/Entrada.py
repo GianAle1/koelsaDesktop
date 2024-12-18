@@ -17,15 +17,22 @@ class Entrada:
                 # Obtener el identrada recién generado
                 identrada = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
 
-                # Insertar en la tabla entradaDetalle
+                # Insertar en la tabla entradaDetalle y actualizar la cantidad en producto
                 query_detalle = "INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES (?, ?, ?)"
+                query_actualizar_producto = "UPDATE producto SET cantidad = cantidad + ? WHERE idproducto = ?"
+
                 for producto in productos:
                     # Obtener el idproducto basado en la descripción del producto
                     cursor.execute("SELECT idproducto FROM producto WHERE descripcion = ?", (producto[0],))
                     result = cursor.fetchone()
                     if result:
-                        idproducto = result[0]  # Extraer el ID del resultado
+                        idproducto = result[0]  # Extraer el ID del producto
+
+                        # Insertar en entradaDetalle
                         cursor.execute(query_detalle, (identrada, idproducto, producto[1]))
+
+                        # Actualizar la cantidad en la tabla producto
+                        cursor.execute(query_actualizar_producto, (producto[1], idproducto))
                     else:
                         print(f"Producto no encontrado: {producto[0]}")
                         continue

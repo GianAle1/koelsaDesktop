@@ -370,3 +370,25 @@ select * from usuario
 DBCC CHECKIDENT ('marca', RESEED, 5);
 UPDATE producto		
     SET idfamilia = 7 where idproducto=4
+
+	SELECT p.idproducto, p.partname, p.descripcion, m.nombre AS Marca,
+                        pr.nombre AS Proveedor, f.nomfamilia AS Familia,
+                        u.nomUnidad AS UnidadMedida, p.cantidad, p.precio, a.nombre AS Almacen
+                    FROM producto p
+                    LEFT JOIN marca m ON p.idmarca = m.idmarca
+                    LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
+                    LEFT JOIN almacen a ON p.idalmacen = a.idalmacen
+                    WHERE f.nomfamilia = 'embalaje'
+
+
+select * from entrada
+
+select * from entradaDetalle
+
+select * from producto
+
+select * from usuario
+
+SELECT idproducto FROM producto WHERE partname
