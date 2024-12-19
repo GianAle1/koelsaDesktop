@@ -393,3 +393,4 @@ select * from usuario
 
 SELECT idproducto FROM producto WHERE partname
 
+SELECT DISTINCT local_tcp_port FROM sys.dm_exec_connections WHERE local_tcp_port IS NOT NULL

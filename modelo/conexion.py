@@ -16,7 +16,7 @@ class ConexionDB:
                 # Establece la conexión a la base de datos SQL Server
                 self.connection = pyodbc.connect(
                     'DRIVER={ODBC Driver 17 for SQL Server};'
-                    'SERVER=38.253.136.195,1433;'  
+                    'SERVER=DESKTOP-DG21939;'  
                     'DATABASE=koelsa;'
                     'UID=sa;'
                     'PWD=080322'

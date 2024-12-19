@@ -1,11 +1,12 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox
 from vista.VistaUnificadaMarcas import VistaUnificadaMarcas
 from vista.VistaUnificadaProveedores import VistaUnificadaProveedores
 from vista.VistaProducto import VistaProducto
 from vista.VistaUnificadaAlamacenes import VistaUnificadaAlamacenes
 from vista.VistaProductos import VistaProductos
 from vista.VistaEntrada import VistaEntrada
+
 
 class VistaMenu:
     def __init__(self, root, controlador):
@@ -23,7 +24,7 @@ class VistaMenu:
         )
         self.titulo_label.pack(fill=tk.X)
 
-        # Frame para organizar los botones
+        # Frame para los botones
         self.frame_botones = tk.Frame(self.root, bg="#f4f4f9")
         self.frame_botones.pack(pady=30)
 
@@ -38,55 +39,42 @@ class VistaMenu:
             ("Cerrar Sesión", self.cerrar_sesion, "#f44336"),
         ]
 
-        for index, (texto, comando, color) in enumerate(botones):
+        for texto, comando, color in botones:
             boton = tk.Button(
                 self.frame_botones, text=texto, font=("Arial", 14, "bold"),
                 bg=color, fg="white", command=comando, width=30, height=2, relief="raised"
             )
-            boton.grid(row=index, column=0, pady=10, padx=20)
-
-    def mostrar_menu(self):
-        """Muestra el menú principal, si el login fue exitoso"""
-        self.root.deiconify()
+            boton.pack(pady=10)
 
     def abrir_ventana_marcas(self):
-        """Abre la ventana de gestión de marcas"""
         ventana_marcas = tk.Toplevel(self.root)
         vista_marcas = VistaUnificadaMarcas(ventana_marcas, self.controlador)
         vista_marcas.mostrar_marcas()
 
     def abrir_ventana_proveedores(self):
-        """Abre la ventana de gestión de proveedores"""
         ventana_proveedores = tk.Toplevel(self.root)
         vista_proveedores = VistaUnificadaProveedores(ventana_proveedores, self.controlador)
         vista_proveedores.mostrar_proveedores()
 
     def abrir_ventana_productos(self):
-        """Abre la ventana de gestión de productos"""
         ventana_productos = tk.Toplevel(self.root)
         vista_productos = VistaProducto(ventana_productos, self.controlador)
         vista_productos.mostrar_producto()
 
     def abrir_ventana_inventario(self):
-        """Abre la ventana de gestión de inventario"""
         ventana_inventario = tk.Toplevel(self.root)
         vista_inventario = VistaProductos(ventana_inventario, self.controlador)
         vista_inventario.mostrar_inventario()
 
     def abrir_ventana_almacenes(self):
-        """Abre la ventana de gestión de almacenes"""
         ventana_almacenes = tk.Toplevel(self.root)
         vista_almacenes = VistaUnificadaAlamacenes(ventana_almacenes, self.controlador)
         vista_almacenes.mostrar_almacenes()
 
     def abrir_ventana_entrada_productos(self):
-        """Abre la ventana de entrada de productos"""
         ventana_entrada = tk.Toplevel(self.root)
         vista_entrada = VistaEntrada(ventana_entrada, self.controlador)
-        vista_entrada.guardar_entrada()  # Cambiar a guardar_entrada si es el método correcto
-
 
     def cerrar_sesion(self):
-        """Cerrar sesión y volver al login"""
         self.root.withdraw()
         print("Sesión cerrada, volver al login.")
