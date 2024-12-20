@@ -1,108 +1,125 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox, ttk
+from tkinter.font import Font
 
 class VistaUnificadaMarcas:
     def __init__(self, root, controlador):
         self.root = root
         self.controlador = controlador
         self.root.title("Gestión de Marcas")
-        self.root.geometry("1000x800")
-        self.root.resizable(False, False)
-        self.root.config(bg="#f0f0f0")  # Fondo claro para toda la ventana
+        self.root.geometry("900x700")
+        self.root.resizable(True, True)
+        self.root.config(bg="#ffffff")  # Fondo blanco
 
-        # Frame para organizar el contenido
-        self.frame = tk.Frame(self.root, bg="#f0f0f0")
-        self.frame.pack(pady=30)
+        # Fuentes personalizadas
+        self.titulo_fuente = Font(family="Arial", size=20, weight="bold")
+        self.boton_fuente = Font(family="Arial", size=12, weight="bold")
+
+        # Frame principal
+        self.frame_principal = tk.Frame(self.root, bg="#ffffff", padx=20, pady=20)
+        self.frame_principal.pack(fill=tk.BOTH, expand=True)
 
         # Título
-        self.titulo_label = tk.Label(self.frame, text="Gestión de Marcas", font=("Arial", 18, "bold"), bg="#f0f0f0", fg="#4CAF50")
-        self.titulo_label.grid(row=0, column=0, columnspan=2, pady=20)
+        self.titulo_label = tk.Label(
+            self.frame_principal, text="Gestión de Marcas", font=self.titulo_fuente,
+            bg="#ffffff", fg="#4CAF50", pady=10
+        )
+        self.titulo_label.grid(row=0, column=0, columnspan=2, pady=10, sticky="nsew")
 
-        # Botones de las operaciones CRUD con nuevos estilos
-        self.registrar_marca_button = tk.Button(self.frame, text="Registrar Marca", width=25, height=2, font=("Arial", 12), 
-                                                bg="#4CAF50", fg="white", command=self.registrar_marca, relief="flat")
-        self.registrar_marca_button.grid(row=1, column=0, pady=15, padx=10)
+        # Botones CRUD
+        self.botones_frame = tk.Frame(self.frame_principal, bg="#ffffff")
+        self.botones_frame.grid(row=1, column=0, sticky="nsew", pady=10, padx=10)
 
-        self.eliminar_marca_button = tk.Button(self.frame, text="Eliminar Marca", width=25, height=2, font=("Arial", 12), 
-                                               bg="#FF5722", fg="white", command=self.eliminar_marca, relief="flat")
-        self.eliminar_marca_button.grid(row=2, column=0, pady=15, padx=10)
+        # Lista de botones con íconos
+        botones = [
+            ("🆕 Registrar Marca", self.registrar_marca, "#4CAF50"),
+            ("❌ Eliminar Marca", self.eliminar_marca, "#FF5722"),
+            ("📋 Listar Marcas", self.listar_marcas, "#2196F3"),
+            ("🚪 Salir", self.salir, "#f44336"),
+        ]
 
-        self.listar_marca_button = tk.Button(self.frame, text="Listar Marcas", width=25, height=2, font=("Arial", 12), 
-                                             bg="#2196F3", fg="white", command=self.listar_marcas, relief="flat")
-        self.listar_marca_button.grid(row=3, column=0, pady=15, padx=10)
+        for idx, (texto, comando, color) in enumerate(botones):
+            boton = tk.Button(
+                self.botones_frame, text=texto, font=self.boton_fuente,
+                bg=color, fg="white", width=25, height=2, command=comando, relief="flat", bd=3
+            )
+            boton.grid(row=idx, column=0, pady=5, padx=5, sticky="nsew")
+            # Hover Effect
+            boton.bind("<Enter>", lambda e, btn=boton: btn.config(bg=self._hover_color(color)))
+            boton.bind("<Leave>", lambda e, btn=boton: btn.config(bg=color))
 
-        self.salir_button = tk.Button(self.frame, text="Salir", width=25, height=2, font=("Arial", 12), 
-                                      bg="#f44336", fg="white", command=self.salir, relief="flat")
-        self.salir_button.grid(row=4, column=0, pady=20, padx=10)
+        # Tabla de Marcas
+        self.tabla_frame = tk.Frame(self.frame_principal, bg="#ffffff")
+        self.tabla_frame.grid(row=1, column=1, sticky="nsew", pady=10, padx=10)
 
-        # Treeview para listar marcas con bordes, mejora visual y ancho ajustado
-        self.tree = ttk.Treeview(self.frame, columns=("ID", "Nombre"), show="headings", height=10)
+        self.tree = ttk.Treeview(self.tabla_frame, columns=("ID", "Nombre"), show="headings", height=15)
         self.tree.heading("ID", text="Código")
         self.tree.heading("Nombre", text="Nombre")
         self.tree.column("ID", width=100, anchor=tk.CENTER)
         self.tree.column("Nombre", width=300, anchor=tk.W)
-        self.tree.grid(row=5, column=0, columnspan=2, pady=20)
+        self.tree.pack(fill=tk.BOTH, expand=True)
 
         # Estilo de la tabla
         self.tree.tag_configure("oddrow", background="#f9f9f9")
         self.tree.tag_configure("evenrow", background="#e9e9e9")
 
+        # Expandir frames al redimensionar ventana
+        self.frame_principal.grid_rowconfigure(1, weight=1)
+        self.frame_principal.grid_columnconfigure(1, weight=1)
+
+    def _hover_color(self, color):
+        """Calcula un color más oscuro para el hover."""
+        import colorsys
+        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+        h, l, s = colorsys.rgb_to_hls(r / 255, g / 255, b / 255)
+        l = max(0, l - 0.1)  # Reduce la luminosidad
+        r, g, b = colorsys.hls_to_rgb(h, l, s)
+        return f"#{int(r * 255):02x}{int(g * 255):02x}{int(b * 255):02x}"
+
     def mostrar_marcas(self):
-        """Muestra la ventana para gestionar las marcas"""
+        """Muestra la ventana para gestionar las marcas."""
         self.root.mainloop()
 
     def registrar_marca(self):
-        """Método para registrar una nueva marca"""
-        # Pedir al usuario el nombre de la marca mediante un cuadro de entrada
+        """Método para registrar una nueva marca."""
         nombre_marca = simpledialog.askstring("Registrar Marca", "Ingrese el nombre de la marca:")
-
-        # Validar si el usuario ha proporcionado un nombre
         if nombre_marca:
             marcas = self.controlador.registrar_marca(nombre_marca)
-            if marcas is not None:
+            if marcas:
                 messagebox.showinfo("Éxito", "Marca registrada con éxito!")
-                self.actualizar_lista_marcas(marcas)  # Actualizar la lista después de registrar
+                self.actualizar_lista_marcas(marcas)
             else:
                 messagebox.showerror("Error", "Hubo un problema al registrar la marca.")
         else:
             messagebox.showwarning("Advertencia", "El nombre de la marca no puede estar vacío.")
 
     def eliminar_marca(self):
-        """Método para eliminar una marca"""
-        # Pedir al usuario el ID de la marca a eliminar
+        """Método para eliminar una marca."""
         id_marca = simpledialog.askinteger("Eliminar Marca", "Ingrese el ID de la marca a eliminar:")
-
         if id_marca:
             marcas = self.controlador.eliminar_marca(id_marca)
-            if marcas is not None:
+            if marcas:
                 messagebox.showinfo("Éxito", "Marca eliminada con éxito!")
-                self.actualizar_lista_marcas(marcas)  # Actualizar la lista después de eliminar
+                self.actualizar_lista_marcas(marcas)
             else:
                 messagebox.showerror("Error", "Hubo un problema al eliminar la marca.")
         else:
             messagebox.showwarning("Advertencia", "Debe ingresar un ID válido.")
 
     def listar_marcas(self):
-        """Método para listar todas las marcas"""
+        """Método para listar todas las marcas."""
         marcas = self.controlador.listar_marcas()
-        if marcas:
-            self.actualizar_lista_marcas(marcas)
+        self.actualizar_lista_marcas(marcas)
 
     def actualizar_lista_marcas(self, marcas):
-        """Actualizar la lista de marcas en el Treeview"""
-        # Limpiar las filas de la tabla antes de agregar nuevas
+        """Actualizar la lista de marcas en el Treeview."""
         for row in self.tree.get_children():
             self.tree.delete(row)
-
         if marcas:
-            # Insertar cada marca como una fila en la tabla
             for index, marca in enumerate(marcas):
                 tag = "oddrow" if index % 2 == 0 else "evenrow"
                 self.tree.insert("", tk.END, values=(marca[0], marca[1]), tags=(tag,))
-        else:
-            # Si no hay marcas, mostrar un mensaje en la tabla
-            self.tree.insert("", tk.END, values=("No se encontraron marcas", ""), tags=("oddrow",))
 
     def salir(self):
-        """Método para salir de la aplicación"""
+        """Método para salir de la aplicación."""
         self.root.quit()

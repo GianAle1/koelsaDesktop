@@ -27,7 +27,7 @@ class Proveedor:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "SELECT * FROM proveedor"
+                query = "SELECT idproveedor, nombre,ruc,direccion,telefono, correo FROM proveedor"
                 cursor.execute(query)
                 proveedores = cursor.fetchall()
                 return proveedores  # Retorna la lista de proveedores

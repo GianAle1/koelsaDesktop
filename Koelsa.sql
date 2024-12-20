@@ -35,6 +35,17 @@ CREATE TABLE almacen (
     capacidad INT
 );
 go
+CREATE TABLE almacenDetalle (
+    idalmacenDetalle INT IDENTITY(1,1) PRIMARY KEY,
+    idalmacen int,
+	ubicacion VARCHAR(100) NOT NULL,
+);
+go
+
+ALTER TABLE almacenDetalle
+ADD CONSTRAINT FK_almacenDetalle_almacen
+FOREIGN KEY (idalmacen) REFERENCES almacen(idalmacen);
+go
 CREATE TABLE UnidadMedida (
     idunidadMedida INT IDENTITY(1,1) PRIMARY KEY,
     nomUnidad VARCHAR(15)
@@ -137,17 +148,12 @@ CREATE TABLE entradaDetalle (
 );
 go
 -- Tabla maquinariaMarca
-CREATE TABLE maquinariaMarca (
-    idmaquinariaMarca INT IDENTITY(1,1) PRIMARY KEY,
-    tipo VARCHAR(50),
-    nombre VARCHAR(40)
-);
-go
+
 CREATE TABLE maquinaria (
     idmaquinaria INT IDENTITY(1,1) PRIMARY KEY,
-    idmaquinariaMarca int,
-    idmarca INT,
-    descripcion VARCHAR(50),
+	tIPO varchar(50),
+	Modelo varchar(50)
+    marca VARCHAR(50),
     FOREIGN KEY (idmaquinariaMarca) REFERENCES maquinariaMarca(idmaquinariaMarca)
 );
 go
@@ -383,7 +389,23 @@ SELECT p.idproducto, p.partname, p.descripcion, m.nombre AS Marca,
                     WHERE f.nomfamilia = 'embalaje'
 
 
-select * from entrada
+select * from marca
+INSERT INTO marca (nombre) VALUES
+('Mobil')
+DBCC CHECKIDENT ('marca', RESEED, 5);
+
+SET IDENTITY_INSERT producto ON;
+
+-- Step 2: Delete the row with idproducto = 3
+DELETE FROM producto WHERE idproducto = 3;
+
+-- Step 3: Insert the new row with the desired idproducto value (1002)
+-- Make sure to include all the other necessary column values in the INSERT statement
+INSERT INTO producto (idproducto, other_column1, other_column2) 
+VALUES (1002, 'value1', 'value2');  -- Replace with actual column values
+
+-- Step 4: Disable identity insert to return to default behavior
+SET IDENTITY_INSERT producto OFF;
 
 select * from entradaDetalle
 
@@ -394,3 +416,29 @@ select * from usuario
 SELECT idproducto FROM producto WHERE partname
 
 SELECT DISTINCT local_tcp_port FROM sys.dm_exec_connections WHERE local_tcp_port IS NOT NULL
+
+select * from proveedor
+
+DELETE FROM proveedor WHERE idproveedor = 1002;
+
+DBCC CHECKIDENT ('proveedor', RESEED, 5);
+
+
+select * from usuario
+
+ALTER TABLE proveedor ADD  ruc varchar(11) 
+SELECT idproveedor, nombre,ruc,direccion,telefono, correo FROM proveedor
+
+select * from maquinaria
+
+
+
+INSERT INTO maquinaria (Tipo, Modelo, marca)
+VALUES 
+    ('Excavadora', '330D L', 'Caterpillar'),
+    ('Bulldozer', 'D155AX-8', 'Komatsu'),
+    ('Retroexcavadora', 'L90H', 'Volvo'),
+    ('Grúa', 'LTM 1350-6.1', 'Liebherr'),
+    ('Pala Cargadora', 'ZAXIS 330LC', 'Hitachi');
+
+

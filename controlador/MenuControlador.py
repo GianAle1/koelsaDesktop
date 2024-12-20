@@ -8,6 +8,8 @@ from controlador.ControladorUnidadMedida import ControladorUnidadMedida
 from controlador.ControladorEquipo import ControladorEquipo
 from controlador.ControladorFamilia import ControladorFamilia
 from controlador.ControladorEntrada import ControladorEntrada
+from controlador.ControladorMaquinaria import ControladorMaquinaria
+
 class MenuControlador:
     def __init__(self):
         self.controlador_marca = ControladorMarca()
@@ -19,6 +21,7 @@ class MenuControlador:
         self.controlador_equipo = ControladorEquipo()
         self.controlador_familia = ControladorFamilia()
         self.controlador_entrada = ControladorEntrada()
+        self.controlador_maquinaria = ControladorMaquinaria()
 
     def registrar_marca(self, nombre_marca):
         return self.controlador_marca.registrar_marca(nombre_marca)
@@ -70,3 +73,6 @@ class MenuControlador:
     def guardar_entrada(self, fecha, productos):
         return self.controlador_entrada.guardar_entrada(fecha, productos)
     
+    def listar_maquinarias(self):
+        """Obtiene la lista de maquinarias del modelo."""
+        return self.controlador_maquinaria.listar_maquinarias()
