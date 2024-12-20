@@ -8,7 +8,7 @@ class VistaSalida:
         self.root = root
         self.controlador = controlador
         self.root.title("Registrar Salida de Productos")
-        self.root.geometry("800x600")
+        self.root.geometry("900x600")  # Ajustar el tamaño para más espacio
         self.root.configure(bg="#f4f4f9")
 
         # Título
@@ -81,12 +81,14 @@ class VistaSalida:
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("Producto", "Cantidad")
+        columnas = ("Producto", "Cantidad", "ID Maquinaria")
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=10)
         self.tree.heading("Producto", text="Producto")
         self.tree.heading("Cantidad", text="Cantidad")
+        self.tree.heading("ID Maquinaria", text="ID Maquinaria")
         self.tree.column("Producto", anchor="center", width=300)
         self.tree.column("Cantidad", anchor="center", width=100)
+        self.tree.column("ID Maquinaria", anchor="center", width=150)
         self.tree.pack(fill=tk.BOTH, expand=True)
 
     def cargar_maquinarias(self):
@@ -102,28 +104,35 @@ class VistaSalida:
     def agregar_producto(self):
         producto_seleccionado = self.producto_combobox.get()
         cantidad = self.cantidad_entry.get()
+        maquinaria_seleccionada = self.maquinaria_combobox.get()
 
         if not producto_seleccionado or not cantidad.isdigit() or int(cantidad) <= 0:
             messagebox.showerror("Error", "Debe seleccionar un producto y una cantidad válida.")
             return
 
-        self.productos_temporales.append((producto_seleccionado, int(cantidad)))
+        if not maquinaria_seleccionada:
+            messagebox.showerror("Error", "Debe seleccionar una maquinaria.")
+            return
+
+        idmaquinaria = int(maquinaria_seleccionada.split()[0])  # Suponiendo que el ID está al inicio
+        self.productos_temporales.append((producto_seleccionado, int(cantidad), idmaquinaria))
         self.actualizar_tabla()
 
     def actualizar_tabla(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
-        for producto, cantidad in self.productos_temporales:
-            self.tree.insert("", tk.END, values=(producto, cantidad))
+        for producto, cantidad, idmaquinaria in self.productos_temporales:
+            self.tree.insert("", tk.END, values=(producto, cantidad, idmaquinaria))
 
     def eliminar_producto(self):
         selected_item = self.tree.selection()
         if selected_item:
             for item in selected_item:
                 values = self.tree.item(item, "values")
-                producto, cantidad = values[0], int(values[1])
+                producto, cantidad, idmaquinaria = values[0], int(values[1]), int(values[2])
                 self.productos_temporales = [
-                    prod for prod in self.productos_temporales if not (prod[0] == producto and prod[1] == cantidad)
+                    prod for prod in self.productos_temporales if not (
+                        prod[0] == producto and prod[1] == cantidad and prod[2] == idmaquinaria)
                 ]
                 self.tree.delete(item)
             messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
@@ -133,18 +142,16 @@ class VistaSalida:
     def guardar_salida(self):
         fecha = self.fecha_entry.get()
         responsable = self.responsable_entry.get()
-        maquinaria = self.maquinaria_combobox.get()
 
-        if not maquinaria or not responsable:
-            messagebox.showerror("Error", "Debe seleccionar una maquinaria y un responsable.")
+        if not responsable:
+            messagebox.showerror("Error", "Debe ingresar un responsable.")
             return
 
         if not self.productos_temporales:
             messagebox.showerror("Error", "Debe agregar al menos un producto a la salida.")
             return
 
-        idmaquinaria = int(maquinaria.split()[0])
-        salida_id = self.controlador.guardar_salida(idmaquinaria, fecha, responsable, self.productos_temporales)
+        salida_id = self.controlador.guardar_salida(fecha, responsable, self.productos_temporales)
         if salida_id:
             messagebox.showinfo("Éxito", f"Salida registrada con ID: {salida_id}")
             self.productos_temporales = []

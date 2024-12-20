@@ -1,9 +1,9 @@
-from modelo.Entrada import Entrada
+from modelo.Salida import Salida
 
-class ControladorEntrada:
+class ControladorSalida:
     def __init__(self):
-        self.modelo_entrada = Entrada()
+        self.salida_modelo = Salida() 
 
-    def guardar_salida(self, fecha, productos):
-        """Guarda una entrada y sus detalles en la base de datos"""
-        return self.modelo_entrada.guardar_entrada(fecha, productos)
+    def guardar_salida(self, fecha, responsable, productos_temporales):
+        """Llama al modelo para registrar la salida."""
+        return self.salida_modelo.guardar_salida(fecha, responsable, productos_temporales)

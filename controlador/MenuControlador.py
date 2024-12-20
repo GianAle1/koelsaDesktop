@@ -9,6 +9,9 @@ from controlador.ControladorEquipo import ControladorEquipo
 from controlador.ControladorFamilia import ControladorFamilia
 from controlador.ControladorEntrada import ControladorEntrada
 from controlador.ControladorMaquinaria import ControladorMaquinaria
+from controlador.ControladorSalida import ControladorSalida    # Asegúrate de importar este controlador
+
+
 
 class MenuControlador:
     def __init__(self):
@@ -22,7 +25,7 @@ class MenuControlador:
         self.controlador_familia = ControladorFamilia()
         self.controlador_entrada = ControladorEntrada()
         self.controlador_maquinaria = ControladorMaquinaria()
-
+        self.controlador_salida = ControladorSalida()
     def registrar_marca(self, nombre_marca):
         return self.controlador_marca.registrar_marca(nombre_marca)
 
@@ -76,3 +79,7 @@ class MenuControlador:
     def listar_maquinarias(self):
         """Obtiene la lista de maquinarias del modelo."""
         return self.controlador_maquinaria.listar_maquinarias()
+    
+    def guardar_salida(self, fecha, responsable, productos_temporales):
+        """Llama al controlador de salidas para registrar la salida."""
+        return self.controlador_salida.guardar_salida(fecha, responsable, productos_temporales)
