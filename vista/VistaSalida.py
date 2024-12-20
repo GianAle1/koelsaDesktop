@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import date
 
+
 class VistaSalida:
     def __init__(self, root, controlador):
         self.root = root
@@ -21,39 +22,62 @@ class VistaSalida:
         self.frame_entrada = tk.Frame(self.root, bg="#f4f4f9", padx=10, pady=10)
         self.frame_entrada.pack(fill=tk.X)
 
-        # Fecha
-        tk.Label(self.frame_entrada, text="Fecha:", font=("Arial", 12), bg="#f4f4f9").grid(row=0, column=0, sticky="w", padx=5)
-        self.fecha_entry = tk.Entry(self.frame_entrada, font=("Arial", 12), width=20)
-        self.fecha_entry.grid(row=0, column=1, padx=5)
+        # Inicializar atributos para entradas
+        self.fecha_entry = None
+        self.responsable_entry = None
+        self.maquinaria_combobox = None
+        self.producto_combobox = None
+        self.cantidad_entry = None
+
+        # Crear campos
+        self.fecha_entry = self._crear_campo("Fecha:", 0)
         self.fecha_entry.insert(0, date.today().strftime('%Y-%m-%d'))
-
-        # Responsable
-        tk.Label(self.frame_entrada, text="Responsable:", font=("Arial", 12), bg="#f4f4f9").grid(row=1, column=0, sticky="w", padx=5)
-        self.responsable_entry = tk.Entry(self.frame_entrada, font=("Arial", 12), width=40)
-        self.responsable_entry.grid(row=1, column=1, padx=5)
-
-        # Maquinaria
-        tk.Label(self.frame_entrada, text="Maquinaria:", font=("Arial", 12), bg="#f4f4f9").grid(row=2, column=0, sticky="w", padx=5)
-        self.maquinaria_combobox = ttk.Combobox(self.frame_entrada, font=("Arial", 12), state="readonly", width=40)
-        self.maquinaria_combobox.grid(row=2, column=1, padx=5)
-
-        # Producto
-        tk.Label(self.frame_entrada, text="Producto:", font=("Arial", 12), bg="#f4f4f9").grid(row=3, column=0, sticky="w", padx=5)
-        self.producto_combobox = ttk.Combobox(self.frame_entrada, font=("Arial", 12), state="readonly", width=40)
-        self.producto_combobox.grid(row=3, column=1, padx=5)
-
-        # Cantidad
-        tk.Label(self.frame_entrada, text="Cantidad:", font=("Arial", 12), bg="#f4f4f9").grid(row=4, column=0, sticky="w", padx=5)
-        self.cantidad_entry = tk.Entry(self.frame_entrada, font=("Arial", 12), width=20)
-        self.cantidad_entry.grid(row=4, column=1, padx=5)
+        self.responsable_entry = self._crear_campo("Responsable:", 1)
+        self.maquinaria_combobox = self._crear_combobox("Maquinaria:", 2)
+        self.producto_combobox = self._crear_combobox("Producto:", 3)
+        self.cantidad_entry = self._crear_campo("Cantidad:", 4)
 
         # Botón para agregar a la lista
-        self.agregar_button = tk.Button(
-            self.frame_entrada, text="Agregar Producto", font=("Arial", 12), bg="#4CAF50", fg="white", command=self.agregar_producto
-        )
-        self.agregar_button.grid(row=5, column=1, sticky="e", pady=10)
+        self._crear_boton("Agregar Producto", 5, self.agregar_producto, "#4CAF50")
 
         # Tabla para productos agregados
+        self._crear_tabla()
+
+        # Botón para eliminar producto
+        self._crear_boton("Eliminar Producto", None, self.eliminar_producto, "#f44336", pady=10)
+
+        # Botón para guardar la salida
+        self._crear_boton("Guardar Salida", None, self.guardar_salida, "#4CAF50", pady=10)
+
+        # Inicializar listas y cargar datos
+        self.productos_temporales = []
+        self.cargar_maquinarias()
+        self.cargar_productos()
+
+    def _crear_campo(self, texto, row):
+        """Crea un campo de entrada con una etiqueta."""
+        tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
+        entry_var = tk.Entry(self.frame_entrada, font=("Arial", 12), width=40)
+        entry_var.grid(row=row, column=1, padx=5)
+        return entry_var
+
+    def _crear_combobox(self, texto, row):
+        """Crea un combobox con una etiqueta."""
+        tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
+        combobox = ttk.Combobox(self.frame_entrada, font=("Arial", 12), state="readonly", width=40)
+        combobox.grid(row=row, column=1, padx=5)
+        return combobox
+
+    def _crear_boton(self, texto, row, command, bg_color, pady=0):
+        """Crea un botón."""
+        boton = tk.Button(
+            self.root, text=texto, font=("Arial", 12), bg=bg_color, fg="white", command=command
+        )
+        boton.pack(pady=pady)
+        return boton
+
+    def _crear_tabla(self):
+        """Crea la tabla para los productos agregados."""
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
@@ -65,33 +89,11 @@ class VistaSalida:
         self.tree.column("Cantidad", anchor="center", width=100)
         self.tree.pack(fill=tk.BOTH, expand=True)
 
-        # Botón para eliminar producto
-        self.eliminar_button = tk.Button(
-            self.root, text="Eliminar Producto", font=("Arial", 12), bg="#f44336", fg="white", command=self.eliminar_producto
-        )
-        self.eliminar_button.pack(pady=10)
-
-        # Botón para guardar la salida
-        self.guardar_button = tk.Button(
-            self.root, text="Guardar Salida", font=("Arial", 12), bg="#4CAF50", fg="white", command=self.guardar_salida
-        )
-        self.guardar_button.pack(pady=10)
-
-        # Cargar datos iniciales
-        self.productos_temporales = []
-        self.cargar_maquinarias()
-        self.cargar_productos()
-
-   # vista/VistaSalida.py
     def cargar_maquinarias(self):
-        """Carga las maquinarias en el combobox."""
         maquinarias = self.controlador.listar_maquinarias()
-        if maquinarias:
-            self.maquinaria_combobox['values'] = [
-                f"{maq[0]} - {maq[1]} {maq[2]} ({maq[3]})" for maq in maquinarias
-            ]
-        else:
-            self.maquinaria_combobox['values'] = []
+        self.maquinaria_combobox['values'] = [
+            f"{maq[0]} - {maq[1]} {maq[2]} ({maq[3]})" for maq in maquinarias
+        ] if maquinarias else []
 
     def cargar_productos(self):
         productos = self.controlador.listar_productos()
@@ -111,7 +113,6 @@ class VistaSalida:
     def actualizar_tabla(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
-
         for producto, cantidad in self.productos_temporales:
             self.tree.insert("", tk.END, values=(producto, cantidad))
 
@@ -142,7 +143,7 @@ class VistaSalida:
             messagebox.showerror("Error", "Debe agregar al menos un producto a la salida.")
             return
 
-        idmaquinaria = int(maquinaria.split()[0])  # Suponiendo que el ID está al inicio
+        idmaquinaria = int(maquinaria.split()[0])
         salida_id = self.controlador.guardar_salida(idmaquinaria, fecha, responsable, self.productos_temporales)
         if salida_id:
             messagebox.showinfo("Éxito", f"Salida registrada con ID: {salida_id}")
