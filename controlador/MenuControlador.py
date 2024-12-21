@@ -61,10 +61,10 @@ class MenuControlador:
         return self.controlador_familia.listar_familias() 
     
 
-    def registrar_producto(self, nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo,familia):
+    def registrar_producto(self, nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida,familia):
         if not nombre or not descripcion or not cantidad or not precio:
             return False  
-        exito = self.controlador_producto.registrar_producto(nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida, uso, equipo,familia)
+        exito = self.controlador_producto.registrar_producto(nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida,familia)
         return exito
     
     def listar_productos(self):
@@ -89,3 +89,7 @@ class MenuControlador:
         entradas = self.controlador_entrada.obtener_entradas_por_producto(producto_id)
         salidas = self.controlador_salida.obtener_salidas_por_producto(producto_id)
         return {"entradas": entradas, "salidas": salidas}
+    
+    def listar_subalmacenes(self, almacen_id):
+        """Obtiene los subalmacenes asociados a un almacén específico."""
+        return self.controlador_almacen.listar_subalmacenes(almacen_id) 

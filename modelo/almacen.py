@@ -63,3 +63,25 @@ class Almacen:
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return False
+
+    def obtener_subalmacenes(self, almacen_id):
+        """Obtiene los subalmacenes asociados a un almacén específico."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                query = "SELECT idalmacenDetalle, ubicacion FROM almacenDetalle WHERE idalmacen = ?"
+                cursor.execute(query, (almacen_id,))
+                resultados = cursor.fetchall()
+                if not resultados:
+                    print(f"No se encontraron subalmacenes para el almacén ID: {almacen_id}")
+                return resultados
+            except Exception as e:
+                print(f"Error obteniendo subalmacenes: {e}")
+                return []
+            finally:
+                cursor.close()  # Cerrar el cursor explícitamente
+                #self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo conectar a la base de datos.")
+            return []

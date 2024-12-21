@@ -68,5 +68,5 @@ class Entrada:
             except Exception as e:
                 print(f"Error obteniendo entradas del producto: {e}")
                 return []
-            finally:
-                self.conexion_db.cerrar_conexion()
+            #finally:
+             #   self.conexion_db.cerrar_conexion()

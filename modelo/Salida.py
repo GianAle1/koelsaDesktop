@@ -111,5 +111,5 @@ class Salida:
             except Exception as e:
                 print(f"Error obteniendo salidas del producto: {e}")
                 return []
-            finally:
-                self.conexion_db.cerrar_conexion()
+            #finally:
+                #self.conexion_db.cerrar_conexion()

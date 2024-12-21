@@ -24,3 +24,8 @@ class ControladorAlmacen:
     def listar_almacenes(self):
         """Obtiene las marcas del modelo y las pasa a la vista"""
         return self.almacen_modelo.listar_almacenes()
+    
+    def listar_subalmacenes(self, almacen_id):
+        """Consulta los subalmacenes de un almacén desde el modelo."""
+        return self.almacen_modelo.obtener_subalmacenes(almacen_id)
+

@@ -3,7 +3,7 @@ from controlador.LoginControlador import LoginControlador
 
 def main():
     root = tk.Tk()
-    LoginControlador(root)  # Aquí instanciamos el controlador
+    LoginControlador(root)
     root.mainloop()
 
 if __name__ == "__main__":

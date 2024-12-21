@@ -23,62 +23,60 @@ class VistaProducto:
         self.partname_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.partname_entry.grid(row=1, column=1, pady=5)
 
-        self.descripcion_label = tk.Label(self.frame, text="Descripción:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.descripcion_label.grid(row=2, column=0, sticky="w", padx=15, pady=5)
-        self.descripcion_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
-        self.descripcion_entry.grid(row=2, column=1, pady=5)
-
-        self.undMedida_label = tk.Label(self.frame, text="Unidad de Medida:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.undMedida_label.grid(row=3, column=0, sticky="w", padx=15, pady=5)
-        self.unidadMedida_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.unidadMedida_combobox.grid(row=3, column=1, pady=5)
-
-        self.cantidad_label = tk.Label(self.frame, text="Cantidad:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.cantidad_label.grid(row=4, column=0, sticky="w", padx=15, pady=5)
-        self.cantidad_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
-        self.cantidad_entry.grid(row=4, column=1, pady=5)
-
-        self.precio_label = tk.Label(self.frame, text="Precio:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.precio_label.grid(row=5, column=0, sticky="w", padx=15, pady=5)
-        self.precio_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
-        self.precio_entry.grid(row=5, column=1, pady=5)
-
-        self.proveedor_label = tk.Label(self.frame, text="Proveedor:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.proveedor_label.grid(row=6, column=0, sticky="w", padx=15, pady=5)
-        self.proveedor_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.proveedor_combobox.grid(row=6, column=1, pady=5)
-
         self.marca_label = tk.Label(self.frame, text="Marca:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.marca_label.grid(row=7, column=0, sticky="w", padx=15, pady=5)
+        self.marca_label.grid(row=2, column=0, sticky="w", padx=15, pady=5)
         self.marca_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.marca_combobox.grid(row=7, column=1, pady=5)
-
-        self.uso_label = tk.Label(self.frame, text="Uso:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.uso_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
-        self.uso_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.uso_combobox.grid(row=8, column=1, pady=5)
-
-        self.equipo_label = tk.Label(self.frame, text="Equipo:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.equipo_label.grid(row=9, column=0, sticky="w", padx=15, pady=5)
-        self.equipo_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.equipo_combobox.grid(row=9, column=1, pady=5)
-
-        self.almacen_label = tk.Label(self.frame, text="Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.almacen_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
-        self.almacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.almacen_combobox.grid(row=10, column=1, pady=5)
+        self.marca_combobox.grid(row=2, column=1, pady=5)
 
         self.familia_label = tk.Label(self.frame, text="Familia:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.familia_label.grid(row=11, column=0, sticky="w", padx=15, pady=5)
+        self.familia_label.grid(row=3, column=0, sticky="w", padx=15, pady=5)
         self.familia_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.familia_combobox.grid(row=11, column=1, pady=5)
+        self.familia_combobox.grid(row=3, column=1, pady=5)
 
+        self.descripcion_label = tk.Label(self.frame, text="Descripción:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.descripcion_label.grid(row=4, column=0, sticky="w", padx=15, pady=5)
+        self.descripcion_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
+        self.descripcion_entry.grid(row=4, column=1, pady=5)
+
+        self.undMedida_label = tk.Label(self.frame, text="Unidad de Medida:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.undMedida_label.grid(row=5, column=0, sticky="w", padx=15, pady=5)
+        self.unidadMedida_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
+        self.unidadMedida_combobox.grid(row=5, column=1, pady=5)
+
+        self.cantidad_label = tk.Label(self.frame, text="Cantidad:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.cantidad_label.grid(row=6, column=0, sticky="w", padx=15, pady=5)
+        self.cantidad_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
+        self.cantidad_entry.grid(row=6, column=1, pady=5)
+
+        self.precio_label = tk.Label(self.frame, text="Precio:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.precio_label.grid(row=7, column=0, sticky="w", padx=15, pady=5)
+        self.precio_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
+        self.precio_entry.grid(row=7, column=1, pady=5)
+
+        self.proveedor_label = tk.Label(self.frame, text="Proveedor:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.proveedor_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
+        self.proveedor_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
+        self.proveedor_combobox.grid(row=8, column=1, pady=5)
+
+        # Almacén
+        self.almacen_label = tk.Label(self.frame, text="Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.almacen_label.grid(row=9, column=0, sticky="w", padx=15, pady=5)
+        self.almacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
+        self.almacen_combobox.grid(row=9, column=1, pady=5)
+        self.almacen_combobox.bind("<<ComboboxSelected>>", self.cargar_subalmacenes)  # Vincular evento
+
+        # Sub Almacén
+        self.subalmacen_label = tk.Label(self.frame, text="Sub Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.subalmacen_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
+        self.subalmacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
+        self.subalmacen_combobox.grid(row=10, column=1, pady=5)
+        
         self.listar_proveedores()
         self.listar_marcas()
         self.listar_almacenes()
-        self.listar_usos()
+        #self.listar_usos()
         self.listar_unidadMedidas()
-        self.listar_equipos()
+        #self.listar_equipos()
         self.listar_familias()
 
         self.registrar_button = tk.Button(self.frame, text="Registrar Producto", font=("Arial", 14), command=self.registrar_producto, bg="#4CAF50", fg="white", relief="raised", bd=4)
@@ -99,17 +97,17 @@ class VistaProducto:
         self.marca_combobox['values'] = marca_nombres
         self.marca_combobox.current(0)
 
-    def listar_usos(self):
+    """def listar_usos(self):
         usos = self.controlador.listar_usos()
         uso_nombres = [uso[1] for uso in usos]
         self.uso_combobox['values'] = uso_nombres
-        self.uso_combobox.current(0)
+        self.uso_combobox.current(0)"""
 
-    def listar_equipos(self):
+    """def listar_equipos(self):
         equipos = self.controlador.listar_equipos()
         equipo_nombres = [equipo[1] for equipo in equipos]
         self.equipo_combobox['values'] = equipo_nombres
-        self.equipo_combobox.current(0)
+        self.equipo_combobox.current(0)"""
 
     def listar_unidadMedidas(self):
         unidadMedidas = self.controlador.listar_unidadMedidas()
@@ -137,12 +135,11 @@ class VistaProducto:
         proveedor_seleccionado = self.proveedor_combobox.get()
         marca_seleccionada = self.marca_combobox.get()
         und_medida = self.unidadMedida_combobox.get()  # Unidad de medida
-        uso = self.uso_combobox.get()  # Uso
-        equipo = self.equipo_combobox.get()  # Equipo
         almacen_seleccionado = self.almacen_combobox.get()  # Almacén seleccionado
         familia_seleccionado = self.familia_combobox.get()
+
         # Validación de campos
-        if not nombre or not descripcion or not cantidad or not precio or not proveedor_seleccionado or not marca_seleccionada or not und_medida or not uso or not equipo or not almacen_seleccionado or not familia_seleccionado:
+        if not nombre or not descripcion or not cantidad or not precio or not proveedor_seleccionado or not marca_seleccionada or not und_medida or not almacen_seleccionado or not familia_seleccionado:
             messagebox.showwarning("Advertencia", "Todos los campos deben ser completados.")
             return
 
@@ -153,9 +150,11 @@ class VistaProducto:
         except ValueError:
             messagebox.showwarning("Advertencia", "La cantidad debe ser un número entero y el precio debe ser un número válido.")
             return
+
+        # Obtener IDs de las opciones seleccionadas
         proveedores = self.controlador.listar_proveedores()
         proveedor_id = next((proveedor[0] for proveedor in proveedores if proveedor[1] == proveedor_seleccionado), None)
-        
+
         marcas = self.controlador.listar_marcas()
         marca_id = next((marca[0] for marca in marcas if marca[1] == marca_seleccionada), None)
 
@@ -165,25 +164,48 @@ class VistaProducto:
         unidades = self.controlador.listar_unidadMedidas()
         unidad_id = next((unidad[0] for unidad in unidades if unidad[1] == und_medida), None)
 
-        usos = self.controlador.listar_usos()
-        uso_id = next((uso_item[0] for uso_item in usos if uso_item[1] == uso), None)
-
-        equipos = self.controlador.listar_equipos()
-        equipo_id = next((equipo_item[0] for equipo_item in equipos if equipo_item[1] == equipo), None)
-
         familias = self.controlador.listar_familias()
         familia_id = next((familia_item[0] for familia_item in familias if familia_item[1] == familia_seleccionado), None)
 
         # Validar que todos los IDs sean encontrados
-        if not all([proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id,familia_id]):
+        if not all([proveedor_id, marca_id, almacen_id, unidad_id, familia_id]):
             messagebox.showerror("Error", "Uno o más de los valores seleccionados no son válidos.")
             return
 
-        # Si los IDs son válidos, llamar al controlador para registrar el producto
+        # Llamar al controlador para registrar el producto
         exito = self.controlador.registrar_producto(
-            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, unidad_id, uso_id, equipo_id,familia_id
+            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, unidad_id, familia_id
         )
         if exito:
             messagebox.showinfo("Éxito", "Producto registrado con éxito.")
+            self.limpiar_campos()
         else:
             messagebox.showerror("Error", "Hubo un problema al registrar el producto.")
+
+        # Función para cargar subalmacenes
+    def cargar_subalmacenes(self, event=None):
+        """Carga los subalmacenes asociados al almacén seleccionado."""
+        almacen_seleccionado = self.almacen_combobox.get()
+        if not almacen_seleccionado:
+            self.subalmacen_combobox["values"] = []
+            return
+
+        # Obtener el ID del almacén seleccionado
+        almacenes = self.controlador.listar_almacenes()
+        almacen_id = next((almacen[0] for almacen in almacenes if almacen[1] == almacen_seleccionado), None)
+
+        if almacen_id:
+            # Obtener subalmacenes para el almacén seleccionado
+            subalmacenes = self.controlador.listar_subalmacenes(almacen_id)
+            if subalmacenes:
+                # Asegúrate de que cada subalmacen tiene al menos 2 columnas (ID y Nombre)
+                self.subalmacen_combobox["values"] = [
+                    subalmacen[1] for subalmacen in subalmacenes if len(subalmacen) > 1
+                ]
+                self.subalmacen_combobox.current(0)
+            else:
+                self.subalmacen_combobox["values"] = ["No hay subalmacenes"]
+                self.subalmacen_combobox.current(0)
+        else:
+            self.subalmacen_combobox["values"] = ["No hay subalmacenes"]
+            self.subalmacen_combobox.current(0)
