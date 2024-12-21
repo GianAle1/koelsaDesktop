@@ -7,3 +7,7 @@ class ControladorEntrada:
     def guardar_entrada(self, fecha, productos):
         """Guarda una entrada y sus detalles en la base de datos"""
         return self.modelo_entrada.guardar_entrada(fecha, productos)
+    
+    def obtener_entradas_por_producto(self, producto_id):
+        """Obtiene el historial de entradas para un producto específico."""
+        return self.modelo_entrada.obtener_entradas_por_producto(producto_id)

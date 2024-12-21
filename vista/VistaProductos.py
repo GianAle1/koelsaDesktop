@@ -50,7 +50,7 @@ class VistaProductos:
         )
         self.boton_resetear.pack(side=tk.LEFT, padx=10)
 
-         # Botón de Exportar
+        # Botón de Exportar
         self.boton_exportar = tk.Button(
             self.frame_filtros, text="Exportar a Excel", font=("Arial", 12, "bold"),
             bg="#007ACC", fg="white", command=self.exportar_a_excel,
@@ -99,9 +99,13 @@ class VistaProductos:
         scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
         self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
+        # Evento para seleccionar producto
+        self.tree.bind("<Double-1>", self.mostrar_entradas_salidas)
+
         # Cargar productos
         self.listar_productos()
         self.cargar_familias()
+
     def mostrar_inventario(self):
         self.root.mainloop()
 
@@ -109,42 +113,98 @@ class VistaProductos:
         productos = self.controlador.listar_productos()
         if productos:
             self.actualizar_lista_productos(productos)
-    def cargar_familias(self):
-        """Carga las familias en el ComboBox."""
-        familias = self.controlador.listar_familias()
-        nombres_familias = [familia[1] for familia in familias]  # Suponiendo que el nombre está en el índice 1
-        self.familia_combobox["values"] = nombres_familias
-        if nombres_familias:
-            self.familia_combobox.current(0)
-            
-   
-    def filtrar_por_familia(self):
-        """Filtra los productos por la familia seleccionada."""
-        familia_seleccionada = self.familia_combobox.get()
-        if familia_seleccionada:
-            productos = self.controlador.listar_productos_por_familia(familia_seleccionada)
-            if productos:
-                self.actualizar_lista_productos(productos)
-            else:
-                self.tree.delete(*self.tree.get_children())  # Limpia la tabla si no hay productos
-                self.tree.insert("", tk.END, values=("No se encontraron productos para la familia seleccionada",))
 
+    def cargar_familias(self):
+        familias = self.controlador.listar_familias()
+        self.familia_combobox["values"] = [familia[1] for familia in familias]
+        if familias:
+            self.familia_combobox.current(0)
+
+    def filtrar_por_familia(self):
+        familia_seleccionada = self.familia_combobox.get()
+        productos = self.controlador.listar_productos_por_familia(familia_seleccionada)
+        self.actualizar_lista_productos(productos)
 
     def actualizar_lista_productos(self, productos):
         for row in self.tree.get_children():
             self.tree.delete(row)
-        if productos:
-            for index, producto in enumerate(productos):
-                # Asegurarse de que los valores sean cadenas y no causen errores
-                valores = tuple(str(valor) if valor is not None else "" for valor in producto)
-                tag = "oddrow" if index % 2 == 0 else "evenrow"
-                try:
-                    self.tree.insert("", tk.END, values=valores, tags=(tag,))
-                except Exception as e:
-                    print(f"Error insertando el producto en la tabla: {e}")
+
+        for producto in productos:
+            # Convertir los valores a cadenas y reemplazar comas para evitar conflictos
+            valores = tuple(str(valor).replace(",", " ") if valor is not None else "" for valor in producto)
+
+            try:
+                self.tree.insert("", tk.END, values=valores)
+            except Exception as e:
+                print(f"Error insertando producto: {producto} - {e}")
+
+
+    def mostrar_entradas_salidas(self, event):
+        selected_item = self.tree.selection()
+        if selected_item:
+            producto_id = self.tree.item(selected_item[0])["values"][0]  # ID del producto
+            self.abrir_ventana_entradas_salidas(producto_id)
+
+    def abrir_ventana_entradas_salidas(self, producto_id):
+        """Abre una ventana con el historial de entradas y salidas para un producto."""
+        ventana_historial = tk.Toplevel(self.root)
+        ventana_historial.title("Historial de Entradas y Salidas")
+        ventana_historial.geometry("800x400")
+        ventana_historial.configure(bg="#f4f4f9")
+
+        # Título de la ventana
+        tk.Label(
+            ventana_historial, text="Historial de Entradas y Salidas",
+            font=("Arial", 16, "bold"), bg="#4CAF50", fg="white", pady=10
+        ).pack(fill=tk.X)
+
+        # Crear un frame para la tabla
+        frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
+        frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Crear la tabla
+        columnas = ("Tipo", "Fecha", "Cantidad", "Detalles")
+        tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
+
+        # Encabezados de la tabla
+        for col in columnas:
+            tree.heading(col, text=col)
+            tree.column(col, anchor="center", width=150)
+
+        # Scrollbars
+        scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scroll_y.set)
+        scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Obtener registros
+        registros = self.controlador.obtener_historial_producto(producto_id)
+
+        # Insertar datos en la tabla
+        if registros:
+            entradas = registros["entradas"]
+            salidas = registros["salidas"]
+
+            # Agregar entradas
+            for entrada in entradas:
+                fecha, cantidad = entrada
+                tree.insert("", tk.END, values=("Entrada", fecha, cantidad, "-"))
+
+            # Agregar salidas
+            for salida in salidas:
+                fecha, cantidad, tipo, modelo, marca = salida
+                detalles = f"{tipo} {modelo} {marca}"
+                tree.insert("", tk.END, values=("Salida", fecha, cantidad, detalles))
         else:
-            self.tree.insert("", tk.END, values=("No se encontraron productos",), tags=("oddrow",))
-    
+            tree.insert("", tk.END, values=("No hay datos", "", "", ""))
+
+        # Botón para cerrar la ventana
+        tk.Button(
+            ventana_historial, text="Cerrar", font=("Arial", 12), bg="#f44336", fg="white",
+            command=ventana_historial.destroy
+        ).pack(pady=10)
+
+
     def exportar_a_excel(self):
         productos = [self.tree.item(child)["values"] for child in self.tree.get_children()]
         if not productos:

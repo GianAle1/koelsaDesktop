@@ -50,3 +50,23 @@ class Entrada:
         else:
             print("No se pudo establecer conexión con la base de datos.")
             return False
+
+    def obtener_entradas_por_producto(self, producto_id):
+        """Consulta las entradas asociadas a un producto específico."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = connection.cursor()
+            try:
+                query = """
+                SELECT e.fecha, d.cantidad
+                FROM entradaDetalle d
+                JOIN entrada e ON e.identrada = d.identrada
+                WHERE d.idproducto = ?
+                """
+                cursor.execute(query, (producto_id,))
+                return cursor.fetchall()
+            except Exception as e:
+                print(f"Error obteniendo entradas del producto: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()

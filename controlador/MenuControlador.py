@@ -83,3 +83,9 @@ class MenuControlador:
     def guardar_salida(self, fecha, responsable, productos_temporales):
         """Llama al controlador de salidas para registrar la salida."""
         return self.controlador_salida.guardar_salida(fecha, responsable, productos_temporales)
+    
+    def obtener_historial_producto(self, producto_id):
+        """Obtiene el historial de entradas y salidas para un producto específico."""
+        entradas = self.controlador_entrada.obtener_entradas_por_producto(producto_id)
+        salidas = self.controlador_salida.obtener_salidas_por_producto(producto_id)
+        return {"entradas": entradas, "salidas": salidas}

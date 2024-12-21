@@ -92,3 +92,24 @@ class Salida:
         else:
             print("No se pudo establecer conexión con la base de datos.")
             return []
+    
+    def obtener_salidas_por_producto(self, producto_id):
+        """Consulta las salidas asociadas a un producto específico."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = connection.cursor()
+            try:
+                query = """
+                SELECT s.fecha, sd.cantidad, m.tipo, m.modelo, m.marca
+                FROM salidaDetalle sd
+                JOIN salida s ON s.idsalida = sd.idsalida
+                JOIN maquinaria m ON m.idmaquinaria = sd.idmaquinaria
+                WHERE sd.idproducto = ?
+                """
+                cursor.execute(query, (producto_id,))
+                return cursor.fetchall()
+            except Exception as e:
+                print(f"Error obteniendo salidas del producto: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()

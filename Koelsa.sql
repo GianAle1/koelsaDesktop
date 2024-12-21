@@ -159,10 +159,9 @@ CREATE TABLE maquinaria (
 go
 CREATE TABLE salida (
     idsalida INT IDENTITY(1,1) PRIMARY KEY,
-    idmaquinaria INT,
     fecha DATE,
     responsable VARCHAR(50),
-    FOREIGN KEY (idmaquinaria) REFERENCES maquinaria(idmaquinaria)
+    
 );
 go
 CREATE TABLE salidaDetalle (
@@ -170,8 +169,10 @@ CREATE TABLE salidaDetalle (
     idsalida INT,
     idproducto INT,
     cantidad INT,
+	idmaquinaria INT,
 	FOREIGN KEY (idsalida) REFERENCES salida(idsalida),
-    FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
+    FOREIGN KEY (idproducto) REFERENCES producto(idproducto),
+	FOREIGN KEY (idmaquinaria) REFERENCES maquinaria(idmaquinaria)
 );
 go
 -- Tabla Requerimiento
@@ -429,9 +430,9 @@ select * from usuario
 ALTER TABLE proveedor ADD  ruc varchar(11) 
 SELECT idproveedor, nombre,ruc,direccion,telefono, correo FROM proveedor
 
-select * from maquinaria
+select * from usuario
 
-
+select * from producto
 
 INSERT INTO maquinaria (Tipo, Modelo, marca)
 VALUES 
@@ -441,4 +442,12 @@ VALUES
     ('Grúa', 'LTM 1350-6.1', 'Liebherr'),
     ('Pala Cargadora', 'ZAXIS 330LC', 'Hitachi');
 
+	select * from usuario
 
+
+select * from salida
+select * from salidaDetalle
+
+SELECT e.fecha, d.cantidad
+                FROM entradaDetalle d
+                JOIN entrada e ON e.identrada = d.identrada
