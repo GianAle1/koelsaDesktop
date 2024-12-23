@@ -135,11 +135,11 @@ class VistaProducto:
         proveedor_seleccionado = self.proveedor_combobox.get()
         marca_seleccionada = self.marca_combobox.get()
         und_medida = self.unidadMedida_combobox.get()  # Unidad de medida
-        almacen_seleccionado = self.almacen_combobox.get()  # Almacén seleccionado
         familia_seleccionado = self.familia_combobox.get()
+        subalmacen_seleccionado = self.subalmacen_combobox.get()  # Subalmacén seleccionado
 
         # Validación de campos
-        if not nombre or not descripcion or not cantidad or not precio or not proveedor_seleccionado or not marca_seleccionada or not und_medida or not almacen_seleccionado or not familia_seleccionado:
+        if not nombre or not descripcion or not cantidad or not precio or not proveedor_seleccionado or not marca_seleccionada or not und_medida or not subalmacen_seleccionado or not familia_seleccionado:
             messagebox.showwarning("Advertencia", "Todos los campos deben ser completados.")
             return
 
@@ -158,29 +158,35 @@ class VistaProducto:
         marcas = self.controlador.listar_marcas()
         marca_id = next((marca[0] for marca in marcas if marca[1] == marca_seleccionada), None)
 
-        almacenes = self.controlador.listar_almacenes()
-        almacen_id = next((almacen[0] for almacen in almacenes if almacen[1] == almacen_seleccionado), None)
-
         unidades = self.controlador.listar_unidadMedidas()
         unidad_id = next((unidad[0] for unidad in unidades if unidad[1] == und_medida), None)
 
         familias = self.controlador.listar_familias()
         familia_id = next((familia_item[0] for familia_item in familias if familia_item[1] == familia_seleccionado), None)
 
+        # Obtener subalmacen_id para el subalmacen seleccionado
+        almacen_seleccionado = self.almacen_combobox.get()
+        almacenes = self.controlador.listar_almacenes()
+        almacen_id = next((almacen[0] for almacen in almacenes if almacen[1] == almacen_seleccionado), None)
+
+        subalmacenes = self.controlador.listar_subalmacenes(almacen_id)
+        subalmacen_id = next((subalmacen[0] for subalmacen in subalmacenes if subalmacen[1] == subalmacen_seleccionado), None)
+
         # Validar que todos los IDs sean encontrados
-        if not all([proveedor_id, marca_id, almacen_id, unidad_id, familia_id]):
+        if not all([proveedor_id, marca_id, unidad_id, familia_id, subalmacen_id]):
             messagebox.showerror("Error", "Uno o más de los valores seleccionados no son válidos.")
             return
 
         # Llamar al controlador para registrar el producto
         exito = self.controlador.registrar_producto(
-            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, unidad_id, familia_id
+            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, subalmacen_id, unidad_id, familia_id
         )
         if exito:
             messagebox.showinfo("Éxito", "Producto registrado con éxito.")
             self.limpiar_campos()
         else:
             messagebox.showerror("Error", "Hubo un problema al registrar el producto.")
+
 
         # Función para cargar subalmacenes
     def cargar_subalmacenes(self, event=None):
@@ -198,14 +204,24 @@ class VistaProducto:
             # Obtener subalmacenes para el almacén seleccionado
             subalmacenes = self.controlador.listar_subalmacenes(almacen_id)
             if subalmacenes:
-                # Asegúrate de que cada subalmacen tiene al menos 2 columnas (ID y Nombre)
-                self.subalmacen_combobox["values"] = [
-                    subalmacen[1] for subalmacen in subalmacenes if len(subalmacen) > 1
-                ]
+                self.subalmacen_combobox["values"] = [subalmacen[1] for subalmacen in subalmacenes]
                 self.subalmacen_combobox.current(0)
             else:
                 self.subalmacen_combobox["values"] = ["No hay subalmacenes"]
                 self.subalmacen_combobox.current(0)
         else:
-            self.subalmacen_combobox["values"] = ["No hay subalmacenes"]
+            self.subalmacen_combobox["values"] = ["Seleccione un almacén válido"]
             self.subalmacen_combobox.current(0)
+
+    def limpiar_campos(self):
+        """Limpia todos los campos de entrada después de registrar un producto."""
+        self.partname_entry.delete(0, tk.END)
+        self.descripcion_entry.delete(0, tk.END)
+        self.cantidad_entry.delete(0, tk.END)
+        self.precio_entry.delete(0, tk.END)
+        self.proveedor_combobox.set("")  # Restablecer el ComboBox
+        self.marca_combobox.set("")
+        self.unidadMedida_combobox.set("")
+        self.familia_combobox.set("")
+        self.almacen_combobox.set("")
+        self.subalmacen_combobox.set("")

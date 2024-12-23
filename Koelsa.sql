@@ -70,16 +70,15 @@ CREATE TABLE producto (
     idunidadMedida int,
     cantidad INT,
     idproveedor INT,
-    idalmacen INT,
-    iduso int,
-    idequipo int,
-    precio DECIMAL(10, 2),
+	precio DECIMAL(10, 2),
+	idsmscs int,
+	idfamilia INT,
+    idalmacenDetalle INT,
     FOREIGN KEY (idmarca) REFERENCES marca(idmarca) ON DELETE SET NULL,
-    FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE SET NULL,
-    FOREIGN KEY (idalmacen) REFERENCES almacen(idalmacen) ON DELETE SET NULL,
 	FOREIGN KEY (idUnidadMedida) REFERENCES UnidadMedida(idUnidadMedida) ON DELETE SET NULL,
-    FOREIGN KEY (idUso) REFERENCES Uso(idUso) ON DELETE SET NULL,                 
-    FOREIGN KEY (idEquipo) REFERENCES Equipo(idEquipo) ON DELETE SET NULL  
+    FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE SET NULL,
+	FOREIGN KEY (idfamilia) REFERENCES familia(idfamilia) ON DELETE SET NULL,
+    FOREIGN KEY (idalmacenDetalle) REFERENCES almacenDetalle(idalmacenDetalle) ON DELETE SET NULL
 );
 go
 
@@ -442,7 +441,7 @@ VALUES
     ('Grúa', 'LTM 1350-6.1', 'Liebherr'),
     ('Pala Cargadora', 'ZAXIS 330LC', 'Hitachi');
 
-	select * from usuario
+	select * from producto
 
 
 select * from salida
@@ -451,3 +450,49 @@ select * from salidaDetalle
 SELECT e.fecha, d.cantidad
                 FROM entradaDetalle d
                 JOIN entrada e ON e.identrada = d.identrada
+                WHERE d.idproducto = 1002
+
+SELECT s.fecha, sd.cantidad, m.tipo, m.modelo, m.marca
+                FROM salidaDetalle sd
+                JOIN salida s ON s.idsalida = sd.idsalida
+                JOIN maquinaria m ON m.idmaquinaria = sd.idmaquinaria
+                WHERE sd.idproducto = 1002
+
+Select * from usuario
+
+UPDATE almacen     SET nombre = 'Taller Lima'
+CREATE TABLE almacenDetalle (
+    idalmacenDetalle INT IDENTITY(1,1) PRIMARY KEY,
+    idalmacen int,
+	ubicacion VARCHAR(100) NOT NULL,
+);
+go
+
+INSERT INTO almacen(nombre, direccion, capacidad)
+VALUES 
+    ('Shougang', ' Departamento A', '1000')
+
+INSERT INTO almacen(nombre, direccion, capacidad)
+VALUES 
+    ('Chicama', ' Departamento Chicama', '3000')
+
+select * from almacenDetalle
+
+-- Insertar datos en la tabla almacenDetalle
+INSERT INTO almacenDetalle (idalmacen, ubicacion)
+VALUES 
+(2, 'A1'),
+(2, 'A2'),
+(3, 'A3')
+
+-- Luego agregar la llave foránea:
+ALTER TABLE almacen
+ADD CONSTRAINT fk_almacenDetalle
+FOREIGN KEY (idalmacenDetalle)
+REFERENCES almacenDetalle(idalmacenDetalle);
+
+SELECT * FROM almacen
+
+select * from almacenDetalle
+
+
