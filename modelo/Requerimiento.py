@@ -4,27 +4,44 @@ class Requerimiento:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def registrar_requerimiento(self, fecha, criterio):
+    def registrar_requerimiento(self, fecha, criterio, productos):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                # Usa OUTPUT para obtener el ID insertado
-                query = """
-                    INSERT INTO Requerimiento (fechaRequerimiento, critero, total)
-                    OUTPUT INSERTED.idrequerimiento
-                    VALUES (?, ?, ?)
+                # Insertar en la tabla Requerimiento
+                query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, critero, total) VALUES (?, ?, ?)"
+                cursor.execute(query_requerimiento, (fecha, criterio, 0.0))
+                connection.commit()
+
+                # Obtener el último ID generado
+                id_requerimiento = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
+                print(f"Requerimiento registrado con ID: {id_requerimiento}")
+
+                # Insertar los detalles
+                query_detalle = """
+                    INSERT INTO requerimientoDetalle (
+                        idrequerimiento, idproducto, cantidad, idproveedor, iduso, idalmacen, precioUnitario, precioTotal
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """
-                cursor.execute(query, (fecha, criterio, 0.0))
-                id_requerimiento = cursor.fetchone()[0]  # Recupera el ID directamente
+                for producto in productos:
+                    cursor.execute(query_detalle, (
+                        id_requerimiento,
+                        producto["id_producto"],
+                        producto["cantidad"],
+                        producto["id_proveedor"],
+                        producto["id_uso"],
+                        producto["id_almacen"],
+                        producto["precio_unitario"],
+                        producto["precio_total"]
+                    ))
 
-                print(f"Requerimiento registrado con ID: {id_requerimiento}")  # Debug adicional
-
+                # Confirmar todos los cambios
                 connection.commit()
                 return id_requerimiento
             except Exception as e:
                 print(f"Error al registrar el requerimiento: {e}")
-                connection.rollback()
+                connection.rollback()  # Revertir la transacción si ocurre un error
                 return None
             finally:
                 self.conexion_db.cerrar_conexion()
@@ -32,31 +49,6 @@ class Requerimiento:
             print("No se pudo establecer una conexión a la base de datos.")
             return None
 
-
-
-    def registrar_requerimiento_detalle(self, id_requerimiento, id_producto, cantidad, id_proveedor, id_uso, id_almacen, precio_unitario, precio_total):
-        connection = self.conexion_db.conectar()
-        if connection:
-            cursor = self.conexion_db.obtener_cursor()
-            try:
-                query = """
-                    INSERT INTO requerimientoDetalle (
-                        idrequerimiento, idproducto, cantidad, idproveedor, iduso, idalmacen, precioUnitario, precioTotal
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """
-                cursor.execute(query, (id_requerimiento, id_producto, cantidad, id_proveedor, id_uso, id_almacen, precio_unitario, precio_total))
-                print(f"Detalle registrado para ID Requerimiento: {id_requerimiento}, Producto: {id_producto}")  # Debug adicional
-                connection.commit()
-                return True
-            except Exception as e:
-                print(f"Error al registrar el detalle del requerimiento: {e}")  # Log de error
-                connection.rollback()
-                return False
-            finally:
-                self.conexion_db.cerrar_conexion()
-        else:
-            print("No se pudo establecer una conexión a la base de datos.")
-            return False
     def listar_productos(self):
         connection = self.conexion_db.conectar()
         if connection:
