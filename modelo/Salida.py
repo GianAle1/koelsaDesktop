@@ -4,52 +4,36 @@ class Salida:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def guardar_salida(self, fecha, responsable, productos):
+    def guardar_salida(self, fecha, responsable, productos, observaciones):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 # Insertar en la tabla salida
-                query_salida = "INSERT INTO salida (fecha, responsable) VALUES (?, ?)"
-                cursor.execute(query_salida, (fecha, responsable))
+                query_salida = "INSERT INTO salida (fecha, responsable, observacion) VALUES (?, ?, ?)"
+                cursor.execute(query_salida, (fecha, responsable, observaciones))
                 connection.commit()
 
                 # Obtener el idsalida recién generado
                 idsalida = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
 
-                # Insertar en la tabla salidaDetalle y actualizar el stock en producto
+                # Insertar en la tabla salidaDetalle
                 query_detalle = "INSERT INTO salidaDetalle (idsalida, idproducto, cantidad, idmaquinaria) VALUES (?, ?, ?, ?)"
-                query_actualizar_producto = "UPDATE producto SET cantidad = cantidad - ? WHERE idproducto = ?"
-
                 for producto in productos:
-                    # Obtener el idproducto basado en la descripción del producto
-                    cursor.execute("SELECT idproducto FROM producto WHERE descripcion = ?", (producto[0],))
-                    result = cursor.fetchone()
-                    if result:
-                        idproducto = result[0]  # Extraer el ID del producto
+                    producto_seleccionado, cantidad, idmaquinaria = producto
+                    cursor.execute("SELECT idproducto FROM producto WHERE descripcion = ?", (producto_seleccionado,))
+                    idproducto = cursor.fetchone()[0]
+                    cursor.execute(query_detalle, (idsalida, idproducto, cantidad, idmaquinaria))
 
-                        # Insertar en salidaDetalle
-                        cursor.execute(query_detalle, (idsalida, idproducto, producto[1], producto[2]))
-
-                        # Actualizar el stock en la tabla producto
-                        cursor.execute(query_actualizar_producto, (producto[1], idproducto))
-                    else:
-                        print(f"Producto no encontrado: {producto[0]}")
-                        continue
-
-                # Confirmar todos los cambios
+                # Confirmar cambios
                 connection.commit()
-                print("Salida guardada exitosamente.")
-                return True
+                return idsalida
             except Exception as e:
                 print(f"Error al guardar la salida: {e}")
                 connection.rollback()
-                return False
+                return None
             finally:
                 self.conexion_db.cerrar_conexion()
-        else:
-            print("No se pudo establecer conexión con la base de datos.")
-            return False
 
     def listar_maquinarias(self):
         """

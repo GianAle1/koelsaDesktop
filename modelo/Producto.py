@@ -28,22 +28,24 @@ class Producto:
             try:
                 query = """
             SELECT 
-                p.idproducto AS ID,
-                p.partname AS PartName,
-                p.descripcion AS Descripción,
-                m.nombre AS Marca,
-                pr.nombre AS Proveedor,
-                f.nomfamilia as Familia,
-                u.nomUnidad AS "Unidad de Medida",
-                p.cantidad AS Cantidad,
-                p.precio AS Precio,
-                a.nombre AS Almacén
-            FROM producto p
-            LEFT JOIN marca m ON p.idmarca = m.idmarca
-            LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor
-            INNER JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
-            INNER JOIN familia  f ON p.idfamilia = f.idfamilia
-            INNER JOIN almacen a ON p.idalmacen = a.idalmacen;
+            p.idproducto AS ID,
+            p.partname AS PartName,
+            p.descripcion AS Descripción,
+            m.nombre AS Marca,
+            pr.nombre AS Proveedor,
+            f.nomfamilia AS Familia,
+            u.nomUnidad AS "Unidad de Medida",
+            p.cantidad AS Cantidad,
+            p.precio AS Precio,
+            a.nombre AS Almacen,
+            ad.ubicacion AS Ubicacion
+        FROM producto p
+        LEFT JOIN marca m ON p.idmarca = m.idmarca
+        LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor
+        INNER JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
+        INNER JOIN familia f ON p.idfamilia = f.idfamilia
+        LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle 
+        INNER JOIN almacen a ON a.idalmacen = ad.idalmacen
             """
                 cursor.execute(query)
                 productos = cursor.fetchall()

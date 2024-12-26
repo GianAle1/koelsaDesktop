@@ -7,6 +7,8 @@ from vista.VistaUnificadaAlamacenes import VistaUnificadaAlamacenes
 from vista.VistaProductos import VistaProductos
 from vista.VistaEntrada import VistaEntrada
 from vista.VistaSalida import VistaSalida
+from vista.VistaRequerimiento import VistaRequerimiento
+
 from tkinter.font import Font
 
 
@@ -43,6 +45,7 @@ class VistaMenu:
             ("Gestionar Productos", self.abrir_ventana_productos, "#009688", "🛒"),
             ("Entrada de Productos", self.abrir_ventana_entrada_productos, "#FFC107", "📥"),
             ("Salida de Productos", self.abrir_ventana_salida_productos, "#FF5722", "📤"),
+            ("Gestionar Requerimientos", self.abrir_ventana_requerimientos, "#3F51B5", "📋"),
             ("Cerrar Sesión", self.cerrar_sesion, "#f44336", "🚪"),
         ]
 
@@ -102,6 +105,12 @@ class VistaMenu:
         """Abre la ventana de salida de productos."""
         ventana_salida = tk.Toplevel(self.root)
         vista_salida = VistaSalida(ventana_salida, self.controlador)
+    
+    def abrir_ventana_requerimientos(self):
+        """Abre la ventana de gestión de requerimientos."""
+        ventana_requerimientos = tk.Toplevel(self.root)
+        vista_requerimientos = VistaRequerimiento(ventana_requerimientos, self.controlador)
+        vista_requerimientos.mostrar_requerimiento()
 
     def cerrar_sesion(self):
         self.root.withdraw()

@@ -51,11 +51,7 @@ CREATE TABLE UnidadMedida (
     nomUnidad VARCHAR(15)
 );
 go
-CREATE TABLE equipo (
-    idequipo INT IDENTITY(1,1) PRIMARY KEY,
-    nomEquipo VARCHAR(15)
-);
-go
+
 CREATE TABLE uso (
     iduso INT IDENTITY(1,1) PRIMARY KEY,
     nomUso VARCHAR(15)
@@ -174,31 +170,41 @@ CREATE TABLE salidaDetalle (
 	FOREIGN KEY (idmaquinaria) REFERENCES maquinaria(idmaquinaria)
 );
 go
--- Tabla Requerimiento
+-- Creación de la tabla Requerimiento
 CREATE TABLE Requerimiento (
-    idrequerimiento INT IDENTITY(1,1) PRIMARY KEY,
-    fechaRequerimiento DATE,
-    total DECIMAL(10, 2),
-    critero VARCHAR(50),
-    idsolicitador INT,
-    idsupervisor INT,
-    FOREIGN KEY (idsolicitador) REFERENCES solicitador(idsolicitador),
-    FOREIGN KEY (idsupervisor) REFERENCES supervisor(idsupervisor)
+    idrequerimiento INT IDENTITY(1,1) PRIMARY KEY,      -- Clave primaria auto-incremental
+    fechaRequerimiento DATE,                             -- Fecha del requerimiento
+    total DECIMAL(10, 2),                                -- Total del requerimiento
+    critero VARCHAR(50),                                 -- Descripción o criterio del requerimiento (corrigiendo el nombre a "criterio")
+    idsolicitador INT,                                   -- ID del solicitante
+    idsupervisor INT,                                    -- ID del supervisor
+    FOREIGN KEY (idsolicitador) REFERENCES solicitador(idsolicitador) ON DELETE CASCADE,  -- Relación con la tabla solicitador
+    FOREIGN KEY (idsupervisor) REFERENCES supervisor(idsupervisor) ON DELETE CASCADE  -- Relación con la tabla supervisor
 );
-go
--- Tabla requerimientoDetalle
+GO
+-- Creación de la tabla requerimientoDetalle
 CREATE TABLE requerimientoDetalle (
-    idrequerimientoDetalle INT IDENTITY(1,1) PRIMARY KEY,
-    idrequerimiento INT,
-    idproducto INT,
-    cantidad INT,
-    idproveedor INT,
-    precioUnitario DECIMAL(10, 2),
-    FOREIGN KEY (idproducto) REFERENCES producto(idproducto),
-    FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor),
-    FOREIGN KEY (idrequerimiento) REFERENCES Requerimiento(idrequerimiento)
+    idrequerimientoDetalle INT IDENTITY(1,1) PRIMARY KEY, -- Clave primaria auto-incremental
+    idrequerimiento INT,                                   -- ID del requerimiento asociado
+    idproducto INT,                                        -- ID del producto asociado
+    cantidad INT,                                          -- Cantidad solicitada
+    iduso INT,                                             -- ID de uso asociado
+    idproveedor INT,                                       -- ID del proveedor
+    idmaquinaria INT,                                      -- ID de maquinaria asociada
+    idalmacen INT,                                         -- ID del almacén
+    precioUnitario DECIMAL(10, 2),                         -- Precio unitario
+    precioTotal DECIMAL(10, 2),                  -- Precio total calculado (cantidad * precioUnitario) y persistido
+    FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE, -- Relación con producto
+    FOREIGN KEY (iduso) REFERENCES uso(iduso) ON DELETE CASCADE,             -- Relación con uso
+    FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE CASCADE, -- Relación con proveedor
+    FOREIGN KEY (idalmacen) REFERENCES Almacen(idalmacen) ON DELETE CASCADE,     -- Relación con almacén
+    FOREIGN KEY (idrequerimiento) REFERENCES Requerimiento(idrequerimiento) ON DELETE CASCADE -- Relación con requerimiento
 );
-go
+GO
+
+select * from usuario
+
+
 -- Insertar usuarios
 INSERT INTO usuario (nombre, apellidos, correo, contraseña) VALUES
 ('Gian', 'Alejandro', 'gian.alejandro@koelsa.com', '123');
@@ -228,11 +234,6 @@ INSERT INTO UnidadMedida (nomUnidad) VALUES ('Metro');
 INSERT INTO UnidadMedida (nomUnidad) VALUES ('Cilindro');
 INSERT INTO UnidadMedida (nomUnidad) VALUES ('Und');
 
-INSERT INTO equipo (nomEquipo) VALUES ('Equipos');
-INSERT INTO equipo (nomEquipo) VALUES ('Personal');
-INSERT INTO equipo (nomEquipo) VALUES ('Oficina');
-INSERT INTO equipo (nomEquipo) VALUES ('Excavadora');
-INSERT INTO equipo (nomEquipo) VALUES ('Limpieza');
 INSERT INTO uso (nomUso) VALUES ('Consumible');
 INSERT INTO uso (nomUso) VALUES ('Comercial');
 INSERT INTO uso (nomUso) VALUES ('Doméstico');
@@ -491,8 +492,46 @@ ADD CONSTRAINT fk_almacenDetalle
 FOREIGN KEY (idalmacenDetalle)
 REFERENCES almacenDetalle(idalmacenDetalle);
 
-SELECT * FROM almacen
+SELECT * FROM usuario
 
-select * from almacenDetalle
+SELECT * FROM salida
+
+select * from salidaDetalle
 
 
+ALTER TABLE salida
+ADD observacion VARCHAR(200);
+
+select * from producto
+	SELECT 
+		p.idproducto AS ID,
+		p.partname AS PartName,
+		p.descripcion AS Descripción,
+		m.nombre AS Marca,
+		pr.nombre AS Proveedor,
+		f.nomfamilia AS Familia,
+		u.nomUnidad AS "Unidad de Medida",
+		p.cantidad AS Cantidad,
+		p.precio AS Precio,
+		a.nombre AS Almacen,
+		ad.ubicacion AS Ubicacion
+	FROM producto p
+	LEFT JOIN marca m ON p.idmarca = m.idmarca
+	LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor
+	INNER JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
+	INNER JOIN familia f ON p.idfamilia = f.idfamilia
+	LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle 
+	INNER JOIN almacen a ON a.idalmacen = ad.idalmacen  
+
+
+select * from usuario
+
+Select * from producto
+
+Select * from salidaDetalle
+
+
+UPDATE salida SET observacion = 'Sin OBSERVACION' where observacion is null
+
+
+s

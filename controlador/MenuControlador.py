@@ -10,8 +10,7 @@ from controlador.ControladorFamilia import ControladorFamilia
 from controlador.ControladorEntrada import ControladorEntrada
 from controlador.ControladorMaquinaria import ControladorMaquinaria
 from controlador.ControladorSalida import ControladorSalida    # Asegúrate de importar este controlador
-
-
+from controlador.ControladorRequerimiento import ControladorRequerimiento    # Asegúrate de importar este controlador
 
 class MenuControlador:
     def __init__(self):
@@ -26,6 +25,7 @@ class MenuControlador:
         self.controlador_entrada = ControladorEntrada()
         self.controlador_maquinaria = ControladorMaquinaria()
         self.controlador_salida = ControladorSalida()
+        self.controlador_requerimiento = ControladorRequerimiento()
     def registrar_marca(self, nombre_marca):
         return self.controlador_marca.registrar_marca(nombre_marca)
 
@@ -80,9 +80,9 @@ class MenuControlador:
         """Obtiene la lista de maquinarias del modelo."""
         return self.controlador_maquinaria.listar_maquinarias()
     
-    def guardar_salida(self, fecha, responsable, productos_temporales):
+    def guardar_salida(self, fecha, responsable, productos_temporales,observaciones):
         """Llama al controlador de salidas para registrar la salida."""
-        return self.controlador_salida.guardar_salida(fecha, responsable, productos_temporales)
+        return self.controlador_salida.guardar_salida(fecha, responsable, productos_temporales,observaciones)
     
     def obtener_historial_producto(self, producto_id):
         """Obtiene el historial de entradas y salidas para un producto específico."""
@@ -92,4 +92,9 @@ class MenuControlador:
     
     def listar_subalmacenes(self, almacen_id):
         """Obtiene los subalmacenes asociados a un almacén específico."""
-        return self.controlador_almacen.listar_subalmacenes(almacen_id) 
+        return self.controlador_almacen.listar_subalmacenes(almacen_id)
+    
+    def guardar_requerimiento(self, fecha, criterio, productos):
+        return self.controlador_requerimiento.guardar_requerimiento(fecha, criterio, productos)
+
+    
