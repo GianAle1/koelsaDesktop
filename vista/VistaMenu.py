@@ -8,7 +8,7 @@ from vista.VistaProductos import VistaProductos
 from vista.VistaEntrada import VistaEntrada
 from vista.VistaSalida import VistaSalida
 from vista.VistaRequerimiento import VistaRequerimiento
-
+from vista.VistaRequerimientos import VistaRequerimientos
 from tkinter.font import Font
 
 
@@ -45,7 +45,8 @@ class VistaMenu:
             ("Gestionar Productos", self.abrir_ventana_productos, "#009688", "🛒"),
             ("Entrada de Productos", self.abrir_ventana_entrada_productos, "#FFC107", "📥"),
             ("Salida de Productos", self.abrir_ventana_salida_productos, "#FF5722", "📤"),
-            ("Gestionar Requerimientos", self.abrir_ventana_requerimientos, "#3F51B5", "📋"),
+            ("Gestionar Requerimientos", self.abrir_ventana_requerimiento, "#3F51B5", "📋"),
+            ("Listar Requerimientos", self.abrir_ventana_requerimientos, "#007ACC", "📃"),
             ("Cerrar Sesión", self.cerrar_sesion, "#f44336", "🚪"),
         ]
 
@@ -106,11 +107,17 @@ class VistaMenu:
         ventana_salida = tk.Toplevel(self.root)
         vista_salida = VistaSalida(ventana_salida, self.controlador)
     
-    def abrir_ventana_requerimientos(self):
+    def abrir_ventana_requerimiento(self):
         """Abre la ventana de gestión de requerimientos."""
+        ventana_requerimiento = tk.Toplevel(self.root)
+        vista_requerimiento = VistaRequerimiento(ventana_requerimiento, self.controlador)
+        vista_requerimiento.mostrar_requerimiento()
+    
+    def abrir_ventana_requerimientos(self):
+        """Abre la ventana de lista de requerimientos."""
         ventana_requerimientos = tk.Toplevel(self.root)
-        vista_requerimientos = VistaRequerimiento(ventana_requerimientos, self.controlador)
-        vista_requerimientos.mostrar_requerimiento()
+        vista_requerimientos = VistaRequerimientos(ventana_requerimientos, self.controlador)
+        vista_requerimientos.mostrar_requerimientos()
 
     def cerrar_sesion(self):
         self.root.withdraw()

@@ -96,6 +96,9 @@ class MenuControlador:
     
     def guardar_requerimiento(self, fecha, criterio, productos):
         return self.controlador_requerimiento.guardar_requerimiento(fecha, criterio, productos)
+    
+    def listar_requerimientos(self):
+        return self.controlador_requerimiento.listar_requerimientos()
 
 
     

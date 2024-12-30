@@ -150,3 +150,8 @@ class VistaRequerimiento:
             self.actualizar_tabla()
         else:
             messagebox.showerror("Error", "No se pudo registrar el requerimiento.")
+    
+    def mostrar_requerimiento(self):
+        """Muestra la ventana de requerimientos."""
+        self.root.mainloop()
+

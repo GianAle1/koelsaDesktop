@@ -129,3 +129,30 @@ class Requerimiento:
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return []
+        
+    def listar_requerimientos(self):
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                query = """
+                    SELECT
+                        r.idrequerimiento AS ID,
+                        r.fechaRequerimiento AS Fecha,
+                        r.critero AS Criterio,
+                        COUNT(rd.idproducto) AS Productos,
+                        SUM(rd.precioTotal) AS Total
+                    FROM Requerimiento r
+                    LEFT JOIN requerimientoDetalle rd ON r.idrequerimiento = rd.idrequerimiento
+                    GROUP BY r.idrequerimiento, r.fechaRequerimiento, r.critero
+                """
+                cursor.execute(query)
+                return cursor.fetchall()
+            except Exception as e:
+                print(f"Error al listar requerimientos: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return []

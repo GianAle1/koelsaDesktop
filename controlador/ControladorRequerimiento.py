@@ -20,3 +20,6 @@ class ControladorRequerimiento:
 
     def listar_almacenes(self):
         return self.modelo_requerimiento.listar_almacenes()
+    
+    def listar_requerimientos(self):
+        return self.modelo_requerimiento.listar_requerimientos()
