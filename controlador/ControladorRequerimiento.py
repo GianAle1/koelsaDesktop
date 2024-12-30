@@ -8,6 +8,7 @@ class ControladorRequerimiento:
     def guardar_requerimiento(self, fecha, criterio, productos):
         return self.modelo_requerimiento.guardar_requerimiento(fecha, criterio, productos)
         
+        
     def listar_productos(self):
         return self.modelo_requerimiento.listar_productos()
 

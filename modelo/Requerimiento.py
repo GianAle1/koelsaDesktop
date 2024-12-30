@@ -4,18 +4,21 @@ class Requerimiento:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
+    
     def guardar_requerimiento(self, fecha, criterio, productos):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                # Insertar requerimiento
+                # Insertar en la tabla Requerimiento
                 query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, critero) VALUES (?, ?)"
                 cursor.execute(query_requerimiento, (fecha, criterio))
-                cursor.execute("SELECT SCOPE_IDENTITY()")
-                id_requerimiento = cursor.fetchone()[0]
+                connection.commit()
 
-                # Insertar detalles
+                # Obtener el ID del requerimiento recién generado
+                id_requerimiento = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
+
+                # Insertar los detalles del requerimiento
                 query_detalle = """
                     INSERT INTO requerimientoDetalle (
                         idrequerimiento, idproducto, cantidad, idproveedor, iduso, idalmacen, idmaquinaria, precioUnitario, precioTotal
@@ -44,6 +47,8 @@ class Requerimiento:
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return None
+
+
 
     def listar_productos(self):
         connection = self.conexion_db.conectar()

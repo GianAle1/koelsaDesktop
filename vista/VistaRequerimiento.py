@@ -11,10 +11,7 @@ class VistaRequerimiento:
         self.root.configure(bg="#f4f4f9")
 
         # Título
-        self.titulo_label = tk.Label(
-            self.root, text="Registrar Requerimiento",
-            font=("Arial", 18, "bold"), bg="#2e7d32", fg="white", pady=10
-        )
+        self.titulo_label = tk.Label(self.root, text="Registrar Requerimiento", font=("Arial", 18, "bold"), bg="#2e7d32", fg="white", pady=10)
         self.titulo_label.pack(fill=tk.X)
 
         # Frame para los campos de entrada
@@ -31,23 +28,14 @@ class VistaRequerimiento:
         self.uso_combobox = self._crear_combobox("Uso:", 5)
         self.almacen_combobox = self._crear_combobox("Almacén:", 6)
         self.maquinaria_combobox = self._crear_combobox("Maquinaria:", 7)
-        self.total_label = tk.Label(
-            self.root, text="Total: 0.00", font=("Arial", 14, "bold"), bg="#f4f4f9", fg="#000"
-        )
-        self.total_label.pack(pady=10)
-        self.precio_unitario_entry = self._crear_campo("Precio Unitario:", 8)  # Esta línea
+        self.precio_unitario_entry = self._crear_campo("Precio Unitario:", 8)
 
-        # Botón para agregar a la lista
-        self._crear_boton("Agregar Producto", 8, self.agregar_producto, "#4CAF50")
+        # Botones
+        self._crear_boton("Agregar Producto", 9, self.agregar_producto, "#4CAF50")
+        self._crear_boton("Guardar Requerimiento", None, self.guardar_requerimiento, "#4CAF50")
 
         # Tabla para productos agregados
         self._crear_tabla()
-
-        # Botón para eliminar producto
-        self._crear_boton("Eliminar Producto", None, self.eliminar_producto, "#f44336", pady=10)
-
-        # Botón para guardar el requerimiento
-        self._crear_boton("Guardar Requerimiento", None, self.guardar_requerimiento, "#4CAF50", pady=10)
 
         # Inicializar listas y cargar datos
         self.productos_temporales = []
@@ -76,16 +64,13 @@ class VistaRequerimiento:
         return textarea
 
     def _crear_boton(self, texto, row, command, bg_color, pady=0):
-        boton = tk.Button(
-            self.root, text=texto, font=("Arial", 12), bg=bg_color, fg="white", command=command
-        )
+        boton = tk.Button(self.root, text=texto, font=("Arial", 12), bg=bg_color, fg="white", command=command)
         boton.pack(pady=pady)
         return boton
 
     def _crear_tabla(self):
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-
         columnas = ("Producto", "Cantidad", "Proveedor", "Uso", "Almacén", "Maquinaria", "Precio Unitario", "Precio Total")
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=10)
         for col in columnas:
@@ -129,7 +114,6 @@ class VistaRequerimiento:
         precio_total = int(cantidad) * float(precio_unitario)
         self.productos_temporales.append((producto, int(cantidad), proveedor, uso, almacen, maquinaria, float(precio_unitario), precio_total))
         self.actualizar_tabla()
-        self.actualizar_total()
 
     def actualizar_tabla(self):
         for item in self.tree.get_children():
@@ -159,33 +143,10 @@ class VistaRequerimiento:
             for prod in self.productos_temporales
         ]
 
-        if not self.controlador.guardar_requerimiento(fecha, criterio, productos_para_bd):
-            messagebox.showerror("Error", "Ocurrió un error al guardar el requerimiento.")
-        else:
-            messagebox.showinfo("Éxito", "Requerimiento guardado correctamente.")
+        id_requerimiento = self.controlador.guardar_requerimiento(fecha, criterio, productos_para_bd)
+        if id_requerimiento:
+            messagebox.showinfo("Éxito", f"Requerimiento registrado con ID: {id_requerimiento}")
             self.productos_temporales = []
             self.actualizar_tabla()
-            self.actualizar_total()
-
-    def eliminar_producto(self):
-        selected_item = self.tree.selection()
-        if selected_item:
-            for item in selected_item:
-                values = self.tree.item(item, "values")
-                self.productos_temporales = [
-                    prod for prod in self.productos_temporales if not (
-                        prod[0] == values[0] and prod[1] == int(values[1]) and prod[6] == float(values[6])
-                    )
-                ]
-                self.tree.delete(item)
-            messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
-            self.actualizar_total()
         else:
-            messagebox.showwarning("Advertencia", "Debe seleccionar un producto para eliminar.")
-
-    def actualizar_total(self):
-        total = sum(prod[7] for prod in self.productos_temporales)
-        self.total_label.config(text=f"Total: {total:.2f}")
-
-    def mostrar_requerimiento(self):
-        self.root.mainloop()
+            messagebox.showerror("Error", "No se pudo registrar el requerimiento.")
