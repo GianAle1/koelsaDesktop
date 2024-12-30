@@ -4,30 +4,24 @@ class Requerimiento:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def guardar_requerimiento(self, fecha, criterio, productos, total):
+    def guardar_requerimiento(self, fecha, criterio, productos):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                # Insertar en la tabla Requerimiento
-                print("Intentando insertar en Requerimiento...")
-                query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, critero, total) VALUES (?, ?, ?)"
-                cursor.execute(query_requerimiento, (fecha, criterio, total))
-                connection.commit()
-                print("Requerimiento insertado, intentando obtener ID...")
+                # Insertar requerimiento
+                query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, critero) VALUES (?, ?)"
+                cursor.execute(query_requerimiento, (fecha, criterio))
+                cursor.execute("SELECT SCOPE_IDENTITY()")
+                id_requerimiento = cursor.fetchone()[0]
 
-                # Obtener el ID del requerimiento recién generado
-                id_requerimiento = cursor.execute("SELECT SCOPE_IDENTITY()").fetchone()[0]
-                print(f"ID del requerimiento generado: {id_requerimiento}")
-
-                # Insertar en la tabla requerimientoDetalle
+                # Insertar detalles
                 query_detalle = """
                     INSERT INTO requerimientoDetalle (
                         idrequerimiento, idproducto, cantidad, idproveedor, iduso, idalmacen, idmaquinaria, precioUnitario, precioTotal
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 for producto in productos:
-                    print(f"Intentando insertar detalle para producto: {producto['id_producto']}")
                     cursor.execute(query_detalle, (
                         id_requerimiento,
                         producto["id_producto"],
@@ -37,12 +31,9 @@ class Requerimiento:
                         producto["id_almacen"],
                         producto["id_maquinaria"],
                         producto["precio_unitario"],
-                        producto["precio_total"],
+                        producto["precio_total"]
                     ))
-
-                # Confirmar los cambios
                 connection.commit()
-                print("Todos los detalles insertados correctamente.")
                 return id_requerimiento
             except Exception as e:
                 print(f"Error al guardar el requerimiento: {e}")
@@ -54,15 +45,12 @@ class Requerimiento:
             print("No se pudo establecer una conexión a la base de datos.")
             return None
 
-
-
     def listar_productos(self):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "SELECT idproducto, descripcion FROM producto"
-                cursor.execute(query)
+                cursor.execute("SELECT idproducto, descripcion FROM producto")
                 return cursor.fetchall()
             except Exception as e:
                 print(f"Error al listar productos: {e}")
@@ -78,8 +66,7 @@ class Requerimiento:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "SELECT idproveedor, nombre FROM proveedor"
-                cursor.execute(query)
+                cursor.execute("SELECT idproveedor, nombre FROM proveedor")
                 return cursor.fetchall()
             except Exception as e:
                 print(f"Error al listar proveedores: {e}")
@@ -95,8 +82,7 @@ class Requerimiento:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "SELECT iduso, descripcion FROM uso"
-                cursor.execute(query)
+                cursor.execute("SELECT iduso, descripcion FROM uso")
                 return cursor.fetchall()
             except Exception as e:
                 print(f"Error al listar usos: {e}")
@@ -112,11 +98,26 @@ class Requerimiento:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "SELECT idalmacen, nombre FROM almacen"
-                cursor.execute(query)
+                cursor.execute("SELECT idalmacen, nombre FROM almacen")
                 return cursor.fetchall()
             except Exception as e:
                 print(f"Error al listar almacenes: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return []
+
+    def listar_maquinarias(self):
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                cursor.execute("SELECT idmaquinaria, descripcion FROM maquinaria")
+                return cursor.fetchall()
+            except Exception as e:
+                print(f"Error al listar maquinarias: {e}")
                 return []
             finally:
                 self.conexion_db.cerrar_conexion()
