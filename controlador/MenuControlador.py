@@ -94,7 +94,8 @@ class MenuControlador:
         """Obtiene los subalmacenes asociados a un almacén específico."""
         return self.controlador_almacen.listar_subalmacenes(almacen_id)
     
-    def guardar_requerimiento(self, fecha, criterio, productos):
-        return self.controlador_requerimiento.guardar_requerimiento(fecha, criterio, productos)
+    def guardar_requerimiento(self, fecha, criterio, productos, total):
+        return self.controlador_requerimiento.guardar_requerimiento(fecha, criterio, productos, total)
+
 
     

@@ -32,6 +32,10 @@ class VistaRequerimiento:
         self.almacen_combobox = self._crear_combobox("Almacén:", 6)
         self.maquinaria_combobox = self._crear_combobox("Maquinaria:", 7)  # Nuevo Combobox para Maquinaria
         self.precio_unitario_entry = self._crear_campo("Precio Unitario:", 8)
+        self.total_label = tk.Label(
+        self.root, text="Total: 0.00", font=("Arial", 14, "bold"), bg="#f4f4f9", fg="#000"
+        )
+        self.total_label.pack(pady=10)
 
         # Botón para agregar a la lista
         self._crear_boton("Agregar Producto", 9, self.agregar_producto, "#4CAF50")
@@ -125,6 +129,8 @@ class VistaRequerimiento:
         precio_total = int(cantidad) * float(precio_unitario)
         self.productos_temporales.append((producto, int(cantidad), proveedor, uso, almacen, maquinaria, float(precio_unitario), precio_total))
         self.actualizar_tabla()
+        self.actualizar_total()  # Llama a actualizar_total
+
 
     def actualizar_tabla(self):
         for item in self.tree.get_children():
@@ -140,7 +146,7 @@ class VistaRequerimiento:
             messagebox.showerror("Error", "El criterio es obligatorio.")
             return
 
-        productos_para_bd = [
+        productos_para_bd = [ 
             {
                 "id_producto": prod[0].split(" - ")[0],
                 "cantidad": prod[1],
@@ -154,12 +160,14 @@ class VistaRequerimiento:
             for prod in self.productos_temporales
         ]
 
-        if not self.controlador.guardar_requerimiento(fecha, criterio, productos_para_bd):
+        total = sum(prod["precio_total"] for prod in productos_para_bd)  # Calcula el total
+        if not self.controlador.guardar_requerimiento(fecha, criterio, productos_para_bd, total):  # Envía el total
             messagebox.showerror("Error", "Ocurrió un error al guardar el requerimiento.")
         else:
-            messagebox.showinfo("Éxito", "Requerimiento guardado correctamente.")
+            messagebox.showinfo("Éxito", f"Requerimiento guardado correctamente.\nTotal: {total:.2f}")
             self.productos_temporales = []
             self.actualizar_tabla()
+            self.actualizar_total()
 
     def eliminar_producto(self):
         selected_item = self.tree.selection()
@@ -173,8 +181,14 @@ class VistaRequerimiento:
                 ]
                 self.tree.delete(item)
             messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
+            self.actualizar_total()  # Llama a actualizar_total
         else:
             messagebox.showwarning("Advertencia", "Debe seleccionar un producto para eliminar.")
+
+
+    def actualizar_total(self):
+        total = sum(prod[7] for prod in self.productos_temporales)  # Índice 7 corresponde al precio_total
+        self.total_label.config(text=f"Total: {total:.2f}")
 
     def mostrar_requerimiento(self):
         self.root.mainloop()

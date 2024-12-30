@@ -4,19 +4,17 @@ class ControladorRequerimiento:
     def __init__(self):
         self.modelo_requerimiento = Requerimiento()
 
-    def guardar_requerimiento(self, fecha, criterio, productos):
+    def guardar_requerimiento(self, fecha, criterio, productos, total):
         try:
-            id_requerimiento = self.modelo_requerimiento.registrar_requerimiento(fecha, criterio, productos)
+            id_requerimiento = self.modelo_requerimiento.guardar_requerimiento(fecha, criterio, productos, total)
             if not id_requerimiento:
                 print("Error: No se pudo registrar el requerimiento principal.")
                 return False
-
             print(f"Requerimiento registrado con ID: {id_requerimiento}")
             return True
         except Exception as e:
             print(f"Error en guardar_requerimiento: {e}")
             return False
-
 
         
     def listar_productos(self):

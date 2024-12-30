@@ -11,14 +11,6 @@ CREATE TABLE usuario (
     contraseña VARCHAR(100) NOT NULL
 );
 go
-select * from usuario
--- Tabla marca
-CREATE TABLE marca (
-    idmarca INT IDENTITY(1,1) PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL
-);
-go
--- Tabla proveedor
 CREATE TABLE proveedor (
     idproveedor INT IDENTITY(1,1) PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -533,5 +525,18 @@ Select * from salidaDetalle
 
 UPDATE salida SET observacion = 'Sin OBSERVACION' where observacion is null
 
+select * from usuario
 
-s
+select * from requerimiento
+
+select * from requerimientoDetalle
+
+BEGIN TRANSACTION;
+INSERT INTO Requerimiento (fechaRequerimiento, critero, total) VALUES ('2024-12-26', 'Prueba', 0.0);
+SELECT SCOPE_IDENTITY() AS last_id;
+ROLLBACK TRANSACTION;
+
+SELECT SCOPE_IDENTITY() AS last_id
+
+INSERT INTO Requerimiento (fechaRequerimiento, critero, total) VALUES ('2024-12-23', 'urgente',2)
+

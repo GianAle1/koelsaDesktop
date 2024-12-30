@@ -4,27 +4,30 @@ class Requerimiento:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def registrar_requerimiento(self, fecha, criterio, productos):
+    def guardar_requerimiento(self, fecha, criterio, productos, total):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 # Insertar en la tabla Requerimiento
+                print("Intentando insertar en Requerimiento...")
                 query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, critero, total) VALUES (?, ?, ?)"
-                cursor.execute(query_requerimiento, (fecha, criterio, 0.0))
+                cursor.execute(query_requerimiento, (fecha, criterio, total))
                 connection.commit()
+                print("Requerimiento insertado, intentando obtener ID...")
 
-                # Obtener el último ID generado
-                id_requerimiento = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
-                print(f"Requerimiento registrado con ID: {id_requerimiento}")
+                # Obtener el ID del requerimiento recién generado
+                id_requerimiento = cursor.execute("SELECT SCOPE_IDENTITY()").fetchone()[0]
+                print(f"ID del requerimiento generado: {id_requerimiento}")
 
-                # Insertar los detalles
+                # Insertar en la tabla requerimientoDetalle
                 query_detalle = """
                     INSERT INTO requerimientoDetalle (
-                        idrequerimiento, idproducto, cantidad, idproveedor, iduso, idalmacen, precioUnitario, precioTotal
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        idrequerimiento, idproducto, cantidad, idproveedor, iduso, idalmacen, idmaquinaria, precioUnitario, precioTotal
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 for producto in productos:
+                    print(f"Intentando insertar detalle para producto: {producto['id_producto']}")
                     cursor.execute(query_detalle, (
                         id_requerimiento,
                         producto["id_producto"],
@@ -32,22 +35,26 @@ class Requerimiento:
                         producto["id_proveedor"],
                         producto["id_uso"],
                         producto["id_almacen"],
+                        producto["id_maquinaria"],
                         producto["precio_unitario"],
-                        producto["precio_total"]
+                        producto["precio_total"],
                     ))
 
-                # Confirmar todos los cambios
+                # Confirmar los cambios
                 connection.commit()
+                print("Todos los detalles insertados correctamente.")
                 return id_requerimiento
             except Exception as e:
-                print(f"Error al registrar el requerimiento: {e}")
-                connection.rollback()  # Revertir la transacción si ocurre un error
+                print(f"Error al guardar el requerimiento: {e}")
+                connection.rollback()
                 return None
             finally:
                 self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return None
+
+
 
     def listar_productos(self):
         connection = self.conexion_db.conectar()
