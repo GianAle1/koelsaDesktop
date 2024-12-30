@@ -23,3 +23,6 @@ class ControladorRequerimiento:
     
     def listar_requerimientos(self):
         return self.modelo_requerimiento.listar_requerimientos()
+
+    def obtener_detalle_requerimiento(self, id_requerimiento):
+        return self.modelo_requerimiento.obtener_detalle_requerimiento(id_requerimiento)

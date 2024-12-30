@@ -99,6 +99,11 @@ class MenuControlador:
     
     def listar_requerimientos(self):
         return self.controlador_requerimiento.listar_requerimientos()
+    
+    def obtener_detalle_requerimiento(self, id_requerimiento):
+        """Llama al modelo para obtener los detalles del requerimiento."""
+        return self.controlador_requerimiento.obtener_detalle_requerimiento(id_requerimiento)
+
 
 
     

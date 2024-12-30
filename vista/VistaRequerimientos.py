@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import  ttk
+from vista.VistaEditarRequerimiento import VistaEditarRequerimiento
+
 class VistaRequerimientos:
     def __init__(self, root, controlador):
         self.root = root
@@ -27,7 +29,8 @@ class VistaRequerimientos:
         for col in columnas:
             self.tree.heading(col, text=col)
             self.tree.column(col, anchor="center", width=200)
-
+            
+        self.tree.bind("<Double-1>", self.editar_requerimiento)
         # Scrollbars
         scroll_y = ttk.Scrollbar(self.frame_tabla, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(self.frame_tabla, orient="horizontal", command=self.tree.xview)
@@ -39,7 +42,7 @@ class VistaRequerimientos:
 
         # Cargar requerimientos
         self.listar_requerimientos()
-
+        
     def listar_requerimientos(self):
         requerimientos = self.controlador.listar_requerimientos()
         self.actualizar_tabla(requerimientos)
@@ -52,7 +55,28 @@ class VistaRequerimientos:
             valores = tuple(requerimiento)
             self.tree.insert("", tk.END, values=valores)
 
+    def editar_requerimiento(self, event):
+        # Obtener el elemento seleccionado
+        item = self.tree.focus()
+        if not item:
+            tk.messagebox.showwarning("Selección requerida", "Por favor selecciona un requerimiento.")
+            return
+
+        # Recuperar los valores del elemento seleccionado
+        valores = self.tree.item(item, "values")
+        if not valores:
+            tk.messagebox.showwarning("Error", "No se pudieron recuperar los datos del requerimiento seleccionado.")
+            return
+
+        # Crear una nueva ventana para editar
+        ventana_edicion = tk.Toplevel(self.root)
+        VistaEditarRequerimiento(ventana_edicion, self.controlador, valores)
+
+
+
     def mostrar_requerimientos(self):
         """Muestra la ventana de requerimientos."""
         self.root.mainloop()
 
+    
+    

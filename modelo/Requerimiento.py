@@ -133,8 +133,8 @@ class Requerimiento:
     def listar_requerimientos(self):
         connection = self.conexion_db.conectar()
         if connection:
-            cursor = self.conexion_db.obtener_cursor()
             try:
+                cursor = connection.cursor()
                 query = """
                     SELECT
                         r.idrequerimiento AS ID,
@@ -151,8 +151,48 @@ class Requerimiento:
             except Exception as e:
                 print(f"Error al listar requerimientos: {e}")
                 return []
+            #finally:
+                #cursor.close()  # Cierra el cursor
+                #connection.close()  # Cierra la conexión
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return []
+
+        
+    def obtener_detalle_requerimiento(self, id_requerimiento):
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                query = """
+                    SELECT
+                        rd.idrequerimientoDetalle AS IDDetalle,
+                        p.idproducto AS IDProducto,
+                        p.descripcion AS Descripción,
+                        rd.cantidad AS Cantidad,
+                        rd.precioUnitario AS PrecioUnitario,
+                        rd.precioTotal AS PrecioTotal,
+                        u.nomUso AS Uso,
+                        pr.nombre AS Proveedor,
+                        m.Modelo AS Maquinaria,
+                        a.nombre AS Almacén
+                    FROM requerimientoDetalle rd
+                    LEFT JOIN producto p ON rd.idproducto = p.idproducto
+                    LEFT JOIN uso u ON rd.iduso = u.iduso
+                    LEFT JOIN proveedor pr ON rd.idproveedor = pr.idproveedor
+                    LEFT JOIN maquinaria m ON rd.idmaquinaria = m.idmaquinaria
+                    LEFT JOIN almacen a ON rd.idalmacen = a.idalmacen
+                    WHERE rd.idrequerimiento = ?;
+                """
+                cursor.execute(query, (id_requerimiento,))
+                resultado = cursor.fetchall()
+                return resultado
+            except Exception as e:
+                print(f"Error al obtener detalle del requerimiento: {e}")
+                return []
             finally:
-                self.conexion_db.cerrar_conexion()
+                if connection:
+                    connection.close()
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return []

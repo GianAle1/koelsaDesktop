@@ -29,13 +29,17 @@ class ConexionDB:
         return self.connection
 
     def cerrar_conexion(self):
+        if self.cursor:  # Verifica que el cursor existe antes de cerrarlo
+            try:
+                self.cursor.close()
+            except Exception as e:
+                print(f"Error al cerrar el cursor: {e}")
+        if self.connection:  # Verifica que la conexión existe antes de cerrarla
+            try:
+                self.connection.close()
+            except Exception as e:
+                print(f"Error al cerrar la conexión: {e}")
 
-        if self.connection:
-            # Asegúrate de que el cursor no esté cerrado antes de usarlo
-            if self.cursor:
-                self.cursor.close()  # Cierra el cursor si existe
-            self.connection.close()  # Cierra la conexión
-            print("Conexión cerrada")
 
 
     def obtener_cursor(self):
