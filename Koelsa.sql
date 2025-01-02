@@ -575,3 +575,14 @@ select * from requerimientoDetalle
 select * FROM Requerimiento
 
 select * from usuario
+
+
+select * from maquinaria
+
+select * from salida
+
+
+select * from producto
+
+DELETE FROM producto
+WHERE idproducto = 1003;

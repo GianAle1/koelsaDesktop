@@ -166,8 +166,7 @@ class Requerimiento:
                 cursor = connection.cursor()
                 query = """
                     SELECT
-                        rd.idrequerimientoDetalle AS IDDetalle,
-                        p.idproducto AS IDProducto,
+
                         p.descripcion AS Descripción,
                         rd.cantidad AS Cantidad,
                         rd.precioUnitario AS PrecioUnitario,
