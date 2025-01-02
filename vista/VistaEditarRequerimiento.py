@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from decimal import Decimal
+
 
 class VistaEditarRequerimiento:
     def __init__(self, root, controlador, requerimiento):
         self.root = root
         self.controlador = controlador
-        self.requerimiento = requerimiento  # Datos del requerimiento a editar
+        self.requerimiento = requerimiento
 
         self.root.title("Editar Requerimiento")
         self.root.geometry("800x600")
@@ -21,7 +21,7 @@ class VistaEditarRequerimiento:
 
             entrada = tk.Entry(self.root, font=("Arial", 12))
             entrada.grid(row=i, column=1, padx=10, pady=10)
-            entrada.insert(0, str(self.requerimiento[i]))  # Colocar el valor actual en la entrada
+            entrada.insert(0, str(self.requerimiento[i]))
             if label_text == "ID":  # Hacer que el campo de ID sea de solo lectura
                 entrada.configure(state="readonly")
             self.entradas.append(entrada)
@@ -33,7 +33,7 @@ class VistaEditarRequerimiento:
         self.frame_productos = tk.Frame(self.root, bg="white", bd=2, relief="ridge")
         self.frame_productos.grid(row=len(labels) + 1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-        columnas = ("Producto", "Cantidad", "P. Unitario", "P.Total", "Uso","Proveedor","Maquinaria","Almacen")
+        columnas = ("Producto", "Cantidad", "P. Unitario", "P.Total", "Uso", "Proveedor", "Maquinaria", "Almacen")
         self.tree_productos = ttk.Treeview(self.frame_productos, columns=columnas, show="headings", height=10)
 
         for col in columnas:
@@ -44,6 +44,9 @@ class VistaEditarRequerimiento:
 
         # Cargar productos del detalle
         self.cargar_detalle_productos(self.requerimiento[0])
+
+        # Bind para doble clic
+        self.tree_productos.bind("<Double-1>", self.editar_producto)
 
         # Botones
         btn_guardar = tk.Button(
@@ -62,10 +65,66 @@ class VistaEditarRequerimiento:
 
         for producto in detalle_productos:
             try:
-                valores = [str(value) for value in producto]  # Convierte todos los valores a cadenas
+                valores = [str(value) for value in producto]
                 self.tree_productos.insert("", tk.END, values=valores)
             except Exception as e:
                 print(f"Error al cargar el detalle: {e}")
+
+    def editar_producto(self, event):
+        """Abre una ventana para editar un producto seleccionado."""
+        item = self.tree_productos.focus()
+        if not item:
+            messagebox.showwarning("Advertencia", "Selecciona un producto para editar.")
+            return
+
+        valores = self.tree_productos.item(item, "values")
+
+        # Crear ventana de edición
+        ventana_edicion = tk.Toplevel(self.root)
+        ventana_edicion.title("Editar Producto")
+        ventana_edicion.geometry("400x300")
+
+        campos = ["Cantidad", "P. Unitario", "Proveedor"]
+        entradas = []
+
+        for i, campo in enumerate(campos):
+            label = tk.Label(ventana_edicion, text=campo, font=("Arial", 12))
+            label.grid(row=i, column=0, padx=10, pady=10, sticky="w")
+
+            entrada = tk.Entry(ventana_edicion, font=("Arial", 12))
+            entrada.grid(row=i, column=1, padx=10, pady=10)
+            entrada.insert(0, valores[i + 1])  # Ajustar índice según la columna
+            entradas.append(entrada)
+
+        def guardar_producto():
+            try:
+                nueva_cantidad = entradas[0].get()
+                nuevo_precio_unitario = entradas[1].get()
+                nuevo_proveedor = entradas[2].get()
+
+                # Actualizar los valores en el Treeview
+                self.tree_productos.item(item, values=(
+                    valores[0],  # Producto
+                    nueva_cantidad,
+                    nuevo_precio_unitario,
+                    f"{float(nueva_cantidad) * float(nuevo_precio_unitario):.2f}",  # Nuevo precio total
+                    valores[4],  # Uso
+                    nuevo_proveedor,
+                    valores[6],  # Maquinaria
+                    valores[7]   # Almacén
+                ))
+
+                ventana_edicion.destroy()
+                messagebox.showinfo("Éxito", "Producto actualizado correctamente.")
+            except ValueError:
+                messagebox.showerror("Error", "Por favor ingresa valores numéricos válidos para cantidad y precio unitario.")
+
+        # Botones en la ventana de edición
+        btn_guardar = tk.Button(ventana_edicion, text="Guardar", font=("Arial", 12, "bold"), bg="#4CAF50", fg="white", command=guardar_producto)
+        btn_guardar.grid(row=len(campos), column=0, pady=20, padx=10)
+
+        btn_cancelar = tk.Button(ventana_edicion, text="Cancelar", font=("Arial", 12, "bold"), bg="#f44336", fg="white", command=ventana_edicion.destroy)
+        btn_cancelar.grid(row=len(campos), column=1, pady=20, padx=10)
 
     def guardar_cambios(self):
         """Guarda los cambios realizados en el requerimiento y sus detalles."""
