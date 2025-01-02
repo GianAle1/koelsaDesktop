@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, Menu, messagebox, filedialog
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import landscape, letter
 from reportlab.pdfgen import canvas
 from datetime import date
 
@@ -40,8 +40,9 @@ class VistaRequerimientos:
         scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
         self.tree.pack(fill=tk.BOTH, expand=True)
 
-        # Evento clic derecho
-        self.tree.bind("<Button-3>", self.mostrar_menu_contextual)
+        # Eventos
+        self.tree.bind("<Double-1>", self.editar_requerimiento)  # Doble clic para editar
+        self.tree.bind("<Button-3>", self.mostrar_menu_contextual)  # Clic derecho para menú contextual
 
         # Menú contextual
         self.menu_contextual = Menu(self.root, tearoff=0)
@@ -69,6 +70,84 @@ class VistaRequerimientos:
             self.tree.selection_set(item)
             self.menu_contextual.post(event.x_root, event.y_root)
 
+    def editar_requerimiento(self, event):
+        # Obtener el elemento seleccionado
+        item = self.tree.focus()
+        if not item:
+            messagebox.showwarning("Selección requerida", "Por favor selecciona un requerimiento.")
+            return
+
+        # Recuperar los valores del elemento seleccionado
+        valores = self.tree.item(item, "values")
+        id_requerimiento = valores[0]
+
+        # Crear ventana de edición
+        ventana_edicion = tk.Toplevel(self.root)
+        ventana_edicion.title("Editar Requerimiento")
+        ventana_edicion.geometry("800x600")
+        ventana_edicion.configure(bg="#f4f4f9")
+
+        # Datos generales del requerimiento
+        tk.Label(ventana_edicion, text="Editar Requerimiento", font=("Arial", 16, "bold"), bg="#007ACC", fg="white").pack(fill=tk.X)
+        frame_general = tk.Frame(ventana_edicion, bg="#f4f4f9", pady=10)
+        frame_general.pack(fill=tk.X, padx=10)
+
+        tk.Label(frame_general, text="ID:", bg="#f4f4f9", font=("Arial", 12)).grid(row=0, column=0, sticky="w")
+        tk.Label(frame_general, text=id_requerimiento, bg="#f4f4f9", font=("Arial", 12)).grid(row=0, column=1, sticky="w")
+
+        tk.Label(frame_general, text="Fecha:", bg="#f4f4f9", font=("Arial", 12)).grid(row=1, column=0, sticky="w")
+        fecha_entry = tk.Entry(frame_general, font=("Arial", 12))
+        fecha_entry.grid(row=1, column=1, sticky="w")
+        fecha_entry.insert(0, valores[1])
+
+        tk.Label(frame_general, text="Criterio:", bg="#f4f4f9", font=("Arial", 12)).grid(row=2, column=0, sticky="w")
+        criterio_combobox = ttk.Combobox(frame_general, values=["Programada", "Normal", "Urgente"], state="readonly", font=("Arial", 12))
+        criterio_combobox.grid(row=2, column=1, sticky="w")
+        criterio_combobox.set(valores[2])
+
+        # Detalles del requerimiento
+        tk.Label(ventana_edicion, text="Detalles del Requerimiento", font=("Arial", 14, "bold"), bg="#007ACC", fg="white").pack(fill=tk.X, pady=5)
+        frame_detalles = tk.Frame(ventana_edicion, bg="white", bd=2, relief="ridge")
+        frame_detalles.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        columnas = ("ID", "Producto", "Cantidad", "Proveedor", "Uso", "Almacén", "Precio Unitario", "Precio Total")
+        detalles_tree = ttk.Treeview(frame_detalles, columns=columnas, show="headings")
+        for col in columnas:
+            detalles_tree.heading(col, text=col)
+            detalles_tree.column(col, anchor="center", width=100)
+        detalles_tree.pack(fill=tk.BOTH, expand=True)
+
+        # Obtener detalles del requerimiento
+        detalles = self.controlador.obtener_detalle_requerimiento(id_requerimiento)
+        for detalle in detalles:
+            detalles_tree.insert("", tk.END, values=detalle)
+
+        # Botones
+        frame_botones = tk.Frame(ventana_edicion, bg="#f4f4f9", pady=10)
+        frame_botones.pack(fill=tk.X, padx=10)
+
+        tk.Button(frame_botones, text="Guardar Cambios", font=("Arial", 12), bg="#4CAF50", fg="white", command=lambda: self.guardar_cambios_requerimiento(id_requerimiento, fecha_entry.get(), criterio_combobox.get(), detalles_tree)).pack(side=tk.RIGHT, padx=5)
+        tk.Button(frame_botones, text="Cerrar", font=("Arial", 12), bg="#f44336", fg="white", command=ventana_edicion.destroy).pack(side=tk.RIGHT, padx=5)
+
+    def guardar_cambios_requerimiento(self, id_requerimiento, fecha, criterio, detalles_tree):
+        # Validar datos
+        if not fecha or not criterio:
+            messagebox.showerror("Error", "Todos los campos son obligatorios.")
+            return
+
+        # Preparar datos para guardar
+        detalles_actualizados = []
+        for item in detalles_tree.get_children():
+            valores = detalles_tree.item(item, "values")
+            detalles_actualizados.append(valores)
+
+        exito = self.controlador.actualizar_requerimiento(id_requerimiento, fecha, criterio, detalles_actualizados)
+        if exito:
+            messagebox.showinfo("Éxito", "Requerimiento actualizado correctamente.")
+            self.listar_requerimientos()
+        else:
+            messagebox.showerror("Error", "No se pudo actualizar el requerimiento.")
+
     def generar_reporte(self):
         # Obtener el elemento seleccionado
         item = self.tree.focus()
@@ -94,8 +173,8 @@ class VistaRequerimientos:
 
     def crear_reporte_pdf(self, archivo, detalles, id_requerimiento, fecha_solicitud, total):
         try:
-            c = canvas.Canvas(archivo, pagesize=letter)
-            ancho, alto = letter
+            c = canvas.Canvas(archivo, pagesize=landscape(letter))
+            ancho, alto = landscape(letter)
 
             # Título del reporte
             c.setFont("Helvetica-Bold", 14)
@@ -115,7 +194,7 @@ class VistaRequerimientos:
             # Encabezados de la tabla
             y = alto - 160
             encabezados = ["ITEM", "PART NAME", "CANT.", "USO", "DESCRIPCION DE REPUESTO", "PROVEEDOR", "UN. MED.", "NOMBRE DEL EQUIPO", "SERIE EQUIPO", "NOMBRE DE PROY./ALM.", "COSTO UNITARIO", "COSTO TOTAL"]
-            posiciones_x = [30, 80, 130, 180, 250, 400, 470, 500, 550, 600, 650, 700]
+            posiciones_x = [30, 100, 150, 200, 280, 430, 500, 550, 600, 670, 720, 770]
 
             c.setFont("Helvetica-Bold", 8)
             for i, encabezado in enumerate(encabezados):
@@ -126,7 +205,7 @@ class VistaRequerimientos:
 
             # Detalles del requerimiento
             for idx, detalle in enumerate(detalles, start=1):
-                if y < 50:  # Salto de página
+                if y < 50:
                     c.showPage()
                     y = alto - 50
                 c.drawString(posiciones_x[0], y, str(idx))
@@ -149,5 +228,4 @@ class VistaRequerimientos:
             messagebox.showerror("Error", f"Error al generar el reporte: {e}")
 
     def mostrar_requerimientos(self):
-        """Muestra la ventana de requerimientos."""
         self.root.mainloop()
