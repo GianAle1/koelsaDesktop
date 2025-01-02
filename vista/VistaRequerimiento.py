@@ -34,11 +34,16 @@ class VistaRequerimiento:
         self._crear_boton("Agregar Producto", 9, self.agregar_producto, "#4CAF50")
         self._crear_boton("Guardar Requerimiento", None, self.guardar_requerimiento, "#4CAF50")
 
+        # Label para el total
+        self.total_label = tk.Label(self.root, text="Total del Requerimiento: $0.00", font=("Arial", 14, "bold"), bg="#f4f4f9", fg="#000")
+        self.total_label.pack(pady=10)
+
         # Tabla para productos agregados
         self._crear_tabla()
 
         # Inicializar listas y cargar datos
         self.productos_temporales = []
+        self.total_requerimiento = 0.0
         self.cargar_productos()
         self.cargar_proveedores()
         self.cargar_usos()
@@ -78,23 +83,23 @@ class VistaRequerimiento:
 
     def cargar_productos(self):
         productos = self.controlador.listar_productos()
-        self.producto_combobox['values'] = [f"{prod[0]} - {prod[1]}" for prod in productos]
+        self.producto_combobox['values'] = [f"{prod[1]} - {prod[2]}" for prod in productos]
 
     def cargar_proveedores(self):
         proveedores = self.controlador.listar_proveedores()
-        self.proveedor_combobox['values'] = [f"{prov[0]} - {prov[1]}" for prov in proveedores]
+        self.proveedor_combobox['values'] = [f"{prov[1]}" for prov in proveedores]
 
     def cargar_usos(self):
         usos = self.controlador.listar_usos()
-        self.uso_combobox['values'] = [f"{uso[0]} - {uso[1]}" for uso in usos]
+        self.uso_combobox['values'] = [f"{uso[1]}" for uso in usos]
 
     def cargar_almacenes(self):
         almacenes = self.controlador.listar_almacenes()
-        self.almacen_combobox['values'] = [f"{alm[0]} - {alm[1]}" for alm in almacenes]
+        self.almacen_combobox['values'] = [f"{alm[1]}" for alm in almacenes]
 
     def cargar_maquinarias(self):
         maquinarias = self.controlador.listar_maquinarias()
-        self.maquinaria_combobox['values'] = [f"{maq[0]} - {maq[1]}" for maq in maquinarias]
+        self.maquinaria_combobox['values'] = [f"{maq[1]} - {maq[2]} - {maq[3]}" for maq in maquinarias]
 
     def agregar_producto(self):
         producto = self.producto_combobox.get()
@@ -111,13 +116,18 @@ class VistaRequerimiento:
 
         precio_total = int(cantidad) * float(precio_unitario)
         self.productos_temporales.append((producto, int(cantidad), proveedor, uso, almacen, maquinaria, float(precio_unitario), precio_total))
+        self.total_requerimiento += precio_total
         self.actualizar_tabla()
+        self.actualizar_total_label()
 
     def actualizar_tabla(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
         for prod in self.productos_temporales:
             self.tree.insert("", tk.END, values=prod)
+
+    def actualizar_total_label(self):
+        self.total_label.config(text=f"Total del Requerimiento: ${self.total_requerimiento:.2f}")
 
     def guardar_requerimiento(self):
         fecha = self.fecha_entry.get()
@@ -145,7 +155,9 @@ class VistaRequerimiento:
         if id_requerimiento:
             messagebox.showinfo("Éxito", f"Requerimiento registrado con ID: {id_requerimiento}")
             self.productos_temporales = []
+            self.total_requerimiento = 0.0
             self.actualizar_tabla()
+            self.actualizar_total_label()
         else:
             messagebox.showerror("Error", "No se pudo registrar el requerimiento.")
 

@@ -166,7 +166,6 @@ go
 CREATE TABLE Requerimiento (
     idrequerimiento INT IDENTITY(1,1) PRIMARY KEY,      -- Clave primaria auto-incremental
     fechaRequerimiento DATE,                             -- Fecha del requerimiento
-    total DECIMAL(10, 2),                                -- Total del requerimiento
     critero VARCHAR(50),                                 -- Descripción o criterio del requerimiento (corrigiendo el nombre a "criterio")
     idsolicitador INT,                                   -- ID del solicitante
     idsupervisor INT,                                    -- ID del supervisor
@@ -571,6 +570,8 @@ SELECT
                 LEFT JOIN almacen a ON rd.idalmacen = a.idalmacen
 
 	
-select * from usuario
+select * from requerimientoDetalle
 
-DELETE FROM Requerimiento;
+select * FROM Requerimiento
+
+select * from usuario
