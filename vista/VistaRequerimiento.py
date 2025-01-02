@@ -21,7 +21,7 @@ class VistaRequerimiento:
         # Crear campos
         self.fecha_entry = self._crear_campo("Fecha:", 0)
         self.fecha_entry.insert(0, date.today().strftime('%Y-%m-%d'))
-        self.criterio_entry = self._crear_textarea("Criterio:", 1)
+        self.criterio_combobox = self._crear_combobox("Criterio:", 1, ["Programada", "Normal", "Urgente"], default_value="Programada")
         self.producto_combobox = self._crear_combobox("Producto:", 2)
         self.cantidad_entry = self._crear_campo("Cantidad:", 3)
         self.proveedor_combobox = self._crear_combobox("Proveedor:", 4)
@@ -51,17 +51,15 @@ class VistaRequerimiento:
         entry.grid(row=row, column=1, padx=5)
         return entry
 
-    def _crear_combobox(self, texto, row):
+    def _crear_combobox(self, texto, row, values=None, default_value=None):
         tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
         combobox = ttk.Combobox(self.frame_entrada, font=("Arial", 12), state="readonly", width=40)
+        if values:
+            combobox['values'] = values
+        if default_value:
+            combobox.set(default_value)
         combobox.grid(row=row, column=1, padx=5)
         return combobox
-
-    def _crear_textarea(self, texto, row):
-        tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="nw", padx=5)
-        textarea = tk.Text(self.frame_entrada, font=("Arial", 12), width=40, height=4, wrap=tk.WORD)
-        textarea.grid(row=row, column=1, padx=5, pady=5)
-        return textarea
 
     def _crear_boton(self, texto, row, command, bg_color, pady=0):
         boton = tk.Button(self.root, text=texto, font=("Arial", 12), bg=bg_color, fg="white", command=command)
@@ -123,7 +121,7 @@ class VistaRequerimiento:
 
     def guardar_requerimiento(self):
         fecha = self.fecha_entry.get()
-        criterio = self.criterio_entry.get("1.0", tk.END).strip()
+        criterio = self.criterio_combobox.get()
 
         if not criterio:
             messagebox.showerror("Error", "El criterio es obligatorio.")
@@ -150,8 +148,7 @@ class VistaRequerimiento:
             self.actualizar_tabla()
         else:
             messagebox.showerror("Error", "No se pudo registrar el requerimiento.")
-    
+
     def mostrar_requerimiento(self):
         """Muestra la ventana de requerimientos."""
         self.root.mainloop()
-

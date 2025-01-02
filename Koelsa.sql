@@ -540,3 +540,37 @@ SELECT SCOPE_IDENTITY() AS last_id
 
 INSERT INTO Requerimiento (fechaRequerimiento, critero, total) VALUES ('2024-12-23', 'urgente',2)
 
+SELECT
+                        r.idrequerimiento AS ID,
+                        r.fechaRequerimiento AS Fecha,
+                        r.critero AS Criterio,
+                        COUNT(rd.idproducto) AS Productos,
+                        SUM(rd.precioTotal) AS Total
+                    FROM Requerimiento r
+                    LEFT JOIN requerimientoDetalle rd ON r.idrequerimiento = rd.idrequerimiento
+                    GROUP BY r.idrequerimiento, r.fechaRequerimiento, r.critero
+
+
+
+SELECT
+                    rd.idrequerimientoDetalle AS IDDetalle,
+                    p.idproducto AS IDProducto,
+                    p.descripcion AS Descripción,
+                    rd.cantidad AS Cantidad,
+                    rd.precioUnitario AS PrecioUnitario,
+                    rd.precioTotal AS PrecioTotal,
+                    u.nomUso AS Uso,
+                    pr.nombre AS Proveedor,
+                    m.Modelo AS Maquinaria,
+                    a.nombre AS Almacén
+                FROM requerimientoDetalle rd
+                LEFT JOIN producto p ON rd.idproducto = p.idproducto
+                LEFT JOIN uso u ON rd.iduso = u.iduso
+                LEFT JOIN proveedor pr ON rd.idproveedor = pr.idproveedor
+                LEFT JOIN maquinaria m ON rd.idmaquinaria = m.idmaquinaria
+                LEFT JOIN almacen a ON rd.idalmacen = a.idalmacen
+
+	
+select * from usuario
+
+DELETE FROM Requerimiento;
