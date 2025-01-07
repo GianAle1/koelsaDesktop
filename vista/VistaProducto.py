@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox, ttk
-
+from tkinter import StringVar
 class VistaProducto:
     def __init__(self, root, controlador):
         self.root = root
@@ -25,7 +25,8 @@ class VistaProducto:
 
         self.marca_label = tk.Label(self.frame, text="Marca:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.marca_label.grid(row=2, column=0, sticky="w", padx=15, pady=5)
-        self.marca_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
+        self.marca_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12))  # Elimina state="readonly"
+          # Combobox solo lectura
         self.marca_combobox.grid(row=2, column=1, pady=5)
 
         self.familia_label = tk.Label(self.frame, text="Familia:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
@@ -91,23 +92,40 @@ class VistaProducto:
         self.proveedor_combobox['values'] = proveedor_nombres
         self.proveedor_combobox.current(0)
 
+    def _add_autocomplete(self, combobox, items):
+        """Añade funcionalidad de autocompletar a un Combobox."""
+        combobox.var = StringVar()  # Asocia una variable StringVar al Combobox
+        combobox["textvariable"] = combobox.var
+        combobox["values"] = items
+
+        def on_keyrelease(*args):
+            """Filtra las opciones del Combobox según lo escrito."""
+            value = combobox.var.get().strip().lower()
+            if not value:  # Si no hay texto, mostrar todos los valores
+                combobox.config(values=items)
+            else:
+                # Filtrar los ítems que coincidan parcialmente con el texto ingresado
+                filtered_items = [item for item in items if value in item.lower()]
+                combobox.config(values=filtered_items)
+                print("Filtrado:", filtered_items)  # Agregar esta línea para depurar
+
+
+        def reset_combobox_values(event):
+            """Restablece los valores del Combobox al obtener foco."""
+            combobox.config(values=items)
+
+        # Vincula el evento de escritura al Combobox
+        combobox.var.trace_add("write", on_keyrelease)
+
+        combobox.bind("<FocusIn>", reset_combobox_values)
+
+    
     def listar_marcas(self):
         marcas = self.controlador.listar_marcas()
         marca_nombres = [marca[1] for marca in marcas]
-        self.marca_combobox['values'] = marca_nombres
-        self.marca_combobox.current(0)
-
-    """def listar_usos(self):
-        usos = self.controlador.listar_usos()
-        uso_nombres = [uso[1] for uso in usos]
-        self.uso_combobox['values'] = uso_nombres
-        self.uso_combobox.current(0)"""
-
-    """def listar_equipos(self):
-        equipos = self.controlador.listar_equipos()
-        equipo_nombres = [equipo[1] for equipo in equipos]
-        self.equipo_combobox['values'] = equipo_nombres
-        self.equipo_combobox.current(0)"""
+        self._add_autocomplete(self.marca_combobox, marca_nombres)  # Agregar autocompletar aquí
+        if marca_nombres:
+            self.marca_combobox.current(0)
 
     def listar_unidadMedidas(self):
         unidadMedidas = self.controlador.listar_unidadMedidas()
@@ -225,3 +243,5 @@ class VistaProducto:
         self.familia_combobox.set("")
         self.almacen_combobox.set("")
         self.subalmacen_combobox.set("")
+
+    

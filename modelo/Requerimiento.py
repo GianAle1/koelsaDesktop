@@ -11,12 +11,12 @@ class Requerimiento:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 # Insertar en la tabla Requerimiento
-                query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, critero) VALUES (%s, %s)"
+                query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, criterio) VALUES (%s, %s)"
                 cursor.execute(query_requerimiento, (fecha, criterio))
                 connection.commit()
 
-                # Obtener el ID del requerimiento recién generado
-                id_requerimiento = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
+                cursor.execute("SELECT LAST_INSERT_ID()")
+                id_requerimiento = cursor.fetchone()[0]
 
                 # Insertar los detalles del requerimiento
                 query_detalle = """
@@ -139,12 +139,12 @@ class Requerimiento:
                     SELECT
                         r.idrequerimiento AS ID,
                         r.fechaRequerimiento AS Fecha,
-                        r.critero AS Criterio,
+                        r.criterio AS Criterio,
                         COUNT(rd.idproducto) AS Productos,
                         SUM(rd.precioTotal) AS Total
                     FROM Requerimiento r
                     LEFT JOIN requerimientoDetalle rd ON r.idrequerimiento = rd.idrequerimiento
-                    GROUP BY r.idrequerimiento, r.fechaRequerimiento, r.critero
+                    GROUP BY r.idrequerimiento, r.fechaRequerimiento, r.criterio
                 """
                 cursor.execute(query)
                 return cursor.fetchall()
