@@ -5,9 +5,9 @@ class ControladorProveedor:
     def __init__(self):
         self.modelo_proveedor = Proveedor()
 
-    def registrar_proveedor(self, nombre, direccion, telefono, correo):
+    def registrar_proveedor(self, nombre, direccion, telefono, correo,ruc):
         """Método para registrar una nueva proveedor usando el modelo"""
-        exito = self.modelo_proveedor.registrar_proveedor(nombre,direccion,telefono,correo)
+        exito = self.modelo_proveedor.registrar_proveedor(nombre,direccion,telefono,correo,ruc)
         if exito:
             return self.listar_proveedores()  # Solo retornamos las marcas si la inserción fue exitosa
         else:

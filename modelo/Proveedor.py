@@ -4,14 +4,14 @@ class Proveedor:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def registrar_proveedor(self, nombre, direccion, telefono, correo):
+    def registrar_proveedor(self, nombre, direccion, telefono, correo,ruc):
         """Registra un nuevo proveedor en la base de datos."""
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "INSERT INTO proveedor (nombre, direccion, telefono, correo) VALUES (?, ?, ?, ?)"
-                cursor.execute(query, (nombre, direccion, telefono, correo))
+                query = "INSERT INTO proveedor (nombre, direccion, telefono, correo,ruc) VALUES (?, ?, ?, ?,?)"
+                cursor.execute(query, (nombre, direccion, telefono, correo,ruc))
                 connection.commit()  # Confirmar los cambios
                 return True  # Retornamos True si el proveedor se registró correctamente
             except Exception as e:

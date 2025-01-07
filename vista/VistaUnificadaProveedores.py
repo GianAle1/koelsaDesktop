@@ -110,13 +110,14 @@ class VistaUnificadaProveedores:
 
     def registrar_proveedor(self):
         """Método para registrar un nuevo proveedor."""
+        ruc = simpledialog.askstring("Registrar Proveedor", "Ingrese el RUC del proveedor:")
         nombre = simpledialog.askstring("Registrar Proveedor", "Ingrese el nombre del proveedor:")
         direccion = simpledialog.askstring("Registrar Proveedor", "Ingrese la dirección del proveedor:")
         telefono = simpledialog.askstring("Registrar Proveedor", "Ingrese el teléfono del proveedor:")
         correo = simpledialog.askstring("Registrar Proveedor", "Ingrese el correo del proveedor:")
 
         if nombre and direccion and telefono and correo:
-            proveedor_registrado = self.controlador.registrar_proveedor(nombre, direccion, telefono, correo)
+            proveedor_registrado = self.controlador.registrar_proveedor(nombre, direccion, telefono, correo,ruc)
             if proveedor_registrado:
                 messagebox.showinfo("Éxito", "Proveedor registrado con éxito!")
                 self.listar_proveedores()  # Refrescar lista de proveedores

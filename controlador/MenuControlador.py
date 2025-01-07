@@ -38,8 +38,8 @@ class MenuControlador:
     def listar_proveedores(self):
         return self.controlador_proveedor.listar_proveedores() 
     
-    def registrar_proveedor(self, nombre,direccion,telefono,correo):
-        return self.controlador_proveedor.registrar_proveedor(nombre,direccion,telefono,correo)
+    def registrar_proveedor(self, nombre,direccion,telefono,correo,ruc):
+        return self.controlador_proveedor.registrar_proveedor(nombre,direccion,telefono,correo,ruc)
     
     def listar_proveedores_combo(self):
         """Obtiene los proveedores solo con el id y nombre (para ComboBox)"""

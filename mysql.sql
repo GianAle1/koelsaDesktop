@@ -1,158 +1,99 @@
 CREATE DATABASE koelsa;
-go
 USE koelsa;
-go
--- Tabla usuario
 CREATE TABLE usuario (
-    idusuario  INT IDENTITY(1,1)PRIMARY KEY,
+    idusuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellidos VARCHAR(100) NOT NULL,
     correo VARCHAR(100) NOT NULL,
-    contrase馻 VARCHAR(100) NOT NULL
+    contrase帽a VARCHAR(100) NOT NULL
 );
-go
 CREATE TABLE proveedor (
-    idproveedor INT IDENTITY(1,1) PRIMARY KEY,
+    idproveedor INT AUTO_INCREMENT PRIMARY KEY,
+    ruc  VARCHAR(11) ,
     nombre VARCHAR(100) NOT NULL,
     direccion VARCHAR(199),
     telefono VARCHAR(20),
     correo VARCHAR(100)
 );
-go
--- Tabla almacen
 CREATE TABLE almacen (
-    idalmacen INT IDENTITY(1,1) PRIMARY KEY,
+    idalmacen INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     direccion VARCHAR(255),
     capacidad INT
 );
-go
 CREATE TABLE almacenDetalle (
-    idalmacenDetalle INT IDENTITY(1,1) PRIMARY KEY,
+    idalmacenDetalle INT AUTO_INCREMENT PRIMARY KEY,
     idalmacen int,
 	ubicacion VARCHAR(100) NOT NULL,
+    CONSTRAINT fk_almacen FOREIGN KEY (idalmacen) REFERENCES almacen(idalmacen) ON DELETE CASCADE ON UPDATE CASCADE
 );
-go
-
-ALTER TABLE almacenDetalle
-ADD CONSTRAINT FK_almacenDetalle_almacen
-FOREIGN KEY (idalmacen) REFERENCES almacen(idalmacen);
-go
 CREATE TABLE UnidadMedida (
-    idunidadMedida INT IDENTITY(1,1) PRIMARY KEY,
+    idunidadMedida INT AUTO_INCREMENT PRIMARY KEY,
     nomUnidad VARCHAR(15)
 );
-go
-
 CREATE TABLE uso (
-    iduso INT IDENTITY(1,1) PRIMARY KEY,
+    iduso INT AUTO_INCREMENT PRIMARY KEY,
     nomUso VARCHAR(15)
 );
-go
--- Tabla producto
+CREATE TABLE marca (
+    idmarca INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(45)
+);
+CREATE TABLE familia (
+    idfamilia INT AUTO_INCREMENT PRIMARY KEY,
+    nomfamilia VARCHAR(45)
+);
 CREATE TABLE producto (
-    idproducto INT IDENTITY(1,1) PRIMARY KEY,
+    idproducto INT AUTO_INCREMENT PRIMARY KEY,
     partname VARCHAR(100),
     descripcion VARCHAR(100),
     idmarca INT,
-    idunidadMedida int,
+    idunidadMedida INT,
     cantidad INT,
     idproveedor INT,
-	precio DECIMAL(10, 2),
-	idsmscs int,
-	idfamilia INT,
+    precio DECIMAL(10, 2),
+    idsmscs INT,
+    idfamilia INT,
     idalmacenDetalle INT,
     FOREIGN KEY (idmarca) REFERENCES marca(idmarca) ON DELETE SET NULL,
-	FOREIGN KEY (idUnidadMedida) REFERENCES UnidadMedida(idUnidadMedida) ON DELETE SET NULL,
+    FOREIGN KEY (idunidadMedida) REFERENCES unidadMedida(idunidadMedida) ON DELETE SET NULL,
     FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE SET NULL,
-	FOREIGN KEY (idfamilia) REFERENCES familia(idfamilia) ON DELETE SET NULL,
+    FOREIGN KEY (idfamilia) REFERENCES familia(idfamilia) ON DELETE SET NULL,
     FOREIGN KEY (idalmacenDetalle) REFERENCES almacenDetalle(idalmacenDetalle) ON DELETE SET NULL
 );
-go
-
-
-
-select * from producto
--- Consulta para obtener detalles de los productos
-SELECT 
-    p.idproducto AS ID,
-    p.partname AS PartName,
-    p.descripcion AS Descripci髇,
-    m.nombre AS Marca,
-    pr.nombre AS Proveedor,
-	f.nomfamilia as Familia,
-    u.nomUnidad AS "Unidad de Medida",
-    p.cantidad AS Cantidad,
-    p.precio AS Precio,
-    a.nombre AS Almac閚
-FROM producto p
-LEFT JOIN marca m ON p.idmarca = m.idmarca
-LEFT JOIN proveedor pr ON p.idproveedor = pr.idproveedor
-INNER JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
-INNER JOIN familia  f ON p.idfamilia = f.idfamilia
-INNER JOIN almacen a ON p.idalmacen = a.idalmacen;
-
-go
-select * from usuario 
-select * from familia 
-select * from marca 
-insert into marca(nombre) values ('Solpack')
-select * from proveedor 
-select * from UnidadMedida
-select * FROM  producto
--- Insertar productos
-
-
-select * from salidaDetalle
--- Tabla solicitador
 CREATE TABLE solicitador (
-    idsolicitador INT IDENTITY(1,1) PRIMARY KEY,
+    idsolicitador INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL
 );
-go
--- Tabla supervisor
 CREATE TABLE supervisor (
-    idsupervisor INT IDENTITY(1,1) PRIMARY KEY,
+    idsupervisor INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL
 );
-go
--- Tabla entrada
 CREATE TABLE entrada (
-    identrada INT IDENTITY(1,1) PRIMARY KEY,
+    identrada INT AUTO_INCREMENT PRIMARY KEY,
     fecha DATE
 );
-go
-select*from entrada;
-go
--- Tabla entradaDetalle
 CREATE TABLE entradaDetalle (
-    identradaDetalle INT IDENTITY(1,1) PRIMARY KEY,
+    identradaDetalle INT AUTO_INCREMENT PRIMARY KEY,
     identrada INT,
     idproducto INT,
     cantidad INT,
     FOREIGN KEY (identrada) REFERENCES entrada(identrada),
     FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
 );
-go
--- Tabla maquinariaMarca
-
 CREATE TABLE maquinaria (
-    idmaquinaria INT IDENTITY(1,1) PRIMARY KEY,
+    idmaquinaria INT AUTO_INCREMENT PRIMARY KEY,
 	tIPO varchar(50),
-	Modelo varchar(50)
-    marca VARCHAR(50),
-    FOREIGN KEY (idmaquinariaMarca) REFERENCES maquinariaMarca(idmaquinariaMarca)
+	Modelo varchar(50),
+    marca VARCHAR(50)
 );
-go
 CREATE TABLE salida (
-    idsalida INT IDENTITY(1,1) PRIMARY KEY,
+    idsalida INT AUTO_INCREMENT PRIMARY KEY,
     fecha DATE,
-    responsable VARCHAR(50),
-    
+    responsable VARCHAR(50)
 );
-go
 CREATE TABLE salidaDetalle (
-    idsalidaDetalle INT IDENTITY(1,1) PRIMARY KEY,
+    idsalidaDetalle INT AUTO_INCREMENT PRIMARY KEY,
     idsalida INT,
     idproducto INT,
     cantidad INT,
@@ -161,65 +102,47 @@ CREATE TABLE salidaDetalle (
     FOREIGN KEY (idproducto) REFERENCES producto(idproducto),
 	FOREIGN KEY (idmaquinaria) REFERENCES maquinaria(idmaquinaria)
 );
-go
--- Creaci髇 de la tabla Requerimiento
 CREATE TABLE Requerimiento (
-    idrequerimiento INT IDENTITY(1,1) PRIMARY KEY,      -- Clave primaria auto-incremental
+    idrequerimiento INT AUTO_INCREMENT PRIMARY KEY,      -- Clave primaria auto-incremental
     fechaRequerimiento DATE,                             -- Fecha del requerimiento
-    critero VARCHAR(50),                                 -- Descripci髇 o criterio del requerimiento (corrigiendo el nombre a "criterio")
+    critero VARCHAR(50),                                 -- Descripci贸n o criterio del requerimiento (corrigiendo el nombre a "criterio")
     idsolicitador INT,                                   -- ID del solicitante
     idsupervisor INT,                                    -- ID del supervisor
-    FOREIGN KEY (idsolicitador) REFERENCES solicitador(idsolicitador) ON DELETE CASCADE,  -- Relaci髇 con la tabla solicitador
-    FOREIGN KEY (idsupervisor) REFERENCES supervisor(idsupervisor) ON DELETE CASCADE  -- Relaci髇 con la tabla supervisor
+    FOREIGN KEY (idsolicitador) REFERENCES solicitador(idsolicitador) ON DELETE CASCADE,  -- Relaci贸n con la tabla solicitador
+    FOREIGN KEY (idsupervisor) REFERENCES supervisor(idsupervisor) ON DELETE CASCADE  -- Relaci贸n con la tabla supervisor
 );
-GO
--- Creaci髇 de la tabla requerimientoDetalle
 CREATE TABLE requerimientoDetalle (
-    idrequerimientoDetalle INT IDENTITY(1,1) PRIMARY KEY, -- Clave primaria auto-incremental
+    idrequerimientoDetalle INT AUTO_INCREMENT PRIMARY KEY, -- Clave primaria auto-incremental
     idrequerimiento INT,                                   -- ID del requerimiento asociado
     idproducto INT,                                        -- ID del producto asociado
     cantidad INT,                                          -- Cantidad solicitada
     iduso INT,                                             -- ID de uso asociado
     idproveedor INT,                                       -- ID del proveedor
     idmaquinaria INT,                                      -- ID de maquinaria asociada
-    idalmacen INT,                                         -- ID del almac閚
+    idalmacen INT,                                         -- ID del almac茅n
     precioUnitario DECIMAL(10, 2),                         -- Precio unitario
     precioTotal DECIMAL(10, 2),                  -- Precio total calculado (cantidad * precioUnitario) y persistido
-    FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE, -- Relaci髇 con producto
-    FOREIGN KEY (iduso) REFERENCES uso(iduso) ON DELETE CASCADE,             -- Relaci髇 con uso
-    FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE CASCADE, -- Relaci髇 con proveedor
-    FOREIGN KEY (idalmacen) REFERENCES Almacen(idalmacen) ON DELETE CASCADE,     -- Relaci髇 con almac閚
-    FOREIGN KEY (idrequerimiento) REFERENCES Requerimiento(idrequerimiento) ON DELETE CASCADE -- Relaci髇 con requerimiento
+    FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE, -- Relaci贸n con producto
+    FOREIGN KEY (iduso) REFERENCES uso(iduso) ON DELETE CASCADE,             -- Relaci贸n con uso
+    FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE CASCADE, -- Relaci贸n con proveedor
+    FOREIGN KEY (idalmacen) REFERENCES Almacen(idalmacen) ON DELETE CASCADE,     -- Relaci贸n con almac茅n
+    FOREIGN KEY (idrequerimiento) REFERENCES Requerimiento(idrequerimiento) ON DELETE CASCADE -- Relaci贸n con requerimiento
 );
-GO
-
-select * from usuario
-
-
--- Insertar usuarios
-INSERT INTO usuario (nombre, apellidos, correo, contrase馻) VALUES
+INSERT INTO usuario (nombre, apellidos, correo, contrase帽a) VALUES
 ('Gian', 'Alejandro', 'gian.alejandro@koelsa.com', '123');
--- Insertar marcas
 INSERT INTO marca (nombre) VALUES
-('Caterpillar'),
+('Tek Bond'),
 ('Komatsu'),
 ('XCMG'),
 ('SANY'),
 ('John Deere');
-go
--- Insertar proveedores
-INSERT INTO proveedor (nombre, direccion, telefono, correo) VALUES
-('NRC PACK', 'Calle Falsa 123', '555-1234', 'proveedorA@email.com'),
-('L&L INDUSTRIAL', 'Avenida Real 456', '555-5678', 'proveedorB@email.com'),
-('COLOR Y MATIZ LOPEZ', 'Calle 14 789', '555-9101', 'proveedorC@email.com'),
-('A&C DYNAMIS', 'Paseo Central 101', '555-1122', 'proveedorD@email.com');
-
--- Insertar almacenes
+INSERT INTO proveedor (ruc, nombre, direccion, telefono, correo) VALUES
+(20609509865, 'NRC PACK', 'Calle Falsa 123', '555-1234', 'proveedorA@email.com'),
+(20547071931, 'L&L INDUSTRIAL', 'Avenida Real 456', '555-5678', 'proveedorB@email.com'),
+(20602430325, 'COLOR Y MATIZ LOPEZ', 'Calle 14 789', '555-9101', 'proveedorC@email.com'),
+(20610808655, 'A&C DYNAMIS', 'Paseo Central 101', '555-1122', 'proveedorD@email.com');
 INSERT INTO almacen (nombre, direccion, capacidad) VALUES
-('Almacen 1', 'Kilometro 26 Ant. Pan. Sur', 500);
-
-go
-
+('Taller Lima', 'Kilometro 26 Ant. Pan. Sur', 500);
 INSERT INTO UnidadMedida (nomUnidad) VALUES ('Kilogramo');
 INSERT INTO UnidadMedida (nomUnidad) VALUES ('Metro');
 INSERT INTO UnidadMedida (nomUnidad) VALUES ('Cilindro');
@@ -227,25 +150,29 @@ INSERT INTO UnidadMedida (nomUnidad) VALUES ('Und');
 
 INSERT INTO uso (nomUso) VALUES ('Consumible');
 INSERT INTO uso (nomUso) VALUES ('Comercial');
-INSERT INTO uso (nomUso) VALUES ('Dom閟tico');
-
-
--- Insertar entrada
+INSERT INTO uso (nomUso) VALUES ('Dom茅stico');
+INSERT INTO almacenDetalle (idalmacen, ubicacion)
+VALUES 
+(1, 'A1'),
+(1, 'A2'),
+(1, 'A3');
+INSERT INTO familia (nomfamilia) values
+('ADESIVO');
+INSERT INTO producto (partname, descripcion, idmarca, idunidadMedida, cantidad, idproveedor, precio, idfamilia, idalmacenDetalle) 
+VALUES ('122', 'ADESIVO INSTANTANEO 50 g', 4, 4, 6, 1, 5.6, 1, 1);
 INSERT INTO entrada (fecha) VALUES
 ('2024-01-01'),
 ('2024-02-01'),
 ('2024-03-01'),
 ('2024-04-01'),
 ('2024-05-01');
-select * from entrada
--- Insertar entradaDetalle
-INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES
+select * from entrada;
+select * from entradaDetalle;
+INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES 
 (1, 1, 10),
-(2, 2, 20),
-(3, 3, 15),
-(4, 4, 25),
-(5, 1, 15);
-go
+(2, 1, 20);
+
+
 -- Insertar entrada
 INSERT INTO salida (fecha) VALUES
 ('2024-01-01'),
@@ -253,23 +180,16 @@ INSERT INTO salida (fecha) VALUES
 ('2024-03-01'),
 ('2024-04-01'),
 ('2024-05-01');
-select * from salidaDetalle
--- Insertar entradaDetalle
 INSERT INTO salidaDetalle(idsalida, idproducto, cantidad) VALUES
 (1, 1, 10),
 (2, 2, 20),
 (3, 3, 15),
 (4, 4, 25),
 (5, 1, 15);
-go
-select * from entradaDetalle
--- Insertar maquinaria
 INSERT INTO maquinaria (idmarca, descripcion) VALUES
 (1, 'Excavadora'),
 (2, 'Retroexcavadora'),
 (3, 'Volquete');
-go
--- Insertar maquinariaMarca
 INSERT INTO maquinariaMarca (tipo, nombre) VALUES
 ('Tipo A', 'Caterpillar'),
 ('Tipo B', 'Komatsu'),
@@ -305,7 +225,7 @@ INSERT INTO requerimientoDetalle (idrequerimiento, idproducto, cantidad, idprove
 go
 
 select * from producto
--- Seleccionar todos los productos con informaci髇 de marca, proveedor y almac閚 (JOIN)
+-- Seleccionar todos los productos con informaci贸n de marca, proveedor y almac茅n (JOIN)
 SELECT 
 	p.idproducto as CodProducto,
     e.fecha AS fecha_entrada,
@@ -430,7 +350,7 @@ VALUES
     ('Excavadora', '330D L', 'Caterpillar'),
     ('Bulldozer', 'D155AX-8', 'Komatsu'),
     ('Retroexcavadora', 'L90H', 'Volvo'),
-    ('Gr鷄', 'LTM 1350-6.1', 'Liebherr'),
+    ('Gr煤a', 'LTM 1350-6.1', 'Liebherr'),
     ('Pala Cargadora', 'ZAXIS 330LC', 'Hitachi');
 
 	select * from producto
@@ -477,7 +397,7 @@ VALUES
 (2, 'A2'),
 (3, 'A3')
 
--- Luego agregar la llave for醤ea:
+-- Luego agregar la llave for谩nea:
 ALTER TABLE almacen
 ADD CONSTRAINT fk_almacenDetalle
 FOREIGN KEY (idalmacenDetalle)
@@ -497,7 +417,7 @@ select * from producto
 	SELECT 
 		p.idproducto AS ID,
 		p.partname AS PartName,
-		p.descripcion AS Descripci髇,
+		p.descripcion AS Descripci贸n,
 		m.nombre AS Marca,
 		pr.nombre AS Proveedor,
 		f.nomfamilia AS Familia,
@@ -541,14 +461,14 @@ INSERT INTO Requerimiento (fechaRequerimiento, critero, total) VALUES ('2024-12-
 
 SELECT
 
-                        p.descripcion AS Descripci髇,
+                        p.descripcion AS Descripci贸n,
                         rd.cantidad AS Cantidad,
                         rd.precioUnitario AS PrecioUnitario,
                         rd.precioTotal AS PrecioTotal,
                         u.nomUso AS Uso,
                         pr.nombre AS Proveedor,
                         m.Modelo AS Maquinaria,
-                        a.nombre AS Almac閚
+                        a.nombre AS Almac茅n
                     FROM requerimientoDetalle rd
                     LEFT JOIN producto p ON rd.idproducto = p.idproducto
                     LEFT JOIN uso u ON rd.iduso = u.iduso

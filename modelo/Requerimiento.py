@@ -195,3 +195,32 @@ class Requerimiento:
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return []
+
+    def actualizar_detalle_requerimiento(self, id_detalle, cantidad, id_proveedor, precio_unitario):
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                precio_total = cantidad * precio_unitario
+                query = """
+                    UPDATE requerimientoDetalle
+                    SET 
+                        cantidad = ?,
+                        idproveedor = ?,
+                        precioUnitario = ?,
+                        precioTotal = ?
+                    WHERE idrequerimientoDetalle = ?
+                """
+                parametros = (cantidad, id_proveedor, precio_unitario, precio_total, id_detalle)
+                cursor.execute(query, parametros)
+                connection.commit()
+                return True
+            except Exception as e:
+                print(f"Error al actualizar detalle: {e}")
+                return False
+            finally:
+                if connection:
+                    connection.close()
+        else:
+            print("No se pudo establecer una conexión a la base de datos.")
+            return False
