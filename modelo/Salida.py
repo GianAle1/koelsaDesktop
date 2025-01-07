@@ -10,20 +10,39 @@ class Salida:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 # Insertar en la tabla salida
-                query_salida = "INSERT INTO salida (fecha, responsable, observacion) VALUES (?, ?, ?)"
+                query_salida = "INSERT INTO salida (fecha, responsable, observacion) VALUES (%s, %s, %s)"
                 cursor.execute(query_salida, (fecha, responsable, observaciones))
                 connection.commit()
 
                 # Obtener el idsalida recién generado
-                idsalida = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
+                cursor.execute("SELECT LAST_INSERT_ID()")
+                idsalida = cursor.fetchone()[0]
 
-                # Insertar en la tabla salidaDetalle
-                query_detalle = "INSERT INTO salidaDetalle (idsalida, idproducto, cantidad, idmaquinaria) VALUES (?, ?, ?, ?)"
+                # Insertar en la tabla salidaDetalle y actualizar la cantidad en producto
+                query_detalle = "INSERT INTO salidaDetalle (idsalida, idproducto, cantidad, idmaquinaria) VALUES (%s, %s, %s, %s)"
+                query_actualizar_producto = "UPDATE producto SET cantidad = cantidad - %s WHERE idproducto = %s"
+
                 for producto in productos:
                     producto_seleccionado, cantidad, idmaquinaria = producto
-                    cursor.execute("SELECT idproducto FROM producto WHERE descripcion = ?", (producto_seleccionado,))
-                    idproducto = cursor.fetchone()[0]
-                    cursor.execute(query_detalle, (idsalida, idproducto, cantidad, idmaquinaria))
+                    cursor.execute("SELECT idproducto, cantidad FROM producto WHERE descripcion = %s", (producto_seleccionado,))
+                    resultado = cursor.fetchone()
+
+                    if resultado:
+                        idproducto = resultado[0]
+                        stock_actual = resultado[1]
+
+                        if stock_actual < cantidad:
+                            print(f"No hay suficiente stock para el producto '{producto_seleccionado}'. Stock actual: {stock_actual}")
+                            raise ValueError(f"Stock insuficiente para el producto '{producto_seleccionado}'")
+
+                        # Insertar en salidaDetalle
+                        cursor.execute(query_detalle, (idsalida, idproducto, cantidad, idmaquinaria))
+
+                        # Actualizar el stock del producto
+                        cursor.execute(query_actualizar_producto, (cantidad, idproducto))
+                    else:
+                        print(f"El producto '{producto_seleccionado}' no fue encontrado en la base de datos.")
+                        continue
 
                 # Confirmar cambios
                 connection.commit()
@@ -34,6 +53,9 @@ class Salida:
                 return None
             finally:
                 self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo establecer conexión con la base de datos.")
+            return None
 
     def listar_maquinarias(self):
         """
@@ -88,7 +110,7 @@ class Salida:
                 FROM salidaDetalle sd
                 JOIN salida s ON s.idsalida = sd.idsalida
                 JOIN maquinaria m ON m.idmaquinaria = sd.idmaquinaria
-                WHERE sd.idproducto = ?
+                WHERE sd.idproducto = %s
                 """
                 cursor.execute(query, (producto_id,))
                 return cursor.fetchall()

@@ -10,20 +10,21 @@ class Entrada:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 # Insertar en la tabla entrada
-                query_entrada = "INSERT INTO entrada (fecha) VALUES (?)"
+                query_entrada = "INSERT INTO entrada (fecha) VALUES (%s)"
                 cursor.execute(query_entrada, (fecha,))
                 connection.commit()
 
                 # Obtener el identrada recién generado
-                identrada = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
+                cursor.execute("SELECT LAST_INSERT_ID()")  # Cambiado para MySQL
+                identrada = cursor.fetchone()[0]
 
                 # Insertar en la tabla entradaDetalle y actualizar la cantidad en producto
-                query_detalle = "INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES (?, ?, ?)"
-                query_actualizar_producto = "UPDATE producto SET cantidad = cantidad + ? WHERE idproducto = ?"
+                query_detalle = "INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES (%s, %s, %s)"
+                query_actualizar_producto = "UPDATE producto SET cantidad = cantidad + %s WHERE idproducto = %s"
 
                 for producto in productos:
                     # Obtener el idproducto basado en la descripción del producto
-                    cursor.execute("SELECT idproducto FROM producto WHERE descripcion = ?", (producto[0],))
+                    cursor.execute("SELECT idproducto FROM producto WHERE descripcion = %s", (producto[0],))
                     result = cursor.fetchone()
                     if result:
                         idproducto = result[0]  # Extraer el ID del producto
@@ -40,16 +41,16 @@ class Entrada:
                 # Confirmar todos los cambios
                 connection.commit()
                 print("Entrada guardada exitosamente.")
-                return True
+                return identrada  # Retorna el ID de la entrada creada
             except Exception as e:
                 print(f"Error al guardar la entrada: {e}")
                 connection.rollback()
-                return False
+                return None
             finally:
                 self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer conexión con la base de datos.")
-            return False
+            return None
 
     def obtener_entradas_por_producto(self, producto_id):
         """Consulta las entradas asociadas a un producto específico."""
@@ -61,12 +62,12 @@ class Entrada:
                 SELECT e.fecha, d.cantidad
                 FROM entradaDetalle d
                 JOIN entrada e ON e.identrada = d.identrada
-                WHERE d.idproducto = ?
+                WHERE d.idproducto = %s
                 """
                 cursor.execute(query, (producto_id,))
                 return cursor.fetchall()
             except Exception as e:
                 print(f"Error obteniendo entradas del producto: {e}")
                 return []
-            #finally:
-             #   self.conexion_db.cerrar_conexion()
+            finally:
+                self.conexion_db.cerrar_conexion()

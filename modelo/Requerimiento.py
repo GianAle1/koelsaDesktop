@@ -11,7 +11,7 @@ class Requerimiento:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 # Insertar en la tabla Requerimiento
-                query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, critero) VALUES (?, ?)"
+                query_requerimiento = "INSERT INTO Requerimiento (fechaRequerimiento, critero) VALUES (%s, %s)"
                 cursor.execute(query_requerimiento, (fecha, criterio))
                 connection.commit()
 
@@ -22,7 +22,7 @@ class Requerimiento:
                 query_detalle = """
                     INSERT INTO requerimientoDetalle (
                         idrequerimiento, idproducto, cantidad, idproveedor, iduso, idalmacen, idmaquinaria, precioUnitario, precioTotal
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 for producto in productos:
                     cursor.execute(query_detalle, (
@@ -181,7 +181,7 @@ class Requerimiento:
                     LEFT JOIN proveedor pr ON rd.idproveedor = pr.idproveedor
                     LEFT JOIN maquinaria m ON rd.idmaquinaria = m.idmaquinaria
                     LEFT JOIN almacen a ON rd.idalmacen = a.idalmacen
-                    WHERE rd.idrequerimiento = ?;
+                    WHERE rd.idrequerimiento = %s;
                 """
                 cursor.execute(query, (id_requerimiento,))
                 resultado = cursor.fetchall()
@@ -205,11 +205,11 @@ class Requerimiento:
                 query = """
                     UPDATE requerimientoDetalle
                     SET 
-                        cantidad = ?,
-                        idproveedor = ?,
-                        precioUnitario = ?,
-                        precioTotal = ?
-                    WHERE idrequerimientoDetalle = ?
+                        cantidad = %s,
+                        idproveedor = %s,
+                        precioUnitario = %s,
+                        precioTotal = %s
+                    WHERE idrequerimientoDetalle = %s
                 """
                 parametros = (cantidad, id_proveedor, precio_unitario, precio_total, id_detalle)
                 cursor.execute(query, parametros)

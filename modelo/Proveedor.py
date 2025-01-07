@@ -10,7 +10,7 @@ class Proveedor:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "INSERT INTO proveedor (nombre, direccion, telefono, correo,ruc) VALUES (?, ?, ?, ?,?)"
+                query = "INSERT INTO proveedor (nombre, direccion, telefono, correo,ruc) VALUES (%s, %s, %s, %s,%s)"
                 cursor.execute(query, (nombre, direccion, telefono, correo,ruc))
                 connection.commit()  # Confirmar los cambios
                 return True  # Retornamos True si el proveedor se registró correctamente
@@ -45,7 +45,7 @@ class Proveedor:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "DELETE FROM proveedor WHERE idproveedor = ?"
+                query = "DELETE FROM proveedor WHERE idproveedor = %s"
                 cursor.execute(query, (id_proveedor,))
                 connection.commit()
                 return True

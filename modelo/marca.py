@@ -11,7 +11,7 @@ class Marca:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "INSERT INTO marca (nombre) VALUES (?)"
+                query = "INSERT INTO marca (nombre) VALUES (%s)"
                 cursor.execute(query, (nombre_marca,))
                 connection.commit()  # Confirmar los cambios
                 # Ahora, cerrar la conexión después de la operación
@@ -51,7 +51,7 @@ class Marca:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "DELETE FROM marca WHERE idmarca = ?"
+                query = "DELETE FROM marca WHERE idmarca = %s"
                 cursor.execute(query, (id_marca,))
                 connection.commit()  # Confirmar los cambios
                 # self.conexion_db.cerrar_conexion()  # Cerrar la conexión después de la operación

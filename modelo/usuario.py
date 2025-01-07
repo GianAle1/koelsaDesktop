@@ -14,7 +14,7 @@ class Usuario:
                 return False  # Si no se pudo establecer la conexión, retornamos False
 
             cursor = self.conn.cursor()  # Obtenemos el cursor para realizar la consulta
-            query = "SELECT * FROM usuario WHERE correo = ? AND contraseña = ?"
+            query = "SELECT * FROM usuario WHERE correo = %s AND contraseña = %s"
             cursor.execute(query, (username, password))
             result = cursor.fetchone()
 

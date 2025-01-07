@@ -133,5 +133,9 @@ class VistaEntrada:
             messagebox.showinfo("Éxito", f"Entrada registrada con ID: {entrada_id}")
             self.productos_temporales = []
             self.actualizar_tabla()
+
+            # Actualizar la vista de productos
+            if hasattr(self.controlador, "vista_productos"):
+                self.controlador.vista_productos.listar_productos()
         else:
             messagebox.showerror("Error", "Ocurrió un error al guardar la entrada.")

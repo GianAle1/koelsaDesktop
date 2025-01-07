@@ -1,53 +1,59 @@
-# modelo/conexion.py
-import pyodbc
+import mysql.connector
+from mysql.connector import Error
 
 class ConexionDB:
     def __init__(self):
         self.connection = None
-        self.cursor = None
 
     def conectar(self):
         """
-        Establece la conexión con la base de datos SQL Server.
-        Si la conexión ya existe, la reutiliza.
+        Establece la conexión con la base de datos MySQL.
+        Si la conexión ya existe y está activa, la reutiliza.
         """
-        if not self.connection:
-            try:
-                # Establece la conexión a la base de datos SQL Server
-                self.connection = pyodbc.connect(
-                    'DRIVER={ODBC Driver 17 for SQL Server};'
-                    'SERVER=DESKTOP-DG21939;'  
-                    'DATABASE=koelsa;'
-                    'UID=sa;'
-                    'PWD=080322'
+        try:
+            if not self.connection or not self.connection.is_connected():
+                # Establece la conexión a la base de datos MySQL
+                self.connection = mysql.connector.connect(
+                    host='127.0.0.1',        # Cambia según tu configuración
+                    user='root',             # Usuario de MySQL
+                    password='080322',       # Contraseña de MySQL
+                    database='koelsa',       # Nombre de tu base de datos
+                    port=3310                # Puerto de MySQL
                 )
-                self.cursor = self.connection.cursor()
-                print("Conexión exitosa a la base de datos")
-            except Exception as e:
-                print(f"Error al conectar a la base de datos: {e}")
-                return None
+                if self.connection.is_connected():
+                    print("Conexión exitosa a la base de datos MySQL")
+        except Error as e:
+            print(f"Error al conectar a la base de datos: {e}")
+            self.connection = None
+
         return self.connection
 
     def cerrar_conexion(self):
-        if self.cursor:  # Verifica que el cursor existe antes de cerrarlo
-            try:
-                self.cursor.close()
-            except Exception as e:
-                print(f"Error al cerrar el cursor: {e}")
-        if self.connection:  # Verifica que la conexión existe antes de cerrarla
+        """
+        Cierra el cursor y la conexión a la base de datos si están activos.
+        """
+        if self.connection and self.connection.is_connected():
             try:
                 self.connection.close()
-            except Exception as e:
+                print("Conexión cerrada correctamente")
+            except Error as e:
                 print(f"Error al cerrar la conexión: {e}")
-
-
 
     def obtener_cursor(self):
         """
-        Retorna el cursor para realizar las consultas.
+        Retorna un cursor para realizar consultas.
+        Si no hay una conexión activa, intenta reconectar.
         """
-        if self.connection:
-            return self.cursor
+        if not self.connection or not self.connection.is_connected():
+            print("No hay conexión activa. Intentando reconectar...")
+            self.conectar()
+
+        if self.connection and self.connection.is_connected():
+            try:
+                return self.connection.cursor(buffered=True)  # Usa cursor con buffer para evitar errores con fetches
+            except Error as e:
+                print(f"Error al obtener el cursor: {e}")
+                return None
         else:
-            print("No hay conexión a la base de datos.")
+            print("No se pudo establecer una conexión a la base de datos.")
             return None

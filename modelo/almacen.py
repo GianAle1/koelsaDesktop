@@ -11,7 +11,7 @@ class Almacen:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "INSERT INTO almacen (nombre) VALUES (?)"
+                query = "INSERT INTO almacen (nombre) VALUES (%s)"
                 cursor.execute(query, (nombre_almacen,direccion,capacidad))
                 connection.commit()  # Confirmar los cambios
                 # Ahora, cerrar la conexión después de la operación
@@ -51,7 +51,7 @@ class Almacen:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "DELETE FROM almacen WHERE idalmacen = ?"
+                query = "DELETE FROM almacen WHERE idalmacen = %s"
                 cursor.execute(query, (id_alamcen,))
                 connection.commit()  # Confirmar los cambios
                 # self.conexion_db.cerrar_conexion()  # Cerrar la conexión después de la operación
@@ -70,7 +70,7 @@ class Almacen:
         if connection:
             try:
                 cursor = connection.cursor()
-                query = "SELECT idalmacenDetalle, ubicacion FROM almacenDetalle WHERE idalmacen = ?"
+                query = "SELECT idalmacenDetalle, ubicacion FROM almacenDetalle WHERE idalmacen = %s"
                 cursor.execute(query, (almacen_id,))
                 resultados = cursor.fetchall()
                 if not resultados:

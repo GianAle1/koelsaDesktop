@@ -110,9 +110,12 @@ class VistaProductos:
         self.root.mainloop()
 
     def listar_productos(self):
+        """Lista los productos desde la base de datos y actualiza la tabla."""
         productos = self.controlador.listar_productos()
         if productos:
             self.actualizar_lista_productos(productos)
+        else:
+            self.actualizar_lista_productos([])
 
     def cargar_familias(self):
         familias = self.controlador.listar_familias()
@@ -126,18 +129,15 @@ class VistaProductos:
         self.actualizar_lista_productos(productos)
 
     def actualizar_lista_productos(self, productos):
+        """Actualiza la lista de productos en la tabla."""
+        # Elimina todos los elementos existentes en la tabla
         for row in self.tree.get_children():
             self.tree.delete(row)
 
+        # Inserta los productos actualizados
         for producto in productos:
-            # Convertir los valores a cadenas y reemplazar comas para evitar conflictos
             valores = tuple(str(valor).replace(",", " ") if valor is not None else "" for valor in producto)
-
-            try:
-                self.tree.insert("", tk.END, values=valores)
-            except Exception as e:
-                print(f"Error insertando producto: {producto} - {e}")
-
+            self.tree.insert("", tk.END, values=valores)
 
     def mostrar_entradas_salidas(self, event):
         selected_item = self.tree.selection()
@@ -146,51 +146,41 @@ class VistaProductos:
             self.abrir_ventana_entradas_salidas(producto_id)
 
     def abrir_ventana_entradas_salidas(self, producto_id):
-        """Abre una ventana con el historial de entradas y salidas para un producto."""
         ventana_historial = tk.Toplevel(self.root)
         ventana_historial.title("Historial de Entradas y Salidas")
         ventana_historial.geometry("800x400")
         ventana_historial.configure(bg="#f4f4f9")
 
-        # Título de la ventana
         tk.Label(
             ventana_historial, text="Historial de Entradas y Salidas",
             font=("Arial", 16, "bold"), bg="#4CAF50", fg="white", pady=10
         ).pack(fill=tk.X)
 
-        # Crear un frame para la tabla
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Crear la tabla
         columnas = ("Tipo", "Fecha", "Cantidad", "Detalles")
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
-        # Encabezados de la tabla
         for col in columnas:
             tree.heading(col, text=col)
             tree.column(col, anchor="center", width=150)
 
-        # Scrollbars
         scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=scroll_y.set)
         scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
         tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Obtener registros
         registros = self.controlador.obtener_historial_producto(producto_id)
 
-        # Insertar datos en la tabla
         if registros:
             entradas = registros["entradas"]
             salidas = registros["salidas"]
 
-            # Agregar entradas
             for entrada in entradas:
                 fecha, cantidad = entrada
                 tree.insert("", tk.END, values=("Entrada", fecha, cantidad, "-"))
 
-            # Agregar salidas
             for salida in salidas:
                 fecha, cantidad, tipo, modelo, marca = salida
                 detalles = f"{tipo} {modelo} {marca}"
@@ -198,12 +188,10 @@ class VistaProductos:
         else:
             tree.insert("", tk.END, values=("No hay datos", "", "", ""))
 
-        # Botón para cerrar la ventana
         tk.Button(
             ventana_historial, text="Cerrar", font=("Arial", 12), bg="#f44336", fg="white",
             command=ventana_historial.destroy
         ).pack(pady=10)
-
 
     def exportar_a_excel(self):
         productos = [self.tree.item(child)["values"] for child in self.tree.get_children()]
@@ -222,14 +210,11 @@ class VistaProductos:
         sheet = workbook.active
         sheet.title = "Inventario de Productos"
 
-        # Escribir encabezados
         headers = [col for col in self.tree["columns"]]
         sheet.append(headers)
 
-        # Escribir datos
         for producto in productos:
             sheet.append(producto)
 
-        # Guardar archivo
         workbook.save(filepath)
         messagebox.showinfo("Éxito", f"Datos exportados exitosamente a {filepath}")
