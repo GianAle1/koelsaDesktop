@@ -83,23 +83,23 @@ class VistaRequerimiento:
 
     def cargar_productos(self):
         productos = self.controlador.listar_productos()
-        self.producto_combobox['values'] = [f"{prod[1]} - {prod[2]}" for prod in productos]
+        self.producto_combobox['values'] = [f"{prod[0]} - {prod[1]} - {prod[2]}" for prod in productos]
 
     def cargar_proveedores(self):
         proveedores = self.controlador.listar_proveedores()
-        self.proveedor_combobox['values'] = [f"{prov[1]}" for prov in proveedores]
+        self.proveedor_combobox['values'] = [f"{prov[0]} - {prov[1]}" for prov in proveedores]
 
     def cargar_usos(self):
         usos = self.controlador.listar_usos()
-        self.uso_combobox['values'] = [f"{uso[1]}" for uso in usos]
+        self.uso_combobox['values'] = [f"{uso[0]} - {uso[1]}" for uso in usos]
 
     def cargar_almacenes(self):
         almacenes = self.controlador.listar_almacenes()
-        self.almacen_combobox['values'] = [f"{alm[1]}" for alm in almacenes]
+        self.almacen_combobox['values'] = [f"{alm[0]} - {alm[1]}" for alm in almacenes]
 
     def cargar_maquinarias(self):
         maquinarias = self.controlador.listar_maquinarias()
-        self.maquinaria_combobox['values'] = [f"{maq[1]} - {maq[2]} - {maq[3]}" for maq in maquinarias]
+        self.maquinaria_combobox['values'] = [f"{maq[0]} - {maq[1]} - {maq[2]} - {maq[3]}" for maq in maquinarias]
 
     def agregar_producto(self):
         producto = self.producto_combobox.get()
@@ -139,14 +139,14 @@ class VistaRequerimiento:
 
         productos_para_bd = [
             {
-                "id_producto": prod[0].split(" - ")[0],
-                "cantidad": prod[1],
-                "id_proveedor": prod[2].split(" - ")[0],
-                "id_uso": prod[3].split(" - ")[0],
-                "id_almacen": prod[4].split(" - ")[0],
-                "id_maquinaria": prod[5].split(" - ")[0],
-                "precio_unitario": prod[6],
-                "precio_total": prod[7],
+                "id_producto": prod[0].split(" - ")[0],  # Extrae el ID del producto
+                "cantidad": prod[1],  # Cantidad
+                "id_proveedor": prod[2].split(" - ")[0],  # Extrae el ID del proveedor
+                "id_uso": prod[3].split(" - ")[0],  # Extrae el ID del uso
+                "id_almacen": prod[4].split(" - ")[0],  # Extrae el ID del almacén
+                "id_maquinaria": prod[5].split(" - ")[0],  # Extrae el ID de la maquinaria
+                "precio_unitario": prod[6],  # Precio unitario
+                "precio_total": prod[7],  # Precio total
             }
             for prod in self.productos_temporales
         ]
