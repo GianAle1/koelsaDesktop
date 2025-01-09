@@ -10,6 +10,8 @@ from controlador.ControladorEntrada import ControladorEntrada
 from controlador.ControladorMaquinaria import ControladorMaquinaria
 from controlador.ControladorSalida import ControladorSalida
 from controlador.ControladorRequerimiento import ControladorRequerimiento
+from controlador.ControladorBacklog import ControladorBacklog  
+
 class MenuControlador:
     def __init__(self):
         self.controlador_marca = ControladorMarca()
@@ -24,6 +26,7 @@ class MenuControlador:
         self.controlador_maquinaria = ControladorMaquinaria()
         self.controlador_salida = ControladorSalida()
         self.controlador_requerimiento = ControladorRequerimiento()
+        self.controlador_backlog = ControladorBacklog() 
     def registrar_marca(self, nombre_marca):
         return self.controlador_marca.registrar_marca(nombre_marca)
 
@@ -101,4 +104,8 @@ class MenuControlador:
         """Llama al modelo para obtener los detalles del requerimiento."""
         return self.controlador_requerimiento.obtener_detalle_requerimiento(id_requerimiento)
     
-    
+    def listar_backlogs(self):
+        return self.controlador_backlog.listar_backlogs()
+
+    def guardar_backlog(self, backlog_data, detalles_temporales):
+        return self.controlador_backlog.guardar_backlog(backlog_data, detalles_temporales)
