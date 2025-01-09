@@ -9,6 +9,7 @@ from vista.VistaEntrada import VistaEntrada
 from vista.VistaSalida import VistaSalida
 from vista.VistaRequerimiento import VistaRequerimiento
 from vista.VistaRequerimientos import VistaRequerimientos
+from vista.VistaBacklog import VistaBacklog
 from tkinter.font import Font
 
 
@@ -47,13 +48,14 @@ class VistaMenu:
             ("Salida de Productos", self.abrir_ventana_salida_productos, "#FF5722", "📤"),
             ("Gestionar Requerimientos", self.abrir_ventana_requerimiento, "#3F51B5", "📋"),
             ("Listar Requerimientos", self.abrir_ventana_requerimientos, "#007ACC", "📃"),
+            ("Gestionar Backlogs", self.abrir_ventana_backlogs, "#795548", "🗂"),
             ("Cerrar Sesión", self.cerrar_sesion, "#f44336", "🚪"),
         ]
 
         # Crear botones en una cuadrícula
         for row in range(3):  # Tres filas
-            for col in range(3):  # Tres columnas
-                index = row * 3 + col
+            for col in range(4):  # Cuatro columnas
+                index = row * 4 + col
                 if index < len(botones):
                     texto, comando, color, icono = botones[index]
                     boton = tk.Button(
@@ -66,7 +68,7 @@ class VistaMenu:
         # Expandir las celdas de la cuadrícula para que ocupen el espacio disponible
         for row in range(3):
             self.frame_botones.rowconfigure(row, weight=1)
-        for col in range(3):
+        for col in range(4):
             self.frame_botones.columnconfigure(col, weight=1)
 
     def mostrar_menu(self):
@@ -118,6 +120,12 @@ class VistaMenu:
         ventana_requerimientos = tk.Toplevel(self.root)
         vista_requerimientos = VistaRequerimientos(ventana_requerimientos, self.controlador)
         vista_requerimientos.mostrar_requerimientos()
+
+    def abrir_ventana_backlogs(self):
+        """Abre la ventana de gestión de backlogs."""
+        ventana_backlogs = tk.Toplevel(self.root)
+        vista_backlog = VistaBacklog(ventana_backlogs, self.controlador)
+        vista_backlog.mostrar_backlogs()
 
     def cerrar_sesion(self):
         self.root.withdraw()

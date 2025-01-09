@@ -1,4 +1,3 @@
-# controlador/menu_controlador.py
 from controlador.ControladorMarca import ControladorMarca
 from controlador.ControladorProveedor import ControladorProveedor
 from controlador.ControladorProducto import ControladorProducto
@@ -9,9 +8,8 @@ from controlador.ControladorEquipo import ControladorEquipo
 from controlador.ControladorFamilia import ControladorFamilia
 from controlador.ControladorEntrada import ControladorEntrada
 from controlador.ControladorMaquinaria import ControladorMaquinaria
-from controlador.ControladorSalida import ControladorSalida    # Asegúrate de importar este controlador
-from controlador.ControladorRequerimiento import ControladorRequerimiento    # Asegúrate de importar este controlador
-
+from controlador.ControladorSalida import ControladorSalida
+from controlador.ControladorRequerimiento import ControladorRequerimiento
 class MenuControlador:
     def __init__(self):
         self.controlador_marca = ControladorMarca()
@@ -59,7 +57,6 @@ class MenuControlador:
         return self.controlador_equipo.listar_equipos() 
     def listar_familias(self):
         return self.controlador_familia.listar_familias() 
-    
 
     def registrar_producto(self, nombre, descripcion, cantidad, precio, proveedor_id, marca_id, almacen_id, und_medida,familia):
         if not nombre or not descripcion or not cantidad or not precio:
@@ -103,7 +100,5 @@ class MenuControlador:
     def obtener_detalle_requerimiento(self, id_requerimiento):
         """Llama al modelo para obtener los detalles del requerimiento."""
         return self.controlador_requerimiento.obtener_detalle_requerimiento(id_requerimiento)
-
-
-
+    
     
