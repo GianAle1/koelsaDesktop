@@ -127,6 +127,11 @@ class VistaMenu:
         vista_backlog = VistaBacklog(ventana_backlogs, self.controlador)
         vista_backlog.mostrar_backlogs()
 
+    def abrir_ventana_backlogs(self):
+        ventana_backlogs = tk.Toplevel(self.root)
+        vista_backlog = VistaBacklog(ventana_backlogs, self.controlador)
+        vista_backlog.mostrar_backlogs()
+
     def cerrar_sesion(self):
         self.root.withdraw()
         print("Sesión cerrada, volver al login.")

@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import date
 
+
 class VistaBacklog:
     def __init__(self, root, controlador):
         self.root = root
@@ -11,7 +12,14 @@ class VistaBacklog:
         self.root.configure(bg="#f4f4f9")
 
         # Título
-        self.titulo_label = tk.Label(self.root, text="Registrar Backlog", font=("Arial", 18, "bold"), bg="#2e7d32", fg="white", pady=10)
+        self.titulo_label = tk.Label(
+            self.root,
+            text="Registrar Backlog",
+            font=("Arial", 18, "bold"),
+            bg="#2e7d32",
+            fg="white",
+            pady=10,
+        )
         self.titulo_label.pack(fill=tk.X)
 
         # Frame principal
@@ -19,15 +27,21 @@ class VistaBacklog:
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
         # Frame izquierdo: Información general
-        self.frame_general = tk.LabelFrame(self.main_frame, text="Información General", bg="#f4f4f9", font=("Arial", 14))
+        self.frame_general = tk.LabelFrame(
+            self.main_frame, text="Información General", bg="#f4f4f9", font=("Arial", 14)
+        )
         self.frame_general.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
         # Frame derecho: Detalles del producto
-        self.frame_detalles = tk.LabelFrame(self.main_frame, text="Detalles del Producto", bg="#f4f4f9", font=("Arial", 14))
+        self.frame_detalles = tk.LabelFrame(
+            self.main_frame, text="Detalles del Producto", bg="#f4f4f9", font=("Arial", 14)
+        )
         self.frame_detalles.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
         # Frame tabla
-        self.frame_tabla = tk.LabelFrame(self.main_frame, text="Lista de Detalles", bg="#f4f4f9", font=("Arial", 14))
+        self.frame_tabla = tk.LabelFrame(
+            self.main_frame, text="Lista de Detalles", bg="#f4f4f9", font=("Arial", 14)
+        )
         self.frame_tabla.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
         # Configuración de columnas
@@ -37,13 +51,39 @@ class VistaBacklog:
 
         # Campos de información general
         self.fecha_entry = self._crear_campo(self.frame_general, "Fecha:", 0)
-        self.fecha_entry.insert(0, date.today().strftime('%Y-%m-%d'))
+        self.fecha_entry.insert(0, date.today().strftime("%Y-%m-%d"))
         self.horometro_entry = self._crear_campo(self.frame_general, "Horómetro:", 1)
-        self.prioridad_combobox = self._crear_combobox(self.frame_general, "Prioridad:", 2, ["Emergencia", "Urgente", "Corto Plazo", "Largo Plazo"], default_value="Urgente")
-        self.ubicacion_combobox = self._crear_combobox(self.frame_general, "Ubicación:", 3, ["Taller Lima", "Chicama", "Shougang SM", "Cañete", "Huarmey"], default_value="Taller Lima")
-        self.recurso_humano_combobox = self._crear_combobox(self.frame_general, "Recurso Humano:", 4, ["Mecanico", "Electricista", "Soldador", "Gruero", "Rigger"], default_value="Mecanico")
-        self.cantidad_recurso_entry = self._crear_campo(self.frame_general, "Cantidad de Recursos:", 5)
-        self.equipo_soporte_combobox = self._crear_combobox(self.frame_general, "Equipo Soporte:", 6, ["Grua", "Maquina Soldar", "Compresora", "Luminaria", "Montacarga/Manipulador", "Herramientas/Otros"], default_value="Herramientas/Otros")
+        self.prioridad_combobox = self._crear_combobox(
+            self.frame_general,
+            "Prioridad:",
+            2,
+            ["Emergencia", "Urgente", "Corto Plazo", "Largo Plazo"],
+            default_value="Urgente",
+        )
+        self.ubicacion_combobox = self._crear_combobox(
+            self.frame_general,
+            "Ubicación:",
+            3,
+            ["Taller Lima", "Chicama", "Shougang SM", "Cañete", "Huarmey"],  # Sin errores
+            default_value="Taller Lima"
+        )
+        self.recurso_humano_combobox = self._crear_combobox(
+            self.frame_general,
+            "Recurso Humano:",
+            4,
+            ["Mecanico", "Electricista", "Soldador", "Gruero", "Rigger"],
+            default_value="Mecanico",
+        )
+        self.cantidad_recurso_entry = self._crear_campo(
+            self.frame_general, "Cantidad de Recursos:", 5
+        )
+        self.equipo_soporte_combobox = self._crear_combobox(
+            self.frame_general,
+            "Equipo Soporte:",
+            6,
+            ["Grua", "Maquina Soldar", "Compresora", "Luminaria", "Montacarga/Manipulador", "Herramientas/Otros"],
+            default_value="Herramientas/Otros",
+        )
         self.detalle_text = self._crear_textarea(self.frame_general, "Detalle:", 7)
         self.hora_entry = self._crear_campo(self.frame_general, "Horas:", 8)
         self.elaborado_por_entry = self._crear_campo(self.frame_general, "Elaborado por:", 9)
@@ -54,16 +94,33 @@ class VistaBacklog:
         self.smcs_entry = self._crear_campo(self.frame_detalles, "SMCS:", 0)
         self.producto_combobox = self._crear_combobox(self.frame_detalles, "ID Producto:", 1)
         self.marca_combobox = self._crear_combobox(self.frame_detalles, "ID Marca:", 2)
-        self.unidad_medida_combobox = self._crear_combobox(self.frame_detalles, "Unidad Medida:", 3)
-        self.detalle_producto_text = self._crear_textarea(self.frame_detalles, "Detalle del Producto:", 4)
-        self.precio_entry = self._crear_campo(self.frame_detalles, "Precio:", 5)
-        self.cantidad_necesaria_entry = self._crear_campo(self.frame_detalles, "Cantidad Necesaria:", 6)
-        self.stock_entry = self._crear_campo(self.frame_detalles, "Stock:", 7)
+        self.detalle_producto_text = self._crear_textarea(
+            self.frame_detalles, "Detalle del Producto:", 3
+        )
+        self.precio_entry = self._crear_campo(self.frame_detalles, "Precio:", 4)
+        self.cantidad_necesaria_entry = self._crear_campo(
+            self.frame_detalles, "Cantidad Necesaria:", 5
+        )
+        self.stock_entry = self._crear_campo(self.frame_detalles, "Stock:", 6)
 
         # Botones
-        self.boton_agregar_detalle = tk.Button(self.main_frame, text="Agregar Detalle", font=("Arial", 12), bg="#4CAF50", fg="white", command=self.agregar_detalle)
+        self.boton_agregar_detalle = tk.Button(
+            self.main_frame,
+            text="Agregar Detalle",
+            font=("Arial", 12),
+            bg="#4CAF50",
+            fg="white",
+            command=self.agregar_detalle,
+        )
         self.boton_agregar_detalle.grid(row=2, column=0, pady=10, padx=10, sticky="ew")
-        self.boton_guardar_backlog = tk.Button(self.main_frame, text="Guardar Backlog", font=("Arial", 12), bg="#4CAF50", fg="white", command=self.guardar_backlog)
+        self.boton_guardar_backlog = tk.Button(
+            self.main_frame,
+            text="Guardar Backlog",
+            font=("Arial", 12),
+            bg="#4CAF50",
+            fg="white",
+            command=self.guardar_backlog,
+        )
         self.boton_guardar_backlog.grid(row=2, column=1, pady=10, padx=10, sticky="ew")
 
         # Tabla para los detalles
@@ -73,7 +130,6 @@ class VistaBacklog:
         self.detalles_temporales = []
         self.cargar_productos()
         self.cargar_marcas()
-        self.cargar_unidad_medida()
 
     def _crear_campo(self, frame, texto, row):
         tk.Label(frame, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
@@ -98,7 +154,15 @@ class VistaBacklog:
         return text
 
     def _crear_tabla(self):
-        columnas = ("SMCS", "ID Producto", "ID Marca", "Unidad Medida", "Detalle", "Precio", "Cantidad Necesaria", "Stock")
+        columnas = (
+            "SMCS",
+            "ID Producto",
+            "ID Marca",
+            "Detalle",
+            "Precio",
+            "Cantidad Necesaria",
+            "Stock",
+        )
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=10)
         for col in columnas:
             self.tree.heading(col, text=col)
@@ -107,33 +171,49 @@ class VistaBacklog:
 
     def cargar_productos(self):
         productos = self.controlador.listar_productos()
-        self.producto_combobox['values'] = [f"{prod[0]} - {prod[1]}" for prod in productos]
+        self.producto_combobox['values'] = [f"{prod[0]} - {prod[1]} - {prod[2]}" for prod in productos]
 
     def cargar_marcas(self):
         marcas = self.controlador.listar_marcas()
         self.marca_combobox['values'] = [f"{marca[0]} - {marca[1]}" for marca in marcas]
 
-    def cargar_unidad_medida(self):
-        unidades = self.controlador.listar_unidad_medida()
-        self.unidad_medida_combobox['values'] = [f"{unidad[0]} - {unidad[1]}" for unidad in unidades]
-
     def agregar_detalle(self):
         smcs = self.smcs_entry.get()
         producto = self.producto_combobox.get()
         marca = self.marca_combobox.get()
-        unidad_medida = self.unidad_medida_combobox.get()
         detalle = self.detalle_producto_text.get("1.0", tk.END).strip()
         precio = self.precio_entry.get()
         cantidad_necesaria = self.cantidad_necesaria_entry.get()
         stock = self.stock_entry.get()
 
-        if not all([smcs, producto, marca, unidad_medida, detalle, precio, cantidad_necesaria, stock]):
-            messagebox.showerror("Error", "Todos los campos son obligatorios.")
+        # Validar campos obligatorios
+        if not all([smcs, producto, marca, detalle, precio, cantidad_necesaria, stock]):
+            messagebox.showerror("Error", "Todos los campos de detalle son obligatorios.")
             return
 
-        nuevo_detalle = (smcs, producto, marca, unidad_medida, detalle, precio, cantidad_necesaria, stock)
-        self.detalles_temporales.append(nuevo_detalle)
-        self.tree.insert("", tk.END, values=nuevo_detalle)
+        # Validar valores numéricos
+        try:
+            float(precio)
+            int(cantidad_necesaria)
+            int(stock)
+        except ValueError:
+            messagebox.showerror("Error", "Precio, cantidad necesaria y stock deben ser números válidos.")
+            return
+
+        # Crear el detalle como un diccionario
+        nuevo_detalle = {
+            "smcs": smcs,
+            "idproducto": producto.split(" - ")[0],
+            "idmarca": marca.split(" - ")[0],
+            "detalle": detalle,
+            "precio": precio,
+            "necesita": cantidad_necesaria,
+            "stock": stock
+        }
+
+        self.detalles_temporales.append(nuevo_detalle)  # Agregar como diccionario
+        self.tree.insert("", tk.END, values=(smcs, producto, marca, detalle, precio, cantidad_necesaria, stock))
+
 
     def guardar_backlog(self):
         backlog_data = {
@@ -148,7 +228,7 @@ class VistaBacklog:
             "equipo_soporte": self.equipo_soporte_combobox.get(),
             "elaborado_por": self.elaborado_por_entry.get(),
             "revisado_por": self.revisado_por_entry.get(),
-            "aprobado_por": self.aprobado_por_entry.get()
+            "aprobado_por": self.aprobado_por_entry.get(),
         }
 
         if not all(backlog_data.values()):
@@ -162,3 +242,7 @@ class VistaBacklog:
             self.tree.delete(*self.tree.get_children())
         else:
             messagebox.showerror("Error", "No se pudo registrar el backlog.")
+
+    def mostrar_backlogs(self):
+        """Mantiene la ventana de Backlogs en ejecución."""
+        self.root.mainloop()

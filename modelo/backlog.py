@@ -26,9 +26,14 @@ class ModeloBacklog:
         if connection:
             try:
                 cursor = connection.cursor()
-                # Guardar backlog
+
+                # Guardar en la tabla backlog
                 query_backlog = """
-                    INSERT INTO backlog (horometro, prioridad, ubicacion, fecha, detalle, hora, recurso_humano, cantidad_recurso, equipo_soporte, elaborado_por, revisado_por, aprobado_por)
+                    INSERT INTO backlog (
+                        horometro, prioridad, ubicacion, fecha, detalle, hora,
+                        recurso_humano, cantidad_recurso, equipo_soporte,
+                        elaborado_por, revisado_por, aprobado_por
+                    )
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 cursor.execute(query_backlog, (
@@ -50,24 +55,27 @@ class ModeloBacklog:
                 # Obtener el ID del backlog recién creado
                 backlog_id = cursor.lastrowid
 
-                # Guardar los detalles
+                # Guardar en la tabla backlogDetalle
                 query_detalle = """
-                    INSERT INTO backlogDetalle (idbacklog, smcs, idproducto, idmarca, idunidadMedida, detalle, precio, necesita, stock)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO backlogDetalle (
+                        idbacklog, smcs, idproducto, idmarca, detalle, precio, necesita, stock
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 for detalle in detalles_temporales:
+                    # Asegúrate de que `detalle` sea un diccionario
                     cursor.execute(query_detalle, (
                         backlog_id,
                         detalle["smcs"],
-                        detalle["idproducto"],
-                        detalle["idmarca"],
-                        detalle["idunidadMedida"],
+                        int(detalle["idproducto"]),  # Convertir a int si es necesario
+                        int(detalle["idmarca"]),    # Convertir a int si es necesario
                         detalle["detalle"],
-                        detalle["precio"],
-                        detalle["necesita"],
-                        detalle["stock"]
+                        float(detalle["precio"]),  # Convertir a float si es necesario
+                        int(detalle["necesita"]),  # Convertir a int si es necesario
+                        int(detalle["stock"])      # Convertir a int si es necesario
                     ))
                 connection.commit()
+
                 return backlog_id
             except Exception as e:
                 print(f"Error al guardar backlog: {e}")

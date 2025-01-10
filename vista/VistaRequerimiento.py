@@ -7,39 +7,72 @@ class VistaRequerimiento:
         self.root = root
         self.controlador = controlador
         self.root.title("Registrar Requerimiento")
-        self.root.geometry("1200x800")
+        self.root.geometry("1000x700")
         self.root.configure(bg="#f4f4f9")
 
         # Título
-        self.titulo_label = tk.Label(self.root, text="Registrar Requerimiento", font=("Arial", 18, "bold"), bg="#2e7d32", fg="white", pady=10)
+        self.titulo_label = tk.Label(
+            self.root, text="Registrar Requerimiento", font=("Arial", 18, "bold"),
+            bg="#2e7d32", fg="white", pady=10
+        )
         self.titulo_label.pack(fill=tk.X)
 
-        # Frame para los campos de entrada
-        self.frame_entrada = tk.Frame(self.root, bg="#f4f4f9", padx=10, pady=10)
-        self.frame_entrada.pack(fill=tk.X)
+        # Frame principal para contener dos columnas
+        self.main_frame = tk.Frame(self.root, bg="#f4f4f9", padx=20, pady=20)
+        self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Crear campos
-        self.fecha_entry = self._crear_campo("Fecha:", 0)
+        # Frame izquierdo: Información general
+        self.left_frame = tk.Frame(self.main_frame, bg="#f4f4f9")
+        self.left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+
+        # Frame derecho: Detalle del producto
+        self.right_frame = tk.Frame(self.main_frame, bg="#f4f4f9")
+        self.right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+
+        self.main_frame.columnconfigure(0, weight=1)
+        self.main_frame.columnconfigure(1, weight=1)
+
+        # Información general
+        tk.Label(self.left_frame, text="Información General", font=("Arial", 14, "bold"), bg="#f4f4f9").grid(row=0, column=0, columnspan=2, pady=10)
+
+        self.fecha_entry = self._crear_campo(self.left_frame, "Fecha:", 1)
         self.fecha_entry.insert(0, date.today().strftime('%Y-%m-%d'))
-        self.criterio_combobox = self._crear_combobox("Criterio:", 1, ["Programada", "Normal", "Urgente"], default_value="Programada")
-        self.producto_combobox = self._crear_combobox("Producto:", 2)
-        self.cantidad_entry = self._crear_campo("Cantidad:", 3)
-        self.proveedor_combobox = self._crear_combobox("Proveedor:", 4)
-        self.uso_combobox = self._crear_combobox("Uso:", 5)
-        self.almacen_combobox = self._crear_combobox("Almacén:", 6)
-        self.maquinaria_combobox = self._crear_combobox("Maquinaria:", 7)
-        self.precio_unitario_entry = self._crear_campo("Precio Unitario:", 8)
+        self.criterio_combobox = self._crear_combobox(self.left_frame, "Criterio:", 2, ["Programada", "Normal", "Urgente"], default_value="Programada")
 
-        # Botones
-        self._crear_boton("Agregar Producto", 9, self.agregar_producto, "#4CAF50")
-        self._crear_boton("Guardar Requerimiento", None, self.guardar_requerimiento, "#4CAF50")
+        # Detalle del producto
+        tk.Label(self.right_frame, text="Detalle del Producto", font=("Arial", 14, "bold"), bg="#f4f4f9").grid(row=0, column=0, columnspan=2, pady=10)
 
-        # Label para el total
+        self.producto_combobox = self._crear_combobox(self.right_frame, "Producto:", 1)
+        self.cantidad_entry = self._crear_campo(self.right_frame, "Cantidad:", 2)
+        self.precio_unitario_entry = self._crear_campo(self.right_frame, "Precio Unitario:", 3)
+        self.proveedor_combobox = self._crear_combobox(self.right_frame, "Proveedor:", 4)
+        self.uso_combobox = self._crear_combobox(self.right_frame, "Uso:", 5)
+        self.almacen_combobox = self._crear_combobox(self.right_frame, "Almacén:", 6)
+        self.maquinaria_combobox = self._crear_combobox(self.right_frame, "Maquinaria:", 7)
+
+        # Botones de acción
+        self.action_frame = tk.Frame(self.root, bg="#f4f4f9")
+        self.action_frame.pack(fill=tk.X, pady=10)
+
+        self._crear_boton("Agregar Producto", self.action_frame, self.agregar_producto, "#4CAF50", 0)
+        self._crear_boton("Guardar Requerimiento", self.action_frame, self.guardar_requerimiento, "#2e7d32", 1)
+
+        # Tabla de productos agregados
+        self.table_frame = tk.Frame(self.root, bg="white", bd=2, relief="ridge")
+        self.table_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+
+        columnas = ("Producto", "Cantidad", "Proveedor", "Uso", "Almacén", "Maquinaria", "Precio Unitario", "Precio Total")
+        self.tree = ttk.Treeview(self.table_frame, columns=columnas, show="headings", height=10)
+
+        for col in columnas:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, anchor="center", width=120)
+
+        self.tree.pack(fill=tk.BOTH, expand=True)
+
+        # Total del requerimiento
         self.total_label = tk.Label(self.root, text="Total del Requerimiento: $0.00", font=("Arial", 14, "bold"), bg="#f4f4f9", fg="#000")
         self.total_label.pack(pady=10)
-
-        # Tabla para productos agregados
-        self._crear_tabla()
 
         # Inicializar listas y cargar datos
         self.productos_temporales = []
@@ -50,36 +83,25 @@ class VistaRequerimiento:
         self.cargar_almacenes()
         self.cargar_maquinarias()
 
-    def _crear_campo(self, texto, row):
-        tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
-        entry = tk.Entry(self.frame_entrada, font=("Arial", 12), width=40)
-        entry.grid(row=row, column=1, padx=5)
+    def _crear_campo(self, frame, texto, row):
+        tk.Label(frame, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5, pady=5)
+        entry = tk.Entry(frame, font=("Arial", 12), width=30)
+        entry.grid(row=row, column=1, padx=5, pady=5)
         return entry
 
-    def _crear_combobox(self, texto, row, values=None, default_value=None):
-        tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
-        combobox = ttk.Combobox(self.frame_entrada, font=("Arial", 12), state="readonly", width=40)
+    def _crear_combobox(self, frame, texto, row, values=None, default_value=None):
+        tk.Label(frame, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5, pady=5)
+        combobox = ttk.Combobox(frame, font=("Arial", 12), state="readonly", width=28)
         if values:
             combobox['values'] = values
         if default_value:
             combobox.set(default_value)
-        combobox.grid(row=row, column=1, padx=5)
+        combobox.grid(row=row, column=1, padx=5, pady=5)
         return combobox
 
-    def _crear_boton(self, texto, row, command, bg_color, pady=0):
-        boton = tk.Button(self.root, text=texto, font=("Arial", 12), bg=bg_color, fg="white", command=command)
-        boton.pack(pady=pady)
-        return boton
-
-    def _crear_tabla(self):
-        self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
-        self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        columnas = ("Producto", "Cantidad", "Proveedor", "Uso", "Almacén", "Maquinaria", "Precio Unitario", "Precio Total")
-        self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=10)
-        for col in columnas:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center", width=150)
-        self.tree.pack(fill=tk.BOTH, expand=True)
+    def _crear_boton(self, texto, frame, command, bg_color, col):
+        boton = tk.Button(frame, text=texto, font=("Arial", 12), bg=bg_color, fg="white", command=command)
+        boton.grid(row=0, column=col, padx=10)
 
     def cargar_productos(self):
         productos = self.controlador.listar_productos()
@@ -139,14 +161,14 @@ class VistaRequerimiento:
 
         productos_para_bd = [
             {
-                "id_producto": prod[0].split(" - ")[0],  # Extrae el ID del producto
-                "cantidad": prod[1],  # Cantidad
-                "id_proveedor": prod[2].split(" - ")[0],  # Extrae el ID del proveedor
-                "id_uso": prod[3].split(" - ")[0],  # Extrae el ID del uso
-                "id_almacen": prod[4].split(" - ")[0],  # Extrae el ID del almacén
-                "id_maquinaria": prod[5].split(" - ")[0],  # Extrae el ID de la maquinaria
-                "precio_unitario": prod[6],  # Precio unitario
-                "precio_total": prod[7],  # Precio total
+                "id_producto": prod[0].split(" - ")[0],
+                "cantidad": prod[1],
+                "id_proveedor": prod[2].split(" - ")[0],
+                "id_uso": prod[3].split(" - ")[0],
+                "id_almacen": prod[4].split(" - ")[0],
+                "id_maquinaria": prod[5].split(" - ")[0],
+                "precio_unitario": prod[6],
+                "precio_total": prod[7],
             }
             for prod in self.productos_temporales
         ]
@@ -162,5 +184,4 @@ class VistaRequerimiento:
             messagebox.showerror("Error", "No se pudo registrar el requerimiento.")
 
     def mostrar_requerimiento(self):
-        """Muestra la ventana de requerimientos."""
         self.root.mainloop()
