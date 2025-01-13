@@ -27,7 +27,7 @@ CREATE TABLE almacenDetalle (
 	ubicacion VARCHAR(100) NOT NULL,
     CONSTRAINT fk_almacen FOREIGN KEY (idalmacen) REFERENCES almacen(idalmacen) ON DELETE CASCADE ON UPDATE CASCADE
 );
-CREATE TABLE UnidadMedida (
+CREATE TABLE unidadMedida (
     idunidadMedida INT AUTO_INCREMENT PRIMARY KEY,
     nomUnidad VARCHAR(15)
 );
@@ -126,7 +126,7 @@ CREATE TABLE requerimientoDetalle (
     FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE, -- Relación con producto
     FOREIGN KEY (iduso) REFERENCES uso(iduso) ON DELETE CASCADE,             -- Relación con uso
     FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE CASCADE, -- Relación con proveedor
-    FOREIGN KEY (idalmacen) REFERENCES Almacen(idalmacen) ON DELETE CASCADE,     -- Relación con almacén
+    FOREIGN KEY (idalmacen) REFERENCES almacen(idalmacen) ON DELETE CASCADE,     -- Relación con almacén
     FOREIGN KEY (idrequerimiento) REFERENCES Requerimiento(idrequerimiento) ON DELETE CASCADE -- Relación con requerimiento
 );
 INSERT INTO usuario (nombre, apellidos, correo, contraseña) VALUES
@@ -144,10 +144,10 @@ INSERT INTO proveedor (ruc, nombre, direccion, telefono, correo) VALUES
 (20610808655, 'A&C DYNAMIS', 'Paseo Central 101', '555-1122', 'proveedorD@email.com');
 INSERT INTO almacen (nombre, direccion, capacidad) VALUES
 ('Taller Lima', 'Kilometro 26 Ant. Pan. Sur', 500);
-INSERT INTO UnidadMedida (nomUnidad) VALUES ('Kilogramo');
-INSERT INTO UnidadMedida (nomUnidad) VALUES ('Metro');
-INSERT INTO UnidadMedida (nomUnidad) VALUES ('Cilindro');
-INSERT INTO UnidadMedida (nomUnidad) VALUES ('Und');
+INSERT INTO unidadMedida (nomUnidad) VALUES ('Kilogramo');
+INSERT INTO unidadMedida (nomUnidad) VALUES ('Metro');
+INSERT INTO unidadMedida (nomUnidad) VALUES ('Cilindro');
+INSERT INTO unidadMedida (nomUnidad) VALUES ('Und');
 
 INSERT INTO uso (nomUso) VALUES ('Consumible');
 INSERT INTO uso (nomUso) VALUES ('Comercial');

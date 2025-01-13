@@ -156,8 +156,8 @@ class VistaBacklog:
     def _crear_tabla(self):
         columnas = (
             "SMCS",
-            "ID Producto",
-            "ID Marca",
+            "Producto",
+            "Marca",
             "Detalle",
             "Precio",
             "Cantidad Necesaria",
