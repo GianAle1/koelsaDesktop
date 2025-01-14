@@ -398,3 +398,5 @@ CREATE TABLE backlogDetalle (
     FOREIGN KEY (idunidadMedida) REFERENCES unidadMedida(idunidadMedida) ON DELETE SET NULL ON UPDATE CASCADE,
     FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE ON UPDATE CASCADE
 );
+use koelsa
+select * from producto
