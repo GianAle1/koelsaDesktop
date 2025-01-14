@@ -5,11 +5,13 @@ from tkinter import messagebox
 from PIL import Image, ImageTk  # Usaremos Pillow para redimensionar la imagen
 
 def resource_path(relative_path):
-    """Obtenemos la ruta correcta al recurso dentro del ejecutable"""
+    """Obtén la ruta correcta al recurso dentro del ejecutable"""
     try:
-        base_path = sys._MEIPASS  # Si el script es empaquetado
+        # Ruta para cuando el programa está empaquetado con PyInstaller
+        base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")  # Si estamos ejecutando desde el código fuente
+        # Ruta para el entorno de desarrollo
+        base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
 class VistaLogin:
@@ -17,15 +19,21 @@ class VistaLogin:
         self.root = root
         self.controlador = controlador
 
+        # Configuración de la ventana principal
         self.root.title("Login")
-        self.root.geometry("400x500")  # Aumento el tamaño de la ventana
+        self.root.geometry("400x500")  # Tamaño de la ventana
         self.root.config(bg="#f0f0f0")  # Fondo claro
 
         # Cargar y redimensionar la imagen (logo)
-        image_path = resource_path("vista/imagen/login.png")  # Usamos resource_path para obtener la ruta correcta
-        self.logo = Image.open(image_path)  # Cargar la imagen usando PIL
-        self.logo = self.logo.resize((150, 150))  # Redimensionamos la imagen
-        self.logo = ImageTk.PhotoImage(self.logo)  # Convertimos la imagen para usar en Tkinter
+        try:
+            image_path = resource_path("vista/imagen/login.png")  # Usamos resource_path para obtener la ruta correcta
+            self.logo = Image.open(image_path)  # Cargar la imagen usando PIL
+            self.logo = self.logo.resize((150, 150))  # Redimensionamos la imagen
+            self.logo = ImageTk.PhotoImage(self.logo)  # Convertimos la imagen para usar en Tkinter
+        except FileNotFoundError:
+            # Mostrar un mensaje si no se encuentra la imagen
+            messagebox.showerror("Error", "No se encontró el archivo 'login.png'.")
+            sys.exit(1)
 
         # Agregar el logo en la ventana
         self.logo_label = tk.Label(self.root, image=self.logo, bg="#f0f0f0")
@@ -57,7 +65,7 @@ class VistaLogin:
         self.login_button.pack(pady=20)
 
     def iniciar_sesion(self):
-        """Al hacer click en el botón de login, validamos las credenciales"""
+        """Al hacer clic en el botón de login, validamos las credenciales"""
         username = self.username_entry.get()
         password = self.password_entry.get()
 
