@@ -92,8 +92,8 @@ class VistaBacklog:
 
         # Campos de detalles del producto
         self.smcs_entry = self._crear_campo(self.frame_detalles, "SMCS:", 0)
-        self.producto_combobox = self._crear_combobox(self.frame_detalles, "ID Producto:", 1)
-        self.marca_combobox = self._crear_combobox(self.frame_detalles, "ID Marca:", 2)
+        self.producto_combobox = self._crear_combobox(self.frame_detalles, "Producto:", 1)
+        self.marca_combobox = self._crear_combobox(self.frame_detalles, "Marca:", 2)
         self.detalle_producto_text = self._crear_textarea(
             self.frame_detalles, "Detalle del Producto:", 3
         )
