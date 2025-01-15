@@ -1,6 +1,4 @@
-# modelo/marca.py
 from modelo.conexion import ConexionDB
-
 class Almacen:
     def __init__(self):
         self.conexion_db = ConexionDB()
@@ -13,13 +11,11 @@ class Almacen:
             try:
                 query = "INSERT INTO almacen (nombre) VALUES (%s)"
                 cursor.execute(query, (nombre_almacen,direccion,capacidad))
-                connection.commit()  # Confirmar los cambios
-                # Ahora, cerrar la conexión después de la operación
-                #self.conexion_db.cerrar_conexion()
-                return True  # Retornamos True si la alamcen se registró correctamente
+                connection.commit()  
+                return True
             except Exception as e:
                 print(f"Error al registrar la almacen: {e}")
-                self.conexion_db.cerrar_conexion()  # Aseguramos cerrar la conexión
+                self.conexion_db.cerrar_conexion()
                 return False
         else:
             print("No se pudo establecer una conexión a la base de datos.")
@@ -54,8 +50,7 @@ class Almacen:
                 query = "DELETE FROM almacen WHERE idalmacen = %s"
                 cursor.execute(query, (id_alamcen,))
                 connection.commit()  # Confirmar los cambios
-                # self.conexion_db.cerrar_conexion()  # Cerrar la conexión después de la operación
-                return True  # Retornamos True si la alamcen se eliminó correctamente
+                return True
             except Exception as e:
                 print(f"Error al eliminar almacen: {e}")
                 self.conexion_db.cerrar_conexion()  # Aseguramos cerrar la conexión

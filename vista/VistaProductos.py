@@ -8,8 +8,8 @@ class VistaProductos:
         self.controlador = controlador
         self.root.title("Inventario de Productos")
         self.root.geometry("1400x700")
-        self.root.resizable(False, False)
-        self.root.configure(bg="#e8f4f8")  # Fondo más claro
+        self.root.resizable(True, True)
+        self.root.configure(bg="#e8f4f8")
 
         # Título estilizado
         self.titulo_label = tk.Label(
@@ -65,7 +65,7 @@ class VistaProductos:
         # Configuración de la tabla
         columnas = (
             "ID", "Part Name", "Descripción", "Marca", "Proveedor", "Familia",
-            "Unidad de Medida", "Cantidad", "Precio", "Almacén"
+            "Unidad de Medida", "Cantidad", "Precio", "Almacén","Sub Almacen"
         )
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=20)
 
@@ -89,7 +89,7 @@ class VistaProductos:
         self.tree.column("Cantidad", anchor="center", width=100)
         self.tree.column("Precio", anchor="center", width=100)
         self.tree.column("Almacén", anchor="center", width=150)
-
+        self.tree.column("Sub Almacen", anchor="center", width=150)
         # Scrollbars
         scroll_y = ttk.Scrollbar(self.frame_tabla, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(self.frame_tabla, orient="horizontal", command=self.tree.xview)

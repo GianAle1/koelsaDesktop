@@ -1,18 +1,5 @@
-import os
-import sys
 import tkinter as tk
 from tkinter import messagebox
-from PIL import Image, ImageTk  # Usaremos Pillow para redimensionar la imagen
-
-def resource_path(relative_path):
-    """Obtén la ruta correcta al recurso dentro del ejecutable"""
-    try:
-        # Ruta para cuando el programa está empaquetado con PyInstaller
-        base_path = sys._MEIPASS
-    except Exception:
-        # Ruta para el entorno de desarrollo
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
 
 class VistaLogin:
     def __init__(self, root, controlador):
@@ -21,27 +8,12 @@ class VistaLogin:
 
         # Configuración de la ventana principal
         self.root.title("Login")
-        self.root.geometry("400x500")  # Tamaño de la ventana
+        self.root.geometry("400x400")  # Tamaño ajustado de la ventana
         self.root.config(bg="#f0f0f0")  # Fondo claro
-
-        # Cargar y redimensionar la imagen (logo)
-        try:
-            image_path = resource_path("vista/imagen/login.png")  # Usamos resource_path para obtener la ruta correcta
-            self.logo = Image.open(image_path)  # Cargar la imagen usando PIL
-            self.logo = self.logo.resize((150, 150))  # Redimensionamos la imagen
-            self.logo = ImageTk.PhotoImage(self.logo)  # Convertimos la imagen para usar en Tkinter
-        except FileNotFoundError:
-            # Mostrar un mensaje si no se encuentra la imagen
-            messagebox.showerror("Error", "No se encontró el archivo 'login.png'.")
-            sys.exit(1)
-
-        # Agregar el logo en la ventana
-        self.logo_label = tk.Label(self.root, image=self.logo, bg="#f0f0f0")
-        self.logo_label.pack(pady=20)  # Espaciado en la parte superior
 
         # Título de la pantalla
         self.title_label = tk.Label(self.root, text="Bienvenido", font=("Arial", 20, "bold"), bg="#f0f0f0", fg="#4CAF50")
-        self.title_label.pack(pady=10)
+        self.title_label.pack(pady=30)  # Espaciado en la parte superior
 
         # Frame para los campos de entrada y botones
         self.frame = tk.Frame(self.root, bg="#f0f0f0")
@@ -49,20 +21,20 @@ class VistaLogin:
 
         # Etiquetas y campos de entrada para usuario y contraseña
         self.username_label = tk.Label(self.frame, text="Username:", font=("Arial", 12), bg="#f0f0f0")
-        self.username_label.grid(row=0, column=0, pady=5)
+        self.username_label.grid(row=0, column=0, pady=10, padx=10, sticky="e")
 
         self.username_entry = tk.Entry(self.frame, font=("Arial", 12), bd=2, relief="solid", width=25)
-        self.username_entry.grid(row=0, column=1, pady=5)
+        self.username_entry.grid(row=0, column=1, pady=10, padx=10)
 
         self.password_label = tk.Label(self.frame, text="Password:", font=("Arial", 12), bg="#f0f0f0")
-        self.password_label.grid(row=1, column=0, pady=5)
+        self.password_label.grid(row=1, column=0, pady=10, padx=10, sticky="e")
 
         self.password_entry = tk.Entry(self.frame, show="*", font=("Arial", 12), bd=2, relief="solid", width=25)
-        self.password_entry.grid(row=1, column=1, pady=5)
+        self.password_entry.grid(row=1, column=1, pady=10, padx=10)
 
         # Botón de login
         self.login_button = tk.Button(self.root, text="Login", command=self.iniciar_sesion, font=("Arial", 12), bg="#4CAF50", fg="white", width=20, height=2, relief="flat")
-        self.login_button.pack(pady=20)
+        self.login_button.pack(pady=30)
 
     def iniciar_sesion(self):
         """Al hacer clic en el botón de login, validamos las credenciales"""

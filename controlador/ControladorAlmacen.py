@@ -6,7 +6,6 @@ class ControladorAlmacen:
         self.almacen_modelo = Almacen()
 
     def registrar_Almacen(self, nombre_almacen,direccion,capacidad):
-        """Método para registrar una nueva marca usando el modelo"""
         exito = self.almacen_modelo.registrar_almacen(nombre_almacen,direccion,capacidad)
         if exito:
             return self.listar_almacenes()  # Solo retornamos las marcas si la inserción fue exitosa
