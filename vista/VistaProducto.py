@@ -75,9 +75,7 @@ class VistaProducto:
         self.listar_proveedores()
         self.listar_marcas()
         self.listar_almacenes()
-        #self.listar_usos()
         self.listar_unidadMedidas()
-        #self.listar_equipos()
         self.listar_familias()
 
         self.registrar_button = tk.Button(self.frame, text="Registrar Producto", font=("Arial", 14), command=self.registrar_producto, bg="#4CAF50", fg="white", relief="raised", bd=4)
@@ -92,40 +90,25 @@ class VistaProducto:
         self.proveedor_combobox['values'] = proveedor_nombres
         self.proveedor_combobox.current(0)
 
-    def _add_autocomplete(self, combobox, items):
-        """Añade funcionalidad de autocompletar a un Combobox."""
-        combobox.var = StringVar()  # Asocia una variable StringVar al Combobox
-        combobox["textvariable"] = combobox.var
-        combobox["values"] = items
-
-        def on_keyrelease(*args):
-            """Filtra las opciones del Combobox según lo escrito."""
-            value = combobox.var.get().strip().lower()
-            if not value:  # Si no hay texto, mostrar todos los valores
-                combobox.config(values=items)
-            else:
-                # Filtrar los ítems que coincidan parcialmente con el texto ingresado
-                filtered_items = [item for item in items if value in item.lower()]
-                combobox.config(values=filtered_items)
-                print("Filtrado:", filtered_items)  # Agregar esta línea para depurar
-
-
-        def reset_combobox_values(event):
-            """Restablece los valores del Combobox al obtener foco."""
-            combobox.config(values=items)
-
-        # Vincula el evento de escritura al Combobox
-        combobox.var.trace_add("write", on_keyrelease)
-
-        combobox.bind("<FocusIn>", reset_combobox_values)
-
-    
     def listar_marcas(self):
-        marcas = self.controlador.listar_marcas()
-        marca_nombres = [marca[1] for marca in marcas]
-        self._add_autocomplete(self.marca_combobox, marca_nombres)  # Agregar autocompletar aquí
-        if marca_nombres:
-            self.marca_combobox.current(0)
+        """Obtiene las marcas desde el controlador y habilita la función de autocompletar."""
+        marcas = self.controlador.listar_marcas()  # Obtener marcas del controlador
+        marca_nombres = [marca[1] for marca in marcas]  # Extraer nombres de las marcas
+        self.habilitar_autocompletar(self.marca_combobox, marca_nombres)
+
+    def habilitar_autocompletar(self, combobox, datos):
+        """Añade funcionalidad de autocompletar a un Combobox."""
+        combobox.var = StringVar()  # Variable asociada al Combobox
+        combobox["textvariable"] = combobox.var
+        combobox["values"] = datos
+
+        def filtrar_opciones(*args):
+            """Filtra las opciones del Combobox según el texto ingresado."""
+            texto = combobox.var.get().lower()
+            opciones_filtradas = [dato for dato in datos if texto in dato.lower()]
+            combobox["values"] = opciones_filtradas
+
+        combobox.var.trace_add("write", filtrar_opciones)
 
     def listar_unidadMedidas(self):
         unidadMedidas = self.controlador.listar_unidadMedidas()
@@ -243,5 +226,3 @@ class VistaProducto:
         self.familia_combobox.set("")
         self.almacen_combobox.set("")
         self.subalmacen_combobox.set("")
-
-    
