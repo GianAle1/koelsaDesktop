@@ -1,6 +1,8 @@
 import tkinter as tk
-from tkinter import simpledialog, messagebox, ttk
-from tkinter import StringVar
+from tkinter import  messagebox, ttk
+from ttkwidgets.autocomplete import AutocompleteCombobox
+
+
 class VistaProducto:
     def __init__(self, root, controlador):
         self.root = root
@@ -23,10 +25,12 @@ class VistaProducto:
         self.partname_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.partname_entry.grid(row=1, column=1, pady=5)
 
+        # Campo Marca con AutocompleteCombobox
         self.marca_label = tk.Label(self.frame, text="Marca:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.marca_label.grid(row=2, column=0, sticky="w", padx=15, pady=5)
-        self.marca_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12))  # Elimina state="readonly"
-          # Combobox solo lectura
+        self.marca_combobox = AutocompleteCombobox(self.frame, width=40, font=("Arial", 12))  # Usamos AutocompleteCombobox
+        self.marca_combobox.grid(row=2, column=1, pady=5)
+        # Combobox solo lectura
         self.marca_combobox.grid(row=2, column=1, pady=5)
 
         self.familia_label = tk.Label(self.frame, text="Familia:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
@@ -54,10 +58,7 @@ class VistaProducto:
         self.precio_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.precio_entry.grid(row=7, column=1, pady=5)
 
-        self.proveedor_label = tk.Label(self.frame, text="Proveedor:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.proveedor_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
-        self.proveedor_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.proveedor_combobox.grid(row=8, column=1, pady=5)
+        
 
         # Almacén
         self.almacen_label = tk.Label(self.frame, text="Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
@@ -72,7 +73,7 @@ class VistaProducto:
         self.subalmacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
         self.subalmacen_combobox.grid(row=10, column=1, pady=5)
         
-        self.listar_proveedores()
+      
         self.listar_marcas()
         self.listar_almacenes()
         self.listar_unidadMedidas()
@@ -84,31 +85,14 @@ class VistaProducto:
     def mostrar_producto(self):
         self.root.mainloop()
 
-    def listar_proveedores(self):
-        proveedores = self.controlador.listar_proveedores()
-        proveedor_nombres = [proveedor[1] for proveedor in proveedores]
-        self.proveedor_combobox['values'] = proveedor_nombres
-        self.proveedor_combobox.current(0)
+    
 
     def listar_marcas(self):
-        """Obtiene las marcas desde el controlador y habilita la función de autocompletar."""
+        """Obtiene las marcas desde el controlador y las configura en el AutocompleteCombobox."""
         marcas = self.controlador.listar_marcas()  # Obtener marcas del controlador
         marca_nombres = [marca[1] for marca in marcas]  # Extraer nombres de las marcas
-        self.habilitar_autocompletar(self.marca_combobox, marca_nombres)
-
-    def habilitar_autocompletar(self, combobox, datos):
-        """Añade funcionalidad de autocompletar a un Combobox."""
-        combobox.var = StringVar()  # Variable asociada al Combobox
-        combobox["textvariable"] = combobox.var
-        combobox["values"] = datos
-
-        def filtrar_opciones(*args):
-            """Filtra las opciones del Combobox según el texto ingresado."""
-            texto = combobox.var.get().lower()
-            opciones_filtradas = [dato for dato in datos if texto in dato.lower()]
-            combobox["values"] = opciones_filtradas
-
-        combobox.var.trace_add("write", filtrar_opciones)
+        self.marca_combobox.set_completion_list(marca_nombres)  # Actualizar valores
+        self.marca_combobox.set("")  # Limpiar selección inicial
 
     def listar_unidadMedidas(self):
         unidadMedidas = self.controlador.listar_unidadMedidas()
@@ -133,14 +117,14 @@ class VistaProducto:
         descripcion = self.descripcion_entry.get()
         cantidad = self.cantidad_entry.get()
         precio = self.precio_entry.get()
-        proveedor_seleccionado = self.proveedor_combobox.get()
+        
         marca_seleccionada = self.marca_combobox.get()
         und_medida = self.unidadMedida_combobox.get()  # Unidad de medida
         familia_seleccionado = self.familia_combobox.get()
         subalmacen_seleccionado = self.subalmacen_combobox.get()  # Subalmacén seleccionado
 
         # Validación de campos
-        if not nombre or not descripcion or not cantidad or not precio or not proveedor_seleccionado or not marca_seleccionada or not und_medida or not subalmacen_seleccionado or not familia_seleccionado:
+        if not nombre or not descripcion or not cantidad or not precio  or not marca_seleccionada or not und_medida or not subalmacen_seleccionado or not familia_seleccionado:
             messagebox.showwarning("Advertencia", "Todos los campos deben ser completados.")
             return
 
@@ -153,8 +137,7 @@ class VistaProducto:
             return
 
         # Obtener IDs de las opciones seleccionadas
-        proveedores = self.controlador.listar_proveedores()
-        proveedor_id = next((proveedor[0] for proveedor in proveedores if proveedor[1] == proveedor_seleccionado), None)
+        
 
         marcas = self.controlador.listar_marcas()
         marca_id = next((marca[0] for marca in marcas if marca[1] == marca_seleccionada), None)
@@ -174,14 +157,15 @@ class VistaProducto:
         subalmacen_id = next((subalmacen[0] for subalmacen in subalmacenes if subalmacen[1] == subalmacen_seleccionado), None)
 
         # Validar que todos los IDs sean encontrados
-        if not all([proveedor_id, marca_id, unidad_id, familia_id, subalmacen_id]):
+        if not all([ marca_id, unidad_id, familia_id, subalmacen_id]):
             messagebox.showerror("Error", "Uno o más de los valores seleccionados no son válidos.")
             return
 
         # Llamar al controlador para registrar el producto
         exito = self.controlador.registrar_producto(
-            nombre, descripcion, cantidad, precio, proveedor_id, marca_id, subalmacen_id, unidad_id, familia_id
+        nombre, descripcion, cantidad, precio, marca_id, subalmacen_id, unidad_id, familia_id
         )
+
         if exito:
             messagebox.showinfo("Éxito", "Producto registrado con éxito.")
             self.limpiar_campos()

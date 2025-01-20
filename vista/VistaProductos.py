@@ -64,7 +64,7 @@ class VistaProductos:
 
         # Configuración de la tabla
         columnas = (
-            "ID", "Part Name", "Descripción", "Marca", "Proveedor", "Familia",
+            "ID", "Part Name", "Descripción", "Marca", "Familia",
             "Unidad de Medida", "Cantidad", "Precio", "Almacén","Sub Almacen"
         )
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=20)
@@ -83,7 +83,7 @@ class VistaProductos:
         self.tree.column("Part Name", anchor="center", width=150)
         self.tree.column("Descripción", anchor="w", width=300)
         self.tree.column("Marca", anchor="center", width=120)
-        self.tree.column("Proveedor", anchor="center", width=150)
+        
         self.tree.column("Familia", anchor="center", width=120)
         self.tree.column("Unidad de Medida", anchor="center", width=120)
         self.tree.column("Cantidad", anchor="center", width=100)

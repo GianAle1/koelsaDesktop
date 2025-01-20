@@ -50,14 +50,12 @@ CREATE TABLE producto (
     idmarca INT,
     idunidadMedida INT,
     cantidad INT,
-    idproveedor INT,
     precio DECIMAL(10, 2),
     idsmscs INT,
     idfamilia INT,
     idalmacenDetalle INT,
     FOREIGN KEY (idmarca) REFERENCES marca(idmarca) ON DELETE SET NULL,
     FOREIGN KEY (idunidadMedida) REFERENCES unidadMedida(idunidadMedida) ON DELETE SET NULL,
-    FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor) ON DELETE SET NULL,
     FOREIGN KEY (idfamilia) REFERENCES familia(idfamilia) ON DELETE SET NULL,
     FOREIGN KEY (idalmacenDetalle) REFERENCES almacenDetalle(idalmacenDetalle) ON DELETE SET NULL
 );
@@ -398,5 +396,28 @@ CREATE TABLE backlogDetalle (
     FOREIGN KEY (idunidadMedida) REFERENCES unidadMedida(idunidadMedida) ON DELETE SET NULL ON UPDATE CASCADE,
     FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE ON UPDATE CASCADE
 );
-use koelsa
+
+CREATE USER 'new_user'@'%' IDENTIFIED BY 'new_password';
+GRANT ALL PRIVILEGES ON koelsa.* TO 'new_user'@'%';
+FLUSH PRIVILEGES;
+SELECT host, user FROM mysql.user;
+use koelsa;
+select * from almacendetalle;
+INSERT INTO almacendetalle (idalmacen, ubicacion)
+VALUES (1, 'S1');
+INSERT INTO almacendetalle (idalmacen, ubicacion)
+VALUES (1, 'S2');
+INSERT INTO almacendetalle (idalmacen, ubicacion)
+VALUES (1, 'S3');
+INSERT INTO almacendetalle (idalmacen, ubicacion)
+VALUES (1, 'S4');
+INSERT INTO almacendetalle (idalmacen, ubicacion)
+VALUES (1, 'S5');
+use koelsa;
+SET SQL_SAFE_UPDATES = 0;
+
+DELETE FROM ENTRADA;
+
+select * from usuario;
+DELETE FROM requerimiento
 select * from producto
