@@ -40,7 +40,6 @@ class Producto:
                     ad.ubicacion AS Ubicacion
                     FROM producto p
                     LEFT JOIN marca m ON p.idmarca = m.idmarca
-                    
                     INNER JOIN unidadMedida u ON p.idunidadMedida = u.idunidadMedida
                     INNER JOIN familia f ON p.idfamilia = f.idfamilia
                     LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle 

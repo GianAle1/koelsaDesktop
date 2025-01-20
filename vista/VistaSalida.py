@@ -104,7 +104,8 @@ class VistaSalida:
 
         def cargar_productos(self):
             productos = self.controlador.listar_productos()
-            self.producto_combobox['values'] = [producto[2] for producto in productos]
+            self.producto_combobox['values'] = [f"{producto[2]} - {producto[3]}" for producto in productos]
+
 
         def agregar_producto(self):
             producto_seleccionado = self.producto_combobox.get()
