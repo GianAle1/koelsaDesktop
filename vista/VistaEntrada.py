@@ -75,52 +75,56 @@ class VistaEntrada:
         # Lista temporal para los productos
         self.productos_temporales = []
 
-    def abrir_ventana_entrada_productos(self):
-        ventana_entrada = tk.Toplevel(self.root)  # Usa Toplevel para ventanas secundarias
-        ventana_entrada = VistaEntrada(ventana_entrada, self.controlador)
-
-    def eliminar_producto(self):
-        # Obtener el producto seleccionado en la tabla
-        selected_item = self.tree.selection()
-        if selected_item:
-            for item in selected_item:
-                # Extraer los valores del producto seleccionado
-                values = self.tree.item(item, "values")
-                producto, cantidad = values[0], int(values[1])
-
-                # Eliminar el producto de la lista temporal
-                self.productos_temporales = [
-                    prod for prod in self.productos_temporales if not (prod[0] == producto and prod[1] == cantidad)
-                ]
-
-                # Eliminar el producto de la tabla visual
-                self.tree.delete(item)
-
-            messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
-        else:
-            messagebox.showwarning("Advertencia", "Debe seleccionar un producto para eliminar.")
-
     def cargar_productos(self):
-        productos = self.controlador.listar_productos()
-        self.producto_combobox['values'] = [producto[2] for producto in productos]
+        try:
+            productos = self.controlador.listar_productos()
+            if productos:
+                self.producto_combobox['values'] = [
+                    f"{producto[0]} - {producto[1]}" for producto in productos
+                ]
+            else:
+                self.producto_combobox['values'] = []
+                print("No se encontraron productos en la base de datos.")
+        except Exception as e:
+            print(f"Error al cargar productos: {e}")
 
     def agregar_producto(self):
         producto_seleccionado = self.producto_combobox.get()
         cantidad = self.cantidad_entry.get()
 
+        # Validaciones
         if not producto_seleccionado or not cantidad.isdigit() or int(cantidad) <= 0:
             messagebox.showerror("Error", "Debe seleccionar un producto y una cantidad válida.")
             return
 
-        self.productos_temporales.append((producto_seleccionado, int(cantidad)))
+        # Extraer ID y descripción del producto
+        id_producto, producto_nombre = producto_seleccionado.split(" - ", 1)
+
+        self.productos_temporales.append((int(id_producto), int(cantidad)))
         self.actualizar_tabla()
 
     def actualizar_tabla(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        for producto, cantidad in self.productos_temporales:
-            self.tree.insert("", tk.END, values=(producto, cantidad))
+        for id_producto, cantidad in self.productos_temporales:
+            self.tree.insert("", tk.END, values=(id_producto, cantidad))
+
+    def eliminar_producto(self):
+        selected_item = self.tree.selection()
+        if selected_item:
+            for item in selected_item:
+                values = self.tree.item(item, "values")
+                id_producto, cantidad = values[0], int(values[1])
+
+                self.productos_temporales = [
+                    prod for prod in self.productos_temporales if not (prod[0] == int(id_producto) and prod[1] == cantidad)
+                ]
+                self.tree.delete(item)
+
+            messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
+        else:
+            messagebox.showwarning("Advertencia", "Debe seleccionar un producto para eliminar.")
 
     def guardar_entrada(self):
         fecha = self.fecha_entry.get()
@@ -128,14 +132,17 @@ class VistaEntrada:
             messagebox.showerror("Error", "Debe agregar al menos un producto a la entrada.")
             return
 
-        entrada_id = self.controlador.guardar_entrada(fecha, self.productos_temporales)
-        if entrada_id:
-            messagebox.showinfo("Éxito", f"Entrada registrada con ID: {entrada_id}")
-            self.productos_temporales = []
-            self.actualizar_tabla()
+        try:
+            entrada_id = self.controlador.guardar_entrada(fecha, self.productos_temporales)
+            if entrada_id:
+                messagebox.showinfo("Éxito", f"Entrada registrada con ID: {entrada_id}")
+                self.productos_temporales = []
+                self.actualizar_tabla()
 
-            # Actualizar la vista de productos
-            if hasattr(self.controlador, "vista_productos"):
-                self.controlador.vista_productos.listar_productos()
-        else:
-            messagebox.showerror("Error", "Ocurrió un error al guardar la entrada.")
+                # Actualizar la vista de productos
+                if hasattr(self.controlador, "vista_productos"):
+                    self.controlador.vista_productos.listar_productos()
+            else:
+                messagebox.showerror("Error", "Ocurrió un error al guardar la entrada.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Ocurrió un error al guardar la entrada: {e}")

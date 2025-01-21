@@ -8,9 +8,9 @@ class VistaProducto:
         self.root = root
         self.controlador = controlador
         self.root.title("Registrar Producto")
-        self.root.geometry("800x600")
+        self.root.geometry("800x800")  # Ajustar tamaño para nuevos campos
         self.root.resizable(False, False)
-        
+
         # Fondo personalizado
         self.frame = tk.Frame(self.root, bg="#f4f4f9")
         self.frame.pack(pady=30)
@@ -28,14 +28,12 @@ class VistaProducto:
         # Campo Marca con AutocompleteCombobox
         self.marca_label = tk.Label(self.frame, text="Marca:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.marca_label.grid(row=2, column=0, sticky="w", padx=15, pady=5)
-        self.marca_combobox = AutocompleteCombobox(self.frame, width=40, font=("Arial", 12))  # Usamos AutocompleteCombobox
-        self.marca_combobox.grid(row=2, column=1, pady=5)
-        # Combobox solo lectura
+        self.marca_combobox = AutocompleteCombobox(self.frame, width=40, font=("Arial", 12))
         self.marca_combobox.grid(row=2, column=1, pady=5)
 
         self.familia_label = tk.Label(self.frame, text="Familia:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.familia_label.grid(row=3, column=0, sticky="w", padx=15, pady=5)
-        self.familia_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
+        self.familia_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")
         self.familia_combobox.grid(row=3, column=1, pady=5)
 
         self.descripcion_label = tk.Label(self.frame, text="Descripción:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
@@ -45,7 +43,7 @@ class VistaProducto:
 
         self.undMedida_label = tk.Label(self.frame, text="Unidad de Medida:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.undMedida_label.grid(row=5, column=0, sticky="w", padx=15, pady=5)
-        self.unidadMedida_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
+        self.unidadMedida_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")
         self.unidadMedida_combobox.grid(row=5, column=1, pady=5)
 
         self.cantidad_label = tk.Label(self.frame, text="Cantidad:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
@@ -58,22 +56,37 @@ class VistaProducto:
         self.precio_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.precio_entry.grid(row=7, column=1, pady=5)
 
-        
+        # Campo SMSCS
+        self.smscs_label = tk.Label(self.frame, text="SMSCS:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.smscs_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
+        self.smscs_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
+        self.smscs_entry.grid(row=8, column=1, pady=5)
+
+        # Campo SAP
+        self.sap_label = tk.Label(self.frame, text="SAP:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.sap_label.grid(row=9, column=0, sticky="w", padx=15, pady=5)
+        self.sap_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
+        self.sap_entry.grid(row=9, column=1, pady=5)
 
         # Almacén
         self.almacen_label = tk.Label(self.frame, text="Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.almacen_label.grid(row=9, column=0, sticky="w", padx=15, pady=5)
-        self.almacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.almacen_combobox.grid(row=9, column=1, pady=5)
-        self.almacen_combobox.bind("<<ComboboxSelected>>", self.cargar_subalmacenes)  # Vincular evento
+        self.almacen_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
+        self.almacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")
+        self.almacen_combobox.grid(row=10, column=1, pady=5)
+        self.almacen_combobox.bind("<<ComboboxSelected>>", self.cargar_subalmacenes)
 
-        # Sub Almacén
+        # Subalmacén
         self.subalmacen_label = tk.Label(self.frame, text="Sub Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.subalmacen_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
-        self.subalmacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")  # Combobox solo lectura
-        self.subalmacen_combobox.grid(row=10, column=1, pady=5)
-        
-      
+        self.subalmacen_label.grid(row=11, column=0, sticky="w", padx=15, pady=5)
+        self.subalmacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")
+        self.subalmacen_combobox.grid(row=11, column=1, pady=5)
+
+        # Botón para registrar producto
+        self.registrar_button = tk.Button(
+            self.frame, text="Registrar Producto", font=("Arial", 14), command=self.registrar_producto, bg="#4CAF50", fg="white", relief="raised", bd=4
+        )
+        self.registrar_button.grid(row=12, column=0, columnspan=2, pady=20)
+
         self.listar_marcas()
         self.listar_almacenes()
         self.listar_unidadMedidas()
@@ -84,8 +97,6 @@ class VistaProducto:
 
     def mostrar_producto(self):
         self.root.mainloop()
-
-    
 
     def listar_marcas(self):
         """Obtiene las marcas desde el controlador y las configura en el AutocompleteCombobox."""
@@ -204,7 +215,6 @@ class VistaProducto:
         self.descripcion_entry.delete(0, tk.END)
         self.cantidad_entry.delete(0, tk.END)
         self.precio_entry.delete(0, tk.END)
-        self.proveedor_combobox.set("")  # Restablecer el ComboBox
         self.marca_combobox.set("")
         self.unidadMedida_combobox.set("")
         self.familia_combobox.set("")
