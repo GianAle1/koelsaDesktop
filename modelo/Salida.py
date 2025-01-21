@@ -23,17 +23,18 @@ class Salida:
                 query_actualizar_producto = "UPDATE producto SET cantidad = cantidad - %s WHERE idproducto = %s"
 
                 for producto in productos:
-                    producto_seleccionado, cantidad, idmaquinaria = producto
-                    cursor.execute("SELECT idproducto, cantidad FROM producto WHERE descripcion = %s", (producto_seleccionado,))
+                    idproducto, cantidad, idmaquinaria = producto  # Asegurarse de que `idproducto` es un entero
+
+                    # Verificar el stock actual
+                    cursor.execute("SELECT cantidad FROM producto WHERE idproducto = %s", (idproducto,))
                     resultado = cursor.fetchone()
 
                     if resultado:
-                        idproducto = resultado[0]
-                        stock_actual = resultado[1]
+                        stock_actual = resultado[0]
 
                         if stock_actual < cantidad:
-                            print(f"No hay suficiente stock para el producto '{producto_seleccionado}'. Stock actual: {stock_actual}")
-                            raise ValueError(f"Stock insuficiente para el producto '{producto_seleccionado}'")
+                            print(f"No hay suficiente stock para el producto con ID '{idproducto}'. Stock actual: {stock_actual}")
+                            raise ValueError(f"Stock insuficiente para el producto con ID '{idproducto}'")
 
                         # Insertar en salidaDetalle
                         cursor.execute(query_detalle, (idsalida, idproducto, cantidad, idmaquinaria))
@@ -41,7 +42,7 @@ class Salida:
                         # Actualizar el stock del producto
                         cursor.execute(query_actualizar_producto, (cantidad, idproducto))
                     else:
-                        print(f"El producto '{producto_seleccionado}' no fue encontrado en la base de datos.")
+                        print(f"El producto con ID '{idproducto}' no fue encontrado en la base de datos.")
                         continue
 
                 # Confirmar cambios
