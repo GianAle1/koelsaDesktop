@@ -61,10 +61,12 @@ class MenuControlador:
     def listar_familias(self):
         return self.controlador_familia.listar_familias() 
 
-    def registrar_producto(self, nombre, descripcion, cantidad, precio, marca_id, almacen_id, und_medida,familia):
+    def registrar_producto(self, nombre, descripcion, cantidad, precio, smcs, sap, marca_id, almacen_id, und_medida, familia):
         if not nombre or not descripcion or not cantidad or not precio:
-            return False  
-        exito = self.controlador_producto.registrar_producto(nombre, descripcion, cantidad, precio, marca_id, almacen_id, und_medida,familia)
+            return False
+        exito = self.controlador_producto.registrar_producto(
+            nombre, descripcion, cantidad, precio, smcs, sap, marca_id, almacen_id, und_medida, familia
+        )
         return exito
     
     def listar_productos(self):

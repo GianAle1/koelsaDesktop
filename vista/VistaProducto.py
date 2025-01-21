@@ -57,10 +57,10 @@ class VistaProducto:
         self.precio_entry.grid(row=7, column=1, pady=5)
 
         # Campo SMSCS
-        self.smscs_label = tk.Label(self.frame, text="SMSCS:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.smscs_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
-        self.smscs_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
-        self.smscs_entry.grid(row=8, column=1, pady=5)
+        self.smcs_label = tk.Label(self.frame, text="SMCS:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.smcs_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
+        self.smcs_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
+        self.smcs_entry.grid(row=8, column=1, pady=5)
 
         # Campo SAP
         self.sap_label = tk.Label(self.frame, text="SAP:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
@@ -124,32 +124,33 @@ class VistaProducto:
         self.familia_combobox.current(0)
 
     def registrar_producto(self):
+        # Obtener valores de entrada
         nombre = self.partname_entry.get()
         descripcion = self.descripcion_entry.get()
         cantidad = self.cantidad_entry.get()
         precio = self.precio_entry.get()
+        smcs = self.smcs_entry.get()
+        sap = self.sap_entry.get()
         
         marca_seleccionada = self.marca_combobox.get()
         und_medida = self.unidadMedida_combobox.get()  # Unidad de medida
-        familia_seleccionado = self.familia_combobox.get()
+        familia_seleccionada = self.familia_combobox.get()
         subalmacen_seleccionado = self.subalmacen_combobox.get()  # Subalmacén seleccionado
 
         # Validación de campos
-        if not nombre or not descripcion or not cantidad or not precio  or not marca_seleccionada or not und_medida or not subalmacen_seleccionado or not familia_seleccionado:
+        if not all([nombre, descripcion, cantidad, precio, smcs, sap, marca_seleccionada, und_medida, familia_seleccionada, subalmacen_seleccionado]):
             messagebox.showwarning("Advertencia", "Todos los campos deben ser completados.")
             return
 
-        # Validación de cantidad y precio numéricos
+        # Validaciones adicionales
         try:
             cantidad = int(cantidad)
             precio = float(precio)
         except ValueError:
-            messagebox.showwarning("Advertencia", "La cantidad debe ser un número entero y el precio debe ser un número válido.")
+            messagebox.showwarning("Advertencia", "Cantidad y Precio  deben ser valores numéricos válidos.")
             return
 
-        # Obtener IDs de las opciones seleccionadas
-        
-
+        # Obtener IDs de selección
         marcas = self.controlador.listar_marcas()
         marca_id = next((marca[0] for marca in marcas if marca[1] == marca_seleccionada), None)
 
@@ -157,24 +158,22 @@ class VistaProducto:
         unidad_id = next((unidad[0] for unidad in unidades if unidad[1] == und_medida), None)
 
         familias = self.controlador.listar_familias()
-        familia_id = next((familia_item[0] for familia_item in familias if familia_item[1] == familia_seleccionado), None)
+        familia_id = next((familia[0] for familia in familias if familia[1] == familia_seleccionada), None)
 
-        # Obtener subalmacen_id para el subalmacen seleccionado
         almacen_seleccionado = self.almacen_combobox.get()
         almacenes = self.controlador.listar_almacenes()
         almacen_id = next((almacen[0] for almacen in almacenes if almacen[1] == almacen_seleccionado), None)
-
         subalmacenes = self.controlador.listar_subalmacenes(almacen_id)
         subalmacen_id = next((subalmacen[0] for subalmacen in subalmacenes if subalmacen[1] == subalmacen_seleccionado), None)
 
         # Validar que todos los IDs sean encontrados
-        if not all([ marca_id, unidad_id, familia_id, subalmacen_id]):
-            messagebox.showerror("Error", "Uno o más de los valores seleccionados no son válidos.")
+        if not all([marca_id, unidad_id, familia_id, subalmacen_id]):
+            messagebox.showerror("Error", "Uno o más valores seleccionados no son válidos.")
             return
 
         # Llamar al controlador para registrar el producto
         exito = self.controlador.registrar_producto(
-        nombre, descripcion, cantidad, precio, marca_id, subalmacen_id, unidad_id, familia_id
+            nombre, descripcion, cantidad, precio, smcs, sap, marca_id, subalmacen_id, unidad_id, familia_id
         )
 
         if exito:
@@ -182,6 +181,7 @@ class VistaProducto:
             self.limpiar_campos()
         else:
             messagebox.showerror("Error", "Hubo un problema al registrar el producto.")
+
 
 
         # Función para cargar subalmacenes

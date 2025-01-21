@@ -4,23 +4,28 @@ class Producto:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def registrar_producto(self, nombre, descripcion, cantidad, precio, marca_id, idalmacenDetalle, und_medida, familia):
+    def registrar_producto(self, nombre, descripcion, cantidad, precio, smcs, sap, marca_id, idalmacenDetalle, und_medida, familia):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "INSERT INTO producto (partname, descripcion, cantidad, precio, idmarca, idalmacenDetalle, idunidadMedida,idfamilia) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-                cursor.execute(query, (nombre, descripcion, cantidad, precio,marca_id,idalmacenDetalle,und_medida,familia))
+                query = """
+                    INSERT INTO producto 
+                    (partname, descripcion, cantidad, precio, smcs, sap, idmarca, idalmacenDetalle, idunidadMedida, idfamilia) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query, (nombre, descripcion, cantidad, precio, smcs, sap, marca_id, idalmacenDetalle, und_medida, familia))
                 connection.commit()             
                 return True 
             except Exception as e:
                 print(f"Error al registrar el producto: {e}")
-                self.conexion_db.cerrar_conexion()  
                 return False
+            finally:
+                self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return False
-        
+
     def listar_productos(self):
         connection = self.conexion_db.conectar()  # Abre una nueva conexión
         if connection:
@@ -36,6 +41,8 @@ class Producto:
                     u.nomUnidad AS UnidadMedida,
                     p.cantidad AS Cantidad,
                     p.precio AS Precio,
+                    p.smcs AS SMCS,
+                    p.sap AS SAP,
                     a.nombre AS Almacen,
                     ad.ubicacion AS Ubicacion
                     FROM producto p
@@ -60,8 +67,6 @@ class Producto:
             print("No se pudo establecer una conexión a la base de datos.")
             return []
 
-
-    
     def listar_productos_por_familia(self, familia):
         connection = self.conexion_db.conectar()
         if connection:
@@ -69,11 +74,10 @@ class Producto:
             try:
                 query = """
                     SELECT p.idproducto, p.partname, p.descripcion, m.nombre AS Marca,
-                        pr.nombre AS Proveedor, f.nomfamilia AS Familia,
-                        u.nomUnidad AS UnidadMedida, p.cantidad, p.precio, a.nombre AS Almacen
+                        f.nomfamilia AS Familia,
+                        u.nomUnidad AS UnidadMedida, p.cantidad, p.precio, p.smcs, p.sap, a.nombre AS Almacen
                     FROM producto p
                     LEFT JOIN marca m ON p.idmarca = m.idmarca
-                    
                     LEFT JOIN familia f ON p.idfamilia = f.idfamilia
                     LEFT JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
                     LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle
@@ -86,8 +90,8 @@ class Producto:
             except Exception as e:
                 print(f"Error al obtener productos por familia: {e}")
                 return []
+            finally:
+                self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return []
-
-    
