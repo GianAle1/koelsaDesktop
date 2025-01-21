@@ -417,7 +417,32 @@ use koelsa;
 SET SQL_SAFE_UPDATES = 0;
 
 DELETE FROM ENTRADA;
+use koelsa;
+select * from producto;
+DELETE FROM b;
+select * from backlogDetalle;
+
+SELECT 
+                    p.idproducto AS ID,
+                    p.partname AS PartName,
+                    p.descripcion AS Descripción,
+                    m.nombre AS Marca,
+                    f.nomfamilia AS Familia,
+                    u.nomUnidad AS UnidadMedida,
+                    p.cantidad AS Cantidad,
+                    p.precio AS Precio,
+                    a.nombre AS Almacen,
+                    ad.ubicacion AS Ubicacion
+                    FROM producto p
+                    LEFT JOIN marca m ON p.idmarca = m.idmarca
+                    INNER JOIN unidadMedida u ON p.idunidadMedida = u.idunidadMedida
+                    INNER JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle 
+                    INNER JOIN almacen a ON a.idalmacen = ad.idalmacen;
+ALTER TABLE producto ADD COLUMN sap VARCHAR(10);
+
 
 select * from usuario;
-DELETE FROM requerimiento
-select * from producto
+
+select * from producto;
+

@@ -65,7 +65,7 @@ class VistaProductos:
         # Configuración de la tabla
         columnas = (
             "ID", "Part Name", "Descripción", "Marca", "Familia",
-            "Unidad de Medida", "Cantidad", "Precio", "Almacén","Sub Almacen"
+            "Unidad de Medida", "Cantidad", "Precio","SMCS","SAP", "Almacén","Sub Almacen"
         )
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=20)
 
@@ -88,6 +88,8 @@ class VistaProductos:
         self.tree.column("Unidad de Medida", anchor="center", width=120)
         self.tree.column("Cantidad", anchor="center", width=100)
         self.tree.column("Precio", anchor="center", width=100)
+        self.tree.column("SMCS", anchor="center", width=100)
+        self.tree.column("SAP", anchor="center", width=100)
         self.tree.column("Almacén", anchor="center", width=150)
         self.tree.column("Sub Almacen", anchor="center", width=150)
         # Scrollbars

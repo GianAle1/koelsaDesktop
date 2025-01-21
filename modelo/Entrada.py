@@ -1,5 +1,5 @@
 from modelo.conexion import ConexionDB
-
+from decimal import Decimal  # Importa Decimal para manejar números decimales
 class Entrada:
     def __init__(self):
         self.conexion_db = ConexionDB()
@@ -20,23 +20,23 @@ class Entrada:
 
                 # Insertar en la tabla entradaDetalle y actualizar la cantidad en producto
                 query_detalle = "INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES (%s, %s, %s)"
-                query_actualizar_producto = "UPDATE producto SET cantidad = cantidad + %s WHERE idproducto = %s"
+                query_actualizar_producto = """
+                    UPDATE producto 
+                    SET cantidad = cantidad + %s, 
+                        precio = ((precio * cantidad) + (%s * %s)) / (cantidad + %s)
+                    WHERE idproducto = %s
+                """
 
                 for producto in productos:
-                    # Obtener el idproducto basado en la descripción del producto
-                    cursor.execute("SELECT idproducto FROM producto WHERE descripcion = %s", (producto[0],))
-                    result = cursor.fetchone()
-                    if result:
-                        idproducto = result[0]  # Extraer el ID del producto
+                    idproducto = producto[0]  # ID del producto
+                    cantidad = producto[1]   # Cantidad ingresada
+                    precio_nuevo = Decimal(producto[2])  # Convertir el precio a Decimal
 
-                        # Insertar en entradaDetalle
-                        cursor.execute(query_detalle, (identrada, idproducto, producto[1]))
+                    # Insertar en entradaDetalle
+                    cursor.execute(query_detalle, (identrada, idproducto, cantidad))
 
-                        # Actualizar la cantidad en la tabla producto
-                        cursor.execute(query_actualizar_producto, (producto[1], idproducto))
-                    else:
-                        print(f"Producto no encontrado: {producto[0]}")
-                        continue
+                    # Actualizar la cantidad y calcular el nuevo precio promedio
+                    cursor.execute(query_actualizar_producto, (cantidad, precio_nuevo, cantidad, cantidad, idproducto))
 
                 # Confirmar todos los cambios
                 connection.commit()
