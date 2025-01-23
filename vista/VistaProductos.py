@@ -58,6 +58,15 @@ class VistaProductos:
         )
         self.boton_exportar.pack(side=tk.LEFT, padx=10)
 
+        # Botón para abrir ventana de entradas y salidas
+        self.boton_historial = tk.Button(
+            self.frame_filtros, text="Ver Entradas/Salidas", font=("Arial", 12, "bold"),
+            bg="#007ACC", fg="white", command=self.abrir_historial_desde_boton,
+            relief="groove", bd=2
+        )
+        self.boton_historial.pack(side=tk.LEFT, padx=10)
+
+
         # Frame contenedor para la tabla
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="ridge")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -220,3 +229,13 @@ class VistaProductos:
 
         workbook.save(filepath)
         messagebox.showinfo("Éxito", f"Datos exportados exitosamente a {filepath}")
+    
+    def abrir_historial_desde_boton(self):
+        # Selecciona el producto actual (si está seleccionado)
+        selected_item = self.tree.selection()
+        if selected_item:
+            producto_id = self.tree.item(selected_item[0])["values"][0]  # Obtiene el ID del producto
+            self.abrir_ventana_entradas_salidas(producto_id)
+        else:
+            messagebox.showwarning("Advertencia", "Por favor, selecciona un producto.")
+

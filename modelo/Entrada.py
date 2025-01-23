@@ -76,4 +76,44 @@ class Entrada:
                 return []
             finally:
                 self.conexion_db.cerrar_conexion()
-    
+
+    def obtener_todas_las_entradas(self):
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                query = """
+                    SELECT p.partname, e.fecha, d.cantidad
+                    FROM entradaDetalle d
+                    JOIN entrada e ON e.identrada = d.identrada
+                    JOIN producto p ON p.idproducto = d.idproducto
+                    ORDER BY e.fecha ASC
+                """
+                cursor.execute(query)
+                return cursor.fetchall()
+            except Exception as e:
+                print(f"Error obteniendo todas las entradas: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        return []
+
+    def obtener_todas_las_salidas(self):
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                query = """
+                    SELECT p.partname, s.fecha, s.cantidad, s.tipo, s.modelo, s.marca
+                    FROM salidaDetalle s
+                    JOIN producto p ON p.idproducto = s.idproducto
+                    ORDER BY s.fecha ASC
+                """
+                cursor.execute(query)
+                return cursor.fetchall()
+            except Exception as e:
+                print(f"Error obteniendo todas las salidas: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        return []

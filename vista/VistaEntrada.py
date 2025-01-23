@@ -53,26 +53,20 @@ class VistaEntrada:
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("Producto", "Cantidad", "Precio", "SMCS", "SAP", "ad1", "ad2", "ad3")
+        columnas = ("Producto", "Cantidad", "Precio", "Familia", "Unid Med")
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=10)
 
         self.tree.heading("Producto", text="Producto")
         self.tree.heading("Cantidad", text="Cantidad")
         self.tree.heading("Precio", text="Precio")
-        self.tree.heading("SMCS", text="SMCS")
-        self.tree.heading("SAP", text="SAP")
-        self.tree.heading("ad1", text="ad1")
-        self.tree.heading("ad2", text="ad2")
-        self.tree.heading("ad3", text="ad3")
+        self.tree.heading("Familia", text="Familia")
+        self.tree.heading("Unid Med", text="Unid Med")
 
         self.tree.column("Producto", anchor="center", width=200)
         self.tree.column("Cantidad", anchor="center", width=100)
         self.tree.column("Precio", anchor="center", width=100)
-        self.tree.column("SMCS", anchor="center", width=100)
-        self.tree.column("SAP", anchor="center", width=100)
-        self.tree.column("ad1", anchor="center", width=100)
-        self.tree.column("ad2", anchor="center", width=100)
-        self.tree.column("ad3", anchor="center", width=100)
+        self.tree.column("Familia", anchor="center", width=100)
+        self.tree.column("Unid Med", anchor="center", width=100)
 
         self.tree.pack(fill=tk.BOTH, expand=True)
 
