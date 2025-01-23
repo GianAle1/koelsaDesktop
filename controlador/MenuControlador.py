@@ -15,9 +15,6 @@ from controlador.ControladorBacklog import ControladorBacklog
 class MenuControlador:
     def __init__(self):
         
-        self.controlador_entrada = modelo_entrada
-        self.controlador_salida = modelo_salida
-
         self.controlador_marca = ControladorMarca()
         self.controlador_proveedor = ControladorProveedor()
         self.controlador_producto = ControladorProducto()
@@ -128,4 +125,9 @@ class MenuControlador:
         except Exception as e:
             print(f"Error al obtener el historial general: {e}")
             return {"entradas": [], "salidas": []}
+
+    def obtener_historial_general(self):
+        entradas = self.controlador_entrada.obtener_todas_las_entradas()
+        salidas = self.controlador_salida.obtener_todas_las_salidas()
+        return {"entradas": entradas, "salidas": salidas}
 

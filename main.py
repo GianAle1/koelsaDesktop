@@ -19,6 +19,7 @@ def iniciar_aplicacion():
         root = tk.Tk()
         LoginControlador(root)
         root.mainloop()
+
     except Exception as e:
         print("Error detectado:")
         print(traceback.format_exc())

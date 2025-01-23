@@ -11,3 +11,6 @@ class ControladorEntrada:
     def obtener_entradas_por_producto(self, producto_id):
         """Obtiene el historial de entradas para un producto específico."""
         return self.modelo_entrada.obtener_entradas_por_producto(producto_id)
+    
+    def obtener_todas_las_salidas(self):
+        return self.modelo.obtener_todas_las_salidas()
