@@ -58,13 +58,13 @@ class VistaProductos:
         )
         self.boton_exportar.pack(side=tk.LEFT, padx=10)
 
-        # Botón para abrir ventana de entradas y salidas
-        self.boton_historial = tk.Button(
-            self.frame_filtros, text="Ver Entradas/Salidas", font=("Arial", 12, "bold"),
-            bg="#007ACC", fg="white", command=self.abrir_historial_desde_boton,
+        # Botón para mostrar todas las entradas y salidas
+        self.boton_todas_entradas_salidas = tk.Button(
+            self.frame_filtros, text="Mostrar Todas las Entradas y Salidas", font=("Arial", 12, "bold"),
+            bg="#007ACC", fg="white", command=self.mostrar_todas_entradas_salidas,
             relief="groove", bd=2
         )
-        self.boton_historial.pack(side=tk.LEFT, padx=10)
+        self.boton_todas_entradas_salidas.pack(side=tk.LEFT, padx=10)
 
 
         # Frame contenedor para la tabla
@@ -229,13 +229,54 @@ class VistaProductos:
 
         workbook.save(filepath)
         messagebox.showinfo("Éxito", f"Datos exportados exitosamente a {filepath}")
-    
-    def abrir_historial_desde_boton(self):
-        # Selecciona el producto actual (si está seleccionado)
-        selected_item = self.tree.selection()
-        if selected_item:
-            producto_id = self.tree.item(selected_item[0])["values"][0]  # Obtiene el ID del producto
-            self.abrir_ventana_entradas_salidas(producto_id)
-        else:
-            messagebox.showwarning("Advertencia", "Por favor, selecciona un producto.")
 
+    def mostrar_todas_entradas_salidas(self):
+        """
+        Abre una ventana para mostrar todas las entradas y salidas de todos los productos.
+        """
+        ventana_historial = tk.Toplevel(self.root)
+        ventana_historial.title("Todas las Entradas y Salidas")
+        ventana_historial.geometry("800x400")
+        ventana_historial.configure(bg="#f4f4f9")
+
+        tk.Label(
+            ventana_historial, text="Todas las Entradas y Salidas",
+            font=("Arial", 16, "bold"), bg="#4CAF50", fg="white", pady=10
+        ).pack(fill=tk.X)
+
+        frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
+        frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        columnas = ("Producto", "Tipo", "Fecha", "Cantidad", "Detalles")
+        tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
+
+        for col in columnas:
+            tree.heading(col, text=col)
+            tree.column(col, anchor="center", width=150)
+
+        scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scroll_y.set)
+        scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        registros = self.controlador.obtener_historial_general()
+
+        if registros:
+            entradas = registros["entradas"]
+            salidas = registros["salidas"]
+
+            for entrada in entradas:
+                producto, fecha, cantidad = entrada
+                tree.insert("", tk.END, values=(producto, "Entrada", fecha, cantidad, "-"))
+
+            for salida in salidas:
+                producto, fecha, cantidad, tipo, modelo, marca = salida
+                detalles = f"{tipo} {modelo} {marca}"
+                tree.insert("", tk.END, values=(producto, "Salida", fecha, cantidad, detalles))
+        else:
+            tree.insert("", tk.END, values=("No hay datos", "", "", "", ""))
+
+        tk.Button(
+            ventana_historial, text="Cerrar", font=("Arial", 12), bg="#f44336", fg="white",
+            command=ventana_historial.destroy
+        ).pack(pady=10)

@@ -57,63 +57,25 @@ class Entrada:
             print("No se pudo establecer conexión con la base de datos.")
             return None
 
-    def obtener_entradas_por_producto(self, producto_id):
-        """Consulta las entradas asociadas a un producto específico."""
-        connection = self.conexion_db.conectar()
-        if connection:
-            cursor = connection.cursor()
-            try:
-                query = """
-                SELECT e.fecha, d.cantidad
-                FROM entradaDetalle d
-                JOIN entrada e ON e.identrada = d.identrada
-                WHERE d.idproducto = %s
-                """
-                cursor.execute(query, (producto_id,))
-                return cursor.fetchall()
-            except Exception as e:
-                print(f"Error obteniendo entradas del producto: {e}")
-                return []
-            finally:
-                self.conexion_db.cerrar_conexion()
-
     def obtener_todas_las_entradas(self):
         connection = self.conexion_db.conectar()
         if connection:
             try:
                 cursor = connection.cursor()
                 query = """
-                    SELECT p.partname, e.fecha, d.cantidad
-                    FROM entradaDetalle d
-                    JOIN entrada e ON e.identrada = d.identrada
-                    JOIN producto p ON p.idproducto = d.idproducto
-                    ORDER BY e.fecha ASC
+                SELECT p.partname, e.fecha, d.cantidad
+                FROM entradaDetalle d
+                JOIN entrada e ON e.identrada = d.identrada
+                JOIN producto p ON p.idproducto = d.idproducto
                 """
                 cursor.execute(query)
-                return cursor.fetchall()
+                entradas = cursor.fetchall()
+                return entradas
             except Exception as e:
-                print(f"Error obteniendo todas las entradas: {e}")
+                print(f"Error al obtener todas las entradas: {e}")
                 return []
             finally:
                 self.conexion_db.cerrar_conexion()
-        return []
-
-    def obtener_todas_las_salidas(self):
-        connection = self.conexion_db.conectar()
-        if connection:
-            try:
-                cursor = connection.cursor()
-                query = """
-                    SELECT p.partname, s.fecha, s.cantidad, s.tipo, s.modelo, s.marca
-                    FROM salidaDetalle s
-                    JOIN producto p ON p.idproducto = s.idproducto
-                    ORDER BY s.fecha ASC
-                """
-                cursor.execute(query)
-                return cursor.fetchall()
-            except Exception as e:
-                print(f"Error obteniendo todas las salidas: {e}")
-                return []
-            finally:
-                self.conexion_db.cerrar_conexion()
-        return []
+        else:
+            print("No se pudo conectar a la base de datos.")
+            return []
