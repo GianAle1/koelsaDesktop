@@ -11,7 +11,7 @@ class Producto:
             try:
                 query = """
                     INSERT INTO producto 
-                    (partname, descripcion, cantidad, precio, smcs, sap, idmarca, idalmacenDetalle, idunidadMedida, idfamilia) 
+                    (partname, descripcion, cantidad, precio, smcs,ubicacion, idmarca, idalmacen, idunidadMedida, idfamilia) 
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 cursor.execute(query, (nombre, descripcion, cantidad, precio, smcs, sap, marca_id, idalmacenDetalle, und_medida, familia))
@@ -27,10 +27,10 @@ class Producto:
             return False
 
     def listar_productos(self):
-        connection = self.conexion_db.conectar()  # Abre una nueva conexión
+        connection = self.conexion_db.conectar()
         if connection:
             try:
-                cursor = connection.cursor()  # Obtén un cursor directamente de la conexión activa
+                cursor = connection.cursor()
                 query = """
                     SELECT 
                     p.idproducto AS ID,
@@ -42,30 +42,28 @@ class Producto:
                     p.cantidad AS Cantidad,
                     p.precio AS Precio,
                     p.smcs AS SMCS,
-                    p.sap AS SAP,
-                    a.nombre AS Almacen,
-                    ad.ubicacion AS Ubicacion
+                    p.ubicacion AS Ubicacion,
+                    a.nombre AS Almacen
                     FROM producto p
                     LEFT JOIN marca m ON p.idmarca = m.idmarca
-                    INNER JOIN unidadMedida u ON p.idunidadMedida = u.idunidadMedida
-                    INNER JOIN familia f ON p.idfamilia = f.idfamilia
-                    LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle 
-                    INNER JOIN almacen a ON a.idalmacen = ad.idalmacen
+                    LEFT JOIN unidadMedida u ON p.idunidadMedida = u.idunidadMedida
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN almacen a ON p.idalmacen = a.idalmacen
                 """
-                cursor.execute(query)  # Ejecuta la consulta
+                cursor.execute(query)
                 productos = cursor.fetchall()
-                return productos  # Devuelve los resultados
+                return productos
             except Exception as e:
                 print(f"Error al obtener productos: {e}")
                 return []
             finally:
-                # Asegúrate de cerrar el cursor y la conexión después de usarla
                 if cursor:
                     cursor.close()
                 self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer una conexión a la base de datos.")
             return []
+
 
     def listar_productos_por_familia(self, familia):
         connection = self.conexion_db.conectar()

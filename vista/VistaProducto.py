@@ -1,7 +1,6 @@
 import tkinter as tk
-from tkinter import  messagebox, ttk
+from tkinter import messagebox, ttk
 from ttkwidgets.autocomplete import AutocompleteCombobox
-
 
 class VistaProducto:
     def __init__(self, root, controlador):
@@ -16,7 +15,7 @@ class VistaProducto:
         self.frame.pack(pady=30)
 
         # Título
-        self.titulo_label = tk.Label(self.frame, text="Registrar Producto", font=("Arial", 18, "bold"), bg="#f4f4f9", fg="#333333")
+        self.titulo_label = tk.Label(self.frame, text="Registrar Nuevo Producto", font=("Arial", 18, "bold"), bg="#f4f4f9", fg="#333333")
         self.titulo_label.grid(row=0, column=0, columnspan=2, pady=10)
 
         # Campos para registrar producto
@@ -56,31 +55,24 @@ class VistaProducto:
         self.precio_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.precio_entry.grid(row=7, column=1, pady=5)
 
-        # Campo SMSCS
+        # Campo SMCS
         self.smcs_label = tk.Label(self.frame, text="SMCS:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.smcs_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
         self.smcs_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.smcs_entry.grid(row=8, column=1, pady=5)
 
-        # Campo SAP
-        self.sap_label = tk.Label(self.frame, text="SAP:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.sap_label.grid(row=9, column=0, sticky="w", padx=15, pady=5)
-        self.sap_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
-        self.sap_entry.grid(row=9, column=1, pady=5)
+        # Campo Ubicación
+        self.ubicacion_label = tk.Label(self.frame, text="Ubicación:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.ubicacion_label.grid(row=9, column=0, sticky="w", padx=15, pady=5)
+        self.ubicacion_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
+        self.ubicacion_entry.grid(row=9, column=1, pady=5)
 
         # Almacén
         self.almacen_label = tk.Label(self.frame, text="Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.almacen_label.grid(row=10, column=0, sticky="w", padx=15, pady=5)
         self.almacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")
         self.almacen_combobox.grid(row=10, column=1, pady=5)
-        self.almacen_combobox.bind("<<ComboboxSelected>>", self.cargar_subalmacenes)
-
-        # Subalmacén
-        self.subalmacen_label = tk.Label(self.frame, text="Sub Almacén:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.subalmacen_label.grid(row=11, column=0, sticky="w", padx=15, pady=5)
-        self.subalmacen_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")
-        self.subalmacen_combobox.grid(row=11, column=1, pady=5)
-
+  
         # Botón para registrar producto
         self.registrar_button = tk.Button(
             self.frame, text="Registrar Producto", font=("Arial", 14), command=self.registrar_producto, bg="#4CAF50", fg="white", relief="raised", bd=4
@@ -92,18 +84,11 @@ class VistaProducto:
         self.listar_unidadMedidas()
         self.listar_familias()
 
-        self.registrar_button = tk.Button(self.frame, text="Registrar Producto", font=("Arial", 14), command=self.registrar_producto, bg="#4CAF50", fg="white", relief="raised", bd=4)
-        self.registrar_button.grid(row=12, column=0, columnspan=2, pady=20)
-
-    def mostrar_producto(self):
-        self.root.mainloop()
-
     def listar_marcas(self):
-        """Obtiene las marcas desde el controlador y las configura en el AutocompleteCombobox."""
-        marcas = self.controlador.listar_marcas()  # Obtener marcas del controlador
-        marca_nombres = [marca[1] for marca in marcas]  # Extraer nombres de las marcas
-        self.marca_combobox.set_completion_list(marca_nombres)  # Actualizar valores
-        self.marca_combobox.set("")  # Limpiar selección inicial
+        marcas = self.controlador.listar_marcas()
+        marca_nombres = [marca[1] for marca in marcas]
+        self.marca_combobox.set_completion_list(marca_nombres)
+        self.marca_combobox.set("")
 
     def listar_unidadMedidas(self):
         unidadMedidas = self.controlador.listar_unidadMedidas()
@@ -130,27 +115,26 @@ class VistaProducto:
         cantidad = self.cantidad_entry.get()
         precio = self.precio_entry.get()
         smcs = self.smcs_entry.get()
-        sap = self.sap_entry.get()
-        
+        ubicacion = self.ubicacion_entry.get()
+
         marca_seleccionada = self.marca_combobox.get()
-        und_medida = self.unidadMedida_combobox.get()  # Unidad de medida
+        und_medida = self.unidadMedida_combobox.get()
         familia_seleccionada = self.familia_combobox.get()
-        subalmacen_seleccionado = self.subalmacen_combobox.get()  # Subalmacén seleccionado
+        almacen_seleccionado = self.almacen_combobox.get()
 
         # Validación de campos
-        if not all([nombre, descripcion, cantidad, precio, smcs, sap, marca_seleccionada, und_medida, familia_seleccionada, subalmacen_seleccionado]):
+        if not all([nombre, descripcion, cantidad, precio, smcs, ubicacion, marca_seleccionada, und_medida, familia_seleccionada, almacen_seleccionado]):
             messagebox.showwarning("Advertencia", "Todos los campos deben ser completados.")
             return
 
-        # Validaciones adicionales
         try:
             cantidad = int(cantidad)
             precio = float(precio)
         except ValueError:
-            messagebox.showwarning("Advertencia", "Cantidad y Precio  deben ser valores numéricos válidos.")
+            messagebox.showwarning("Advertencia", "Cantidad y Precio deben ser valores numéricos válidos.")
             return
 
-        # Obtener IDs de selección
+        # Obtener IDs relacionados
         marcas = self.controlador.listar_marcas()
         marca_id = next((marca[0] for marca in marcas if marca[1] == marca_seleccionada), None)
 
@@ -160,20 +144,17 @@ class VistaProducto:
         familias = self.controlador.listar_familias()
         familia_id = next((familia[0] for familia in familias if familia[1] == familia_seleccionada), None)
 
-        almacen_seleccionado = self.almacen_combobox.get()
         almacenes = self.controlador.listar_almacenes()
         almacen_id = next((almacen[0] for almacen in almacenes if almacen[1] == almacen_seleccionado), None)
-        subalmacenes = self.controlador.listar_subalmacenes(almacen_id)
-        subalmacen_id = next((subalmacen[0] for subalmacen in subalmacenes if subalmacen[1] == subalmacen_seleccionado), None)
 
         # Validar que todos los IDs sean encontrados
-        if not all([marca_id, unidad_id, familia_id, subalmacen_id]):
+        if not all([marca_id, unidad_id, familia_id, almacen_id]):
             messagebox.showerror("Error", "Uno o más valores seleccionados no son válidos.")
             return
 
-        # Llamar al controlador para registrar el producto
+        # Llamar al modelo para registrar el producto
         exito = self.controlador.registrar_producto(
-            nombre, descripcion, cantidad, precio, smcs, sap, marca_id, subalmacen_id, unidad_id, familia_id
+            nombre, descripcion, cantidad, precio, smcs, ubicacion, marca_id, almacen_id, unidad_id, familia_id
         )
 
         if exito:
@@ -182,41 +163,17 @@ class VistaProducto:
         else:
             messagebox.showerror("Error", "Hubo un problema al registrar el producto.")
 
-
-
-        # Función para cargar subalmacenes
-    def cargar_subalmacenes(self, event=None):
-        """Carga los subalmacenes asociados al almacén seleccionado."""
-        almacen_seleccionado = self.almacen_combobox.get()
-        if not almacen_seleccionado:
-            self.subalmacen_combobox["values"] = []
-            return
-
-        # Obtener el ID del almacén seleccionado
-        almacenes = self.controlador.listar_almacenes()
-        almacen_id = next((almacen[0] for almacen in almacenes if almacen[1] == almacen_seleccionado), None)
-
-        if almacen_id:
-            # Obtener subalmacenes para el almacén seleccionado
-            subalmacenes = self.controlador.listar_subalmacenes(almacen_id)
-            if subalmacenes:
-                self.subalmacen_combobox["values"] = [subalmacen[1] for subalmacen in subalmacenes]
-                self.subalmacen_combobox.current(0)
-            else:
-                self.subalmacen_combobox["values"] = ["No hay subalmacenes"]
-                self.subalmacen_combobox.current(0)
-        else:
-            self.subalmacen_combobox["values"] = ["Seleccione un almacén válido"]
-            self.subalmacen_combobox.current(0)
+    def mostrar_producto(self):
+        self.root.mainloop()
 
     def limpiar_campos(self):
-        """Limpia todos los campos de entrada después de registrar un producto."""
         self.partname_entry.delete(0, tk.END)
         self.descripcion_entry.delete(0, tk.END)
         self.cantidad_entry.delete(0, tk.END)
         self.precio_entry.delete(0, tk.END)
+        self.smcs_entry.delete(0, tk.END)
+        self.ubicacion_entry.delete(0, tk.END)
         self.marca_combobox.set("")
         self.unidadMedida_combobox.set("")
         self.familia_combobox.set("")
         self.almacen_combobox.set("")
-        self.subalmacen_combobox.set("")

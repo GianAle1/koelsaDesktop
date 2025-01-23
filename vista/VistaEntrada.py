@@ -114,23 +114,42 @@ class VistaEntrada:
         cantidad = self.cantidad_entry.get()
         precio = self.precio_entry.get()
 
+        # Validaciones
         if not producto_seleccionado or not cantidad.isdigit() or int(cantidad) <= 0 or not precio.replace('.', '', 1).isdigit():
             messagebox.showerror("Error", "Debe seleccionar un producto, ingresar una cantidad válida y un precio válido.")
             return
 
+        # Extraer ID y nombre del producto desde el combobox
         id_producto = int(producto_seleccionado.split(" - ")[0])
+        nombre_producto = " - ".join(producto_seleccionado.split(" - ")[1:]).strip()  # Extraer nombre del producto correctamente
         smcs = self.productos_info[id_producto][4]
         sap = self.productos_info[id_producto][5]
 
-        self.productos_temporales.append((id_producto, int(cantidad), float(precio), smcs, sap))
+        # Agregar a la lista temporal incluyendo el nombre del producto
+        self.productos_temporales.append((id_producto, nombre_producto, int(cantidad), float(precio), smcs, sap))
+
+        # Actualizar la tabla
         self.actualizar_tabla()
 
     def actualizar_tabla(self):
+        # Limpiar la tabla
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        for id_producto, cantidad, precio, smcs, sap in self.productos_temporales:
-            self.tree.insert("", tk.END, values=(id_producto, cantidad, f"{precio:.2f}", smcs, sap))
+        # Insertar productos en la tabla, mostrando el nombre del producto
+        for _, nombre_producto, cantidad, precio, smcs, sap in self.productos_temporales:
+            self.tree.insert("", tk.END, values=(nombre_producto, cantidad, f"{precio:.2f}", smcs, sap))
+
+
+    def actualizar_tabla(self):
+        # Limpiar la tabla
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        # Insertar productos en la tabla, mostrando el nombre del producto
+        for id_producto, nombre_producto, cantidad, precio, smcs, sap in self.productos_temporales:
+            self.tree.insert("", tk.END, values=(nombre_producto, cantidad, f"{precio:.2f}", smcs, sap))
+
 
     def guardar_entrada(self):
         fecha = self.fecha_entry.get()

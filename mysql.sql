@@ -439,10 +439,7 @@ SELECT
                     INNER JOIN familia f ON p.idfamilia = f.idfamilia
                     LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle 
                     INNER JOIN almacen a ON a.idalmacen = ad.idalmacen;
-ALTER TABLE producto ADD COLUMN sap VARCHAR(10);
-
-
-select * from usuario;
-
+use koelsa;
 select * from producto;
+select * from almacen;
 

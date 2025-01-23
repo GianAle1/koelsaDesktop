@@ -1,5 +1,6 @@
 from modelo.conexion import ConexionDB
-from decimal import Decimal  # Importa Decimal para manejar números decimales
+from decimal import Decimal
+
 class Entrada:
     def __init__(self):
         self.conexion_db = ConexionDB()
@@ -29,8 +30,12 @@ class Entrada:
 
                 for producto in productos:
                     idproducto = producto[0]  # ID del producto
-                    cantidad = producto[1]   # Cantidad ingresada
+                    cantidad = int(producto[1])  # Cantidad ingresada
                     precio_nuevo = Decimal(producto[2])  # Convertir el precio a Decimal
+
+                    # Validar que cantidad y precio sean positivos
+                    if cantidad <= 0 or precio_nuevo <= 0:
+                        raise ValueError("La cantidad y el precio deben ser mayores a 0.")
 
                     # Insertar en entradaDetalle
                     cursor.execute(query_detalle, (identrada, idproducto, cantidad))
@@ -71,3 +76,4 @@ class Entrada:
                 return []
             finally:
                 self.conexion_db.cerrar_conexion()
+    
