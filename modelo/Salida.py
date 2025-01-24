@@ -106,16 +106,64 @@ class Salida:
             try:
                 cursor = connection.cursor()
                 query = """
-                SELECT p.partname, s.fecha, d.cantidad, d.tipo, d.modelo, d.marca
+                SELECT 
+                    p.idproducto,
+                    p.partname,
+                    p.smcs,
+                    p.descripcion,
+                    f.nomfamilia,
+                    s.fecha,
+                    d.cantidad,
+                    m.tipo,
+                    m.modelo,
+                    m.marca
                 FROM salidaDetalle d
                 JOIN salida s ON s.idsalida = d.idsalida
                 JOIN producto p ON p.idproducto = d.idproducto
+                LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                LEFT JOIN maquinaria m ON m.idmaquinaria = d.idmaquinaria;
                 """
                 cursor.execute(query)
                 salidas = cursor.fetchall()
                 return salidas
             except Exception as e:
                 print(f"Error al obtener todas las salidas: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo conectar a la base de datos.")
+            return []
+
+    def obtener_salidas_por_producto(self, producto_id):
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                query = """
+                    SELECT 
+                        p.idproducto,
+                        p.partname,
+                        p.smcs,
+                        p.descripcion,
+                        f.nomfamilia,
+                        s.fecha,
+                        d.cantidad,
+                        m.tipo,
+                        m.modelo,
+                        m.marca
+                    FROM salidaDetalle d
+                    JOIN salida s ON s.idsalida = d.idsalida
+                    JOIN producto p ON p.idproducto = d.idproducto
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN maquinaria m ON m.idmaquinaria = d.idmaquinaria
+                    WHERE p.idproducto = %s;
+                """
+                cursor.execute(query, (producto_id,))
+                salidas = cursor.fetchall()
+                return salidas
+            except Exception as e:
+                print(f"Error al obtener salidas para el producto {producto_id}: {e}")
                 return []
             finally:
                 self.conexion_db.cerrar_conexion()

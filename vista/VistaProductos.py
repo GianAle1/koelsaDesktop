@@ -231,12 +231,9 @@ class VistaProductos:
         messagebox.showinfo("Éxito", f"Datos exportados exitosamente a {filepath}")
 
     def mostrar_todas_entradas_salidas(self):
-        """
-        Abre una ventana para mostrar todas las entradas y salidas de todos los productos.
-        """
         ventana_historial = tk.Toplevel(self.root)
         ventana_historial.title("Todas las Entradas y Salidas")
-        ventana_historial.geometry("800x400")
+        ventana_historial.geometry("1000x500")
         ventana_historial.configure(bg="#f4f4f9")
 
         tk.Label(
@@ -247,12 +244,12 @@ class VistaProductos:
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("Producto", "Tipo", "Fecha", "Cantidad", "Detalles")
+        columnas = ("ID Producto", "Part Name", "SMCS", "Descripción", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
         for col in columnas:
             tree.heading(col, text=col)
-            tree.column(col, anchor="center", width=150)
+            tree.column(col, anchor="center", width=120)
 
         scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=scroll_y.set)
@@ -266,15 +263,15 @@ class VistaProductos:
             salidas = registros["salidas"]
 
             for entrada in entradas:
-                producto, fecha, cantidad = entrada
-                tree.insert("", tk.END, values=(producto, "Entrada", fecha, cantidad, "-"))
+                idproducto, partname, smcs, descripcion, nomfamilia, fecha, cantidad = entrada
+                tree.insert("", tk.END, values=(idproducto, partname, smcs, descripcion, nomfamilia, "Entrada", fecha, cantidad, "-"))
 
             for salida in salidas:
-                producto, fecha, cantidad, tipo, modelo, marca = salida
+                idproducto, partname, smcs, descripcion, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
                 detalles = f"{tipo} {modelo} {marca}"
-                tree.insert("", tk.END, values=(producto, "Salida", fecha, cantidad, detalles))
+                tree.insert("", tk.END, values=(idproducto, partname, smcs, descripcion, nomfamilia, "Salida", fecha, cantidad, detalles))
         else:
-            tree.insert("", tk.END, values=("No hay datos", "", "", "", ""))
+            tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
 
         tk.Button(
             ventana_historial, text="Cerrar", font=("Arial", 12), bg="#f44336", fg="white",

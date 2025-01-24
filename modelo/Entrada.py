@@ -57,16 +57,57 @@ class Entrada:
             print("No se pudo establecer conexión con la base de datos.")
             return None
 
+    def obtener_entradas_por_producto(self, producto_id):
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                query = """
+                    SELECT 
+                        p.idproducto,
+                        p.partname,
+                        p.smcs,
+                        p.descripcion,
+                        f.nomfamilia,
+                        e.fecha,
+                        d.cantidad
+                    FROM entradaDetalle d
+                    JOIN entrada e ON e.identrada = d.identrada
+                    JOIN producto p ON p.idproducto = d.idproducto
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    WHERE p.idproducto = %s;
+                """
+                cursor.execute(query, (producto_id,))
+                entradas = cursor.fetchall()
+                return entradas
+            except Exception as e:
+                print(f"Error al obtener entradas para el producto {producto_id}: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo conectar a la base de datos.")
+            return []
+
+
     def obtener_todas_las_entradas(self):
         connection = self.conexion_db.conectar()
         if connection:
             try:
                 cursor = connection.cursor()
                 query = """
-                SELECT p.partname, e.fecha, d.cantidad
-                FROM entradaDetalle d
-                JOIN entrada e ON e.identrada = d.identrada
-                JOIN producto p ON p.idproducto = d.idproducto
+                    SELECT 
+                        p.idproducto,
+                        p.partname,
+                        p.smcs,
+                        p.descripcion,
+                        f.nomfamilia,
+                        e.fecha,
+                        d.cantidad
+                    FROM entradaDetalle d
+                    JOIN entrada e ON e.identrada = d.identrada
+                    JOIN producto p ON p.idproducto = d.idproducto
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia;
                 """
                 cursor.execute(query)
                 entradas = cursor.fetchall()

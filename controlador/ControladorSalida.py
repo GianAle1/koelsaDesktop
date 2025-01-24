@@ -12,5 +12,6 @@ class ControladorSalida:
         """Obtiene el historial de salidas para un producto específico."""
         return self.salida_modelo.obtener_salidas_por_producto(producto_id)  # Usamos el atributo correcto
     
-    def obtener_todas_las_entradas(self):
-        return self.modelo.obtener_todas_las_entradas()
+    def obtener_todas_las_salidas(self):
+        """Obtiene todas las salidas registradas en la base de datos."""
+        return self.salida_modelo.obtener_todas_las_salidas()

@@ -114,20 +114,17 @@ class MenuControlador:
     def guardar_backlog(self, backlog_data, detalles_temporales):
         return self.controlador_backlog.guardar_backlog(backlog_data, detalles_temporales)
     
+
     def obtener_historial_general(self):
         """
         Devuelve un diccionario con todas las entradas y salidas de todos los productos.
         """
         try:
-            entradas = self.modelo_entrada.obtener_todas_las_entradas()
-            salidas = self.modelo_salida.obtener_todas_las_salidas()
+            entradas = self.controlador_entrada.obtener_todas_las_entradas()
+            salidas = self.controlador_salida.obtener_todas_las_salidas()
             return {"entradas": entradas, "salidas": salidas}
         except Exception as e:
             print(f"Error al obtener el historial general: {e}")
             return {"entradas": [], "salidas": []}
 
-    def obtener_historial_general(self):
-        entradas = self.controlador_entrada.obtener_todas_las_entradas()
-        salidas = self.controlador_salida.obtener_todas_las_salidas()
-        return {"entradas": entradas, "salidas": salidas}
 
