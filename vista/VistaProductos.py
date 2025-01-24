@@ -74,7 +74,7 @@ class VistaProductos:
         # Configuración de la tabla
         columnas = (
             "ID", "Part Name", "Descripción", "Marca", "Familia",
-            "Unidad de Medida", "Cantidad", "Precio","SMCS","SAP", "Almacén","Sub Almacen"
+            "Unidad de Medida", "Cantidad", "Precio","SMCS","Ubicaion", "Almacén"
         )
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=20)
 
@@ -98,9 +98,8 @@ class VistaProductos:
         self.tree.column("Cantidad", anchor="center", width=100)
         self.tree.column("Precio", anchor="center", width=100)
         self.tree.column("SMCS", anchor="center", width=100)
-        self.tree.column("SAP", anchor="center", width=100)
+        self.tree.column("Ubicaion", anchor="center", width=100)
         self.tree.column("Almacén", anchor="center", width=150)
-        self.tree.column("Sub Almacen", anchor="center", width=150)
         # Scrollbars
         scroll_y = ttk.Scrollbar(self.frame_tabla, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(self.frame_tabla, orient="horizontal", command=self.tree.xview)
@@ -158,24 +157,24 @@ class VistaProductos:
 
     def abrir_ventana_entradas_salidas(self, producto_id):
         ventana_historial = tk.Toplevel(self.root)
-        ventana_historial.title("Historial de Entradas y Salidas")
-        ventana_historial.geometry("800x400")
+        ventana_historial.title("Historial de Entradas y Salidas del Producto")
+        ventana_historial.geometry("1000x500")
         ventana_historial.configure(bg="#f4f4f9")
 
         tk.Label(
-            ventana_historial, text="Historial de Entradas y Salidas",
+            ventana_historial, text="Historial de Entradas y Salidas del Producto",
             font=("Arial", 16, "bold"), bg="#4CAF50", fg="white", pady=10
         ).pack(fill=tk.X)
 
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("Tipo", "Fecha", "Cantidad", "Detalles")
+        columnas = ("ID Producto", "Part Name", "SMCS", "Descripción", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
         for col in columnas:
             tree.heading(col, text=col)
-            tree.column(col, anchor="center", width=150)
+            tree.column(col, anchor="center", width=120)
 
         scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=scroll_y.set)
@@ -188,21 +187,24 @@ class VistaProductos:
             entradas = registros["entradas"]
             salidas = registros["salidas"]
 
+            # Agregar entradas al Treeview
             for entrada in entradas:
-                fecha, cantidad = entrada
-                tree.insert("", tk.END, values=("Entrada", fecha, cantidad, "-"))
+                idproducto, partname, smcs, descripcion, nomfamilia, fecha, cantidad = entrada
+                tree.insert("", tk.END, values=(idproducto, partname, smcs, descripcion, nomfamilia, "Entrada", fecha, cantidad, "-"))
 
+            # Agregar salidas al Treeview
             for salida in salidas:
-                fecha, cantidad, tipo, modelo, marca = salida
+                idproducto, partname, smcs, descripcion, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
                 detalles = f"{tipo} {modelo} {marca}"
-                tree.insert("", tk.END, values=("Salida", fecha, cantidad, detalles))
+                tree.insert("", tk.END, values=(idproducto, partname, smcs, descripcion, nomfamilia, "Salida", fecha, cantidad, detalles))
         else:
-            tree.insert("", tk.END, values=("No hay datos", "", "", ""))
+            tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
 
         tk.Button(
             ventana_historial, text="Cerrar", font=("Arial", 12), bg="#f44336", fg="white",
             command=ventana_historial.destroy
         ).pack(pady=10)
+
 
     def exportar_a_excel(self):
         productos = [self.tree.item(child)["values"] for child in self.tree.get_children()]

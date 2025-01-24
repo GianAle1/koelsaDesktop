@@ -71,15 +71,23 @@ class Producto:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 query = """
-                    SELECT p.idproducto, p.partname, p.descripcion, m.nombre AS Marca,
+                    SELECT 
+                        p.idproducto, 
+                        p.partname, 
+                        p.descripcion, 
+                        m.nombre AS Marca,
                         f.nomfamilia AS Familia,
-                        u.nomUnidad AS UnidadMedida, p.cantidad, p.precio, p.smcs, p.sap, a.nombre AS Almacen
+                        u.nomUnidad AS UnidadMedida, 
+                        p.cantidad, 
+                        p.precio, 
+                        p.smcs, 
+                        a.nombre AS Almacen,
+                        p.ubicacion AS Ubicacion
                     FROM producto p
                     LEFT JOIN marca m ON p.idmarca = m.idmarca
                     LEFT JOIN familia f ON p.idfamilia = f.idfamilia
                     LEFT JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
-                    LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle
-                    LEFT JOIN almacen a ON ad.idalmacen = a.idalmacen
+                    LEFT JOIN almacen a ON p.idalmacen = a.idalmacen 
                     WHERE f.nomfamilia = %s
                 """
                 cursor.execute(query, (familia,))
