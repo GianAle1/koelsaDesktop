@@ -4,12 +4,43 @@ from tkinter import messagebox
 from datetime import date
 from tkinter import ttk
 
+
+class CustomAutocompleteCombobox(AutocompleteCombobox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.completion_list = []
+        self._completion_matches = []
+        self.bind("<KeyRelease>", self._on_keyrelease)
+
+    def set_completion_list(self, completion_list):
+        """Actualiza la lista de valores disponibles para autocompletar."""
+        self.completion_list = completion_list
+
+    def _on_keyrelease(self, event):
+        """Filtra valores que coincidan con cualquier parte de la cadena."""
+        text = self.get().lower()
+        if text == "":
+            self._completion_matches = self.completion_list
+        else:
+            # Buscar coincidencias en cualquier parte de la cadena
+            self._completion_matches = [item for item in self.completion_list if text in item.lower()]
+
+        self._update_listbox()
+
+    def _update_listbox(self):
+        """Actualiza los elementos desplegables."""
+        self["values"] = self._completion_matches
+        if self._completion_matches:
+            self.event_generate("<Down>")  # Abre el desplegable si hay coincidencias
+
+
+
 class VistaEntrada:
     def __init__(self, root, controlador):
         self.root = root
         self.controlador = controlador
         self.root.title("Registrar Entrada de Producto")
-        self.root.geometry("800x700")  # Ajustar altura para incluir el proveedor
+        self.root.geometry("800x700")
         self.root.configure(bg="#f4f4f9")
 
         # Título
@@ -31,12 +62,12 @@ class VistaEntrada:
 
         # Producto
         tk.Label(self.frame_entrada, text="Producto:", font=("Arial", 12), bg="#f4f4f9").grid(row=1, column=0, sticky="w", padx=5)
-        self.producto_combobox = AutocompleteCombobox(self.frame_entrada, font=("Arial", 12), width=40, completevalues=[])
+        self.producto_combobox = CustomAutocompleteCombobox(self.frame_entrada, font=("Arial", 12), width=40, completevalues=[])
         self.producto_combobox.grid(row=1, column=1, padx=5)
 
         # Proveedor
         tk.Label(self.frame_entrada, text="Proveedor:", font=("Arial", 12), bg="#f4f4f9").grid(row=2, column=0, sticky="w", padx=5)
-        self.proveedor_combobox = AutocompleteCombobox(self.frame_entrada, font=("Arial", 12), width=40, completevalues=[])
+        self.proveedor_combobox = CustomAutocompleteCombobox(self.frame_entrada, font=("Arial", 12), width=40, completevalues=[])
         self.proveedor_combobox.grid(row=2, column=1, padx=5)
 
         # Cantidad
@@ -74,12 +105,6 @@ class VistaEntrada:
 
         self.tree.pack(fill=tk.BOTH, expand=True)
 
-        # Botón para eliminar producto
-        self.eliminar_button = tk.Button(
-            self.root, text="Eliminar Producto", font=("Arial", 12), bg="#f44336", fg="white", command=self.eliminar_producto
-        )
-        self.eliminar_button.pack(pady=10)
-
         # Botón para guardar la entrada
         self.guardar_button = tk.Button(
             self.root, text="Guardar Entrada", font=("Arial", 12), bg="#4CAF50", fg="white", command=self.guardar_entrada
@@ -94,36 +119,28 @@ class VistaEntrada:
         self.productos_temporales = []
 
     def cargar_productos(self):
-        try:
-            productos = self.controlador.listar_productos()
-            if productos:
-                values = [
-                    f"{producto[0]} - {producto[1]} - {producto[2]} - {producto[3]}" for producto in productos
-                ]
-                self.producto_combobox.set_completion_list(values)
-                self.productos_info = {producto[0]: producto for producto in productos}
-            else:
-                self.producto_combobox.set_completion_list([])
-                self.productos_info = {}
-        except Exception as e:
-            print(f"Error al cargar productos: {e}")
+        productos = self.controlador.listar_productos()
+        if productos:
+            values = [
+                f"{producto[0]} - {producto[1]} - {producto[2]} - {producto[3]}" for producto in productos
+            ]
+            print("Productos cargados en el combobox:", values)  # Depuración
+            self.producto_combobox.set_completion_list(values)
+            self.productos_info = {producto[0]: producto for producto in productos}
+        else:
+            print("No se encontraron productos.")  # Depuración
+
 
     def cargar_proveedores(self):
-        try:
-            proveedores = self.controlador.listar_proveedores()
-            if proveedores:
-                values = [
-                    f"{proveedor[0]} - {proveedor[1]}" for proveedor in proveedores
-                ]
-                self.proveedor_combobox.set_completion_list(values)
-                self.proveedores_info = {proveedor[0]: proveedor for proveedor in proveedores}
-            else:
-                self.proveedor_combobox.set_completion_list([])
-                self.proveedores_info = {}
-        except Exception as e:
-            print(f"Error al cargar proveedores: {e}")
+        """Carga los proveedores en el combobox de proveedores."""
+        proveedores = self.controlador.listar_proveedores()
+        if proveedores:
+            values = [f"{proveedor[0]} - {proveedor[1]}" for proveedor in proveedores]
+            self.proveedor_combobox.set_completion_list(values)
+            self.proveedores_info = {proveedor[0]: proveedor for proveedor in proveedores}
 
     def agregar_producto(self):
+        """Agrega un producto a la lista temporal."""
         producto_seleccionado = self.producto_combobox.get()
         proveedor_seleccionado = self.proveedor_combobox.get()
         cantidad = self.cantidad_entry.get()
@@ -137,11 +154,14 @@ class VistaEntrada:
             messagebox.showerror("Error", "Debe ingresar una cantidad y un precio válidos.")
             return
 
-        id_producto = int(producto_seleccionado.split(" - ")[0])
-        id_proveedor = int(proveedor_seleccionado.split(" - ")[0])
-
-        producto = self.productos_info[id_producto]
-        proveedor = self.proveedores_info[id_proveedor]
+        try:
+            id_producto = int(producto_seleccionado.split(" - ")[0])
+            id_proveedor = int(proveedor_seleccionado.split(" - ")[0])
+            producto = self.productos_info[id_producto]
+            proveedor = self.proveedores_info[id_proveedor]
+        except (ValueError, KeyError):
+            messagebox.showerror("Error", "Producto o proveedor seleccionados no válidos.")
+            return
 
         nombre_producto = f"{producto[1]} - {producto[2]} - {producto[3]}"
         nombre_proveedor = proveedor[1]
@@ -150,6 +170,7 @@ class VistaEntrada:
         self.actualizar_tabla()
 
     def actualizar_tabla(self):
+        """Actualiza la tabla de productos agregados."""
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -157,6 +178,7 @@ class VistaEntrada:
             self.tree.insert("", tk.END, values=(nombre_producto, cantidad, f"{precio:.2f}", nombre_proveedor))
 
     def guardar_entrada(self):
+        """Guarda la entrada en la base de datos."""
         fecha = self.fecha_entry.get()
         if not self.productos_temporales:
             messagebox.showerror("Error", "Debe agregar al menos un producto a la entrada.")
@@ -175,18 +197,11 @@ class VistaEntrada:
 
 
     def eliminar_producto(self):
+        """Elimina un producto de la lista temporal."""
         selected_item = self.tree.selection()
         if selected_item:
             for item in selected_item:
-                values = self.tree.item(item, "values")
-                id_producto, cantidad, precio = values[0], int(values[1]), float(values[2])
-
-                # Eliminar el producto de la lista temporal
-                self.productos_temporales = [
-                    prod for prod in self.productos_temporales if not (prod[0] == int(id_producto) and prod[1] == cantidad and prod[2] == precio)
-                ]
                 self.tree.delete(item)
-
             messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
         else:
             messagebox.showwarning("Advertencia", "Debe seleccionar un producto para eliminar.")

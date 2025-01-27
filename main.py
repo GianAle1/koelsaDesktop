@@ -22,6 +22,7 @@ def iniciar_aplicacion():
         root.mainloop()
 
     except Exception as e:
+        
         print("Error detectado:")
         print(traceback.format_exc())
         input("Presiona Enter para cerrar...")
