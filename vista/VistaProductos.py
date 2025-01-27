@@ -74,7 +74,7 @@ class VistaProductos:
         # Configuración de la tabla
         columnas = (
             "ID", "Part Name", "Descripción", "Marca", "Familia",
-            "Unidad de Medida", "Cantidad", "Precio","SMCS","Ubicaion", "Almacén"
+            "Unidad de Medida", "Cantidad", "Precio","Codigo Interno","Ubicaion", "Almacén"
         )
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=20)
 
@@ -92,12 +92,11 @@ class VistaProductos:
         self.tree.column("Part Name", anchor="center", width=150)
         self.tree.column("Descripción", anchor="w", width=300)
         self.tree.column("Marca", anchor="center", width=120)
-        
         self.tree.column("Familia", anchor="center", width=120)
         self.tree.column("Unidad de Medida", anchor="center", width=120)
         self.tree.column("Cantidad", anchor="center", width=100)
         self.tree.column("Precio", anchor="center", width=100)
-        self.tree.column("SMCS", anchor="center", width=100)
+        self.tree.column("Codigo Interno", anchor="center", width=100)
         self.tree.column("Ubicaion", anchor="center", width=100)
         self.tree.column("Almacén", anchor="center", width=150)
         # Scrollbars
@@ -169,7 +168,7 @@ class VistaProductos:
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("ID Producto", "Part Name", "SMCS", "Descripción", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
+        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción","Precio", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
         for col in columnas:
@@ -189,14 +188,14 @@ class VistaProductos:
 
             # Agregar entradas al Treeview
             for entrada in entradas:
-                idproducto, partname, smcs, descripcion, nomfamilia, fecha, cantidad = entrada
-                tree.insert("", tk.END, values=(idproducto, partname, smcs, descripcion, nomfamilia, "Entrada", fecha, cantidad, "-"))
+                idproducto, partname, codigoInterno, descripcion,precio, nomfamilia, fecha, cantidad = entrada
+                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion,precio, nomfamilia, "Entrada", fecha, cantidad, "-"))
 
             # Agregar salidas al Treeview
             for salida in salidas:
-                idproducto, partname, smcs, descripcion, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
+                idproducto, partname, codigoInterno, descripcion,precio, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
                 detalles = f"{tipo} {modelo} {marca}"
-                tree.insert("", tk.END, values=(idproducto, partname, smcs, descripcion, nomfamilia, "Salida", fecha, cantidad, detalles))
+                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion,precio, nomfamilia, "Salida", fecha, cantidad, detalles))
         else:
             tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
 
@@ -246,7 +245,7 @@ class VistaProductos:
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("ID Producto", "Part Name", "SMCS", "Descripción", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
+        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción","Precio", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
         for col in columnas:
@@ -265,13 +264,13 @@ class VistaProductos:
             salidas = registros["salidas"]
 
             for entrada in entradas:
-                idproducto, partname, smcs, descripcion, nomfamilia, fecha, cantidad = entrada
-                tree.insert("", tk.END, values=(idproducto, partname, smcs, descripcion, nomfamilia, "Entrada", fecha, cantidad, "-"))
+                idproducto, partname, codigoInterno, descripcion, nomfamilia, fecha, cantidad = entrada
+                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion, nomfamilia, "Entrada", fecha, cantidad, "-"))
 
             for salida in salidas:
-                idproducto, partname, smcs, descripcion, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
+                idproducto, partname, codigoInterno, descripcion, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
                 detalles = f"{tipo} {modelo} {marca}"
-                tree.insert("", tk.END, values=(idproducto, partname, smcs, descripcion, nomfamilia, "Salida", fecha, cantidad, detalles))
+                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion, nomfamilia, "Salida", fecha, cantidad, detalles))
         else:
             tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
 

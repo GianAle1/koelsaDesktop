@@ -1,6 +1,7 @@
 from modelo.conexion import ConexionDB
 from decimal import Decimal
 
+
 class Entrada:
     def __init__(self):
         self.conexion_db = ConexionDB()
@@ -16,11 +17,14 @@ class Entrada:
                 connection.commit()
 
                 # Obtener el identrada recién generado
-                cursor.execute("SELECT LAST_INSERT_ID()")  # Cambiado para MySQL
+                cursor.execute("SELECT LAST_INSERT_ID()")  # Para MySQL
                 identrada = cursor.fetchone()[0]
 
                 # Insertar en la tabla entradaDetalle y actualizar la cantidad en producto
-                query_detalle = "INSERT INTO entradaDetalle (identrada, idproducto, cantidad) VALUES (%s, %s, %s)"
+                query_detalle = """
+                    INSERT INTO entradaDetalle (identrada, idproducto, cantidad) 
+                    VALUES (%s, %s, %s)
+                """
                 query_actualizar_producto = """
                     UPDATE producto 
                     SET cantidad = cantidad + %s, 
@@ -29,13 +33,20 @@ class Entrada:
                 """
 
                 for producto in productos:
-                    idproducto = producto[0]  # ID del producto
-                    cantidad = int(producto[1])  # Cantidad ingresada
-                    precio_nuevo = Decimal(producto[2])  # Convertir el precio a Decimal
+                    # Validaciones y extracción de datos
+                    if not isinstance(producto[0], int):
+                        raise ValueError(f"El ID del producto no es válido: {producto[0]}")
+                    if not isinstance(producto[2], (int, float)) or producto[2] <= 0:
+                        raise ValueError(f"La cantidad debe ser un número positivo: {producto[2]}")
+                    if not isinstance(producto[3], (int, float, Decimal)) or producto[3] <= 0:
+                        raise ValueError(f"El precio debe ser un número positivo: {producto[3]}")
 
-                    # Validar que cantidad y precio sean positivos
-                    if cantidad <= 0 or precio_nuevo <= 0:
-                        raise ValueError("La cantidad y el precio deben ser mayores a 0.")
+                    idproducto = producto[0]  # ID del producto
+                    cantidad = int(producto[2])  # Cantidad ingresada
+                    precio_nuevo = Decimal(producto[3])  # Convertir el precio a Decimal
+
+                    # Validación adicional de datos
+                    print(f"Procesando producto - ID: {idproducto}, Cantidad: {cantidad}, Precio: {precio_nuevo}")
 
                     # Insertar en entradaDetalle
                     cursor.execute(query_detalle, (identrada, idproducto, cantidad))
@@ -66,8 +77,9 @@ class Entrada:
                     SELECT 
                         p.idproducto,
                         p.partname,
-                        p.smcs,
+                        p.codigoInterno,
                         p.descripcion,
+                        p.precio,
                         f.nomfamilia,
                         e.fecha,
                         d.cantidad
@@ -89,7 +101,6 @@ class Entrada:
             print("No se pudo conectar a la base de datos.")
             return []
 
-
     def obtener_todas_las_entradas(self):
         connection = self.conexion_db.conectar()
         if connection:
@@ -99,8 +110,9 @@ class Entrada:
                     SELECT 
                         p.idproducto,
                         p.partname,
-                        p.smcs,
+                        p.codigoInterno,
                         p.descripcion,
+                        p.precio,
                         f.nomfamilia,
                         e.fecha,
                         d.cantidad

@@ -96,6 +96,7 @@ class VistaEntrada:
                     f"{producto[0]} - {producto[1]} - {producto[2]} - {producto[3]}" for producto in productos
                 ]
                 self.productos_info = {producto[0]: producto for producto in productos}
+                print("Productos cargados:", self.productos_info)  # Depuración
             else:
                 self.producto_combobox['values'] = []
                 self.productos_info = {}
@@ -103,27 +104,47 @@ class VistaEntrada:
         except Exception as e:
             print(f"Error al cargar productos: {e}")
 
+
     def agregar_producto(self):
         producto_seleccionado = self.producto_combobox.get()
+        print("Producto seleccionado:", producto_seleccionado)  # Depuración
+
         cantidad = self.cantidad_entry.get()
         precio = self.precio_entry.get()
 
-        # Validaciones
+        # Validaciones básicas
         if not producto_seleccionado or not cantidad.isdigit() or int(cantidad) <= 0 or not precio.replace('.', '', 1).isdigit():
             messagebox.showerror("Error", "Debe seleccionar un producto, ingresar una cantidad válida y un precio válido.")
             return
 
-        # Extraer ID y nombre del producto desde el combobox
-        id_producto = int(producto_seleccionado.split(" - ")[0])
-        nombre_producto = " - ".join(producto_seleccionado.split(" - ")[1:]).strip()  # Extraer nombre del producto correctamente
-        smcs = self.productos_info[id_producto][4]
-        sap = self.productos_info[id_producto][5]
+        try:
+            # Extraer ID del producto del texto seleccionado
+            id_producto_str = producto_seleccionado.split(" - ")[0].strip()
+            if not id_producto_str.isdigit():
+                messagebox.showerror("Error", f"El ID del producto no es válido: {id_producto_str}")
+                return
 
-        # Agregar a la lista temporal incluyendo el nombre del producto
-        self.productos_temporales.append((id_producto, nombre_producto, int(cantidad), float(precio), smcs, sap))
+            id_producto = int(id_producto_str)
 
-        # Actualizar la tabla
-        self.actualizar_tabla()
+            # Validar que el ID esté en productos_info
+            if id_producto not in self.productos_info:
+                print("productos_info:", self.productos_info)  # Depuración
+                messagebox.showerror("Error", "No se pudo encontrar el ID del producto seleccionado.")
+                return
+
+            # Obtener datos del producto
+            producto = self.productos_info[id_producto]
+            nombre_producto = f"{producto[1]} - {producto[2]} - {producto[3]}"
+            smcs = producto[4]
+            sap = producto[5]
+
+            # Agregar a la lista temporal
+            self.productos_temporales.append((id_producto, nombre_producto, int(cantidad), float(precio), smcs, sap))
+
+            # Actualizar la tabla
+            self.actualizar_tabla()
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al agregar el producto: {e}")
 
     def actualizar_tabla(self):
         # Limpiar la tabla
@@ -134,25 +155,27 @@ class VistaEntrada:
         for _, nombre_producto, cantidad, precio, smcs, sap in self.productos_temporales:
             self.tree.insert("", tk.END, values=(nombre_producto, cantidad, f"{precio:.2f}", smcs, sap))
 
-
-    def actualizar_tabla(self):
-        # Limpiar la tabla
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-
-        # Insertar productos en la tabla, mostrando el nombre del producto
-        for id_producto, nombre_producto, cantidad, precio, smcs, sap in self.productos_temporales:
-            self.tree.insert("", tk.END, values=(nombre_producto, cantidad, f"{precio:.2f}", smcs, sap))
-
-
     def guardar_entrada(self):
+        print("Productos temporales antes de guardar:", self.productos_temporales)  # Depuración
         fecha = self.fecha_entry.get()
         if not self.productos_temporales:
             messagebox.showerror("Error", "Debe agregar al menos un producto a la entrada.")
             return
 
         try:
-            # Llama al controlador para guardar la entrada y actualizar los precios
+            # Validar que la fecha esté en un formato válido
+            date.fromisoformat(fecha)
+
+            # Imprime los datos para depuración
+            print("Productos temporales antes de guardar:", self.productos_temporales)
+
+            # Verificar que los IDs sean correctos antes de guardar
+            for producto in self.productos_temporales:
+                if not isinstance(producto[0], int):
+                    messagebox.showerror("Error", f"El ID del producto no es válido: {producto[0]}")
+                    return
+
+            # Llama al controlador para guardar la entrada
             exito = self.controlador.guardar_entrada(fecha, self.productos_temporales)
             if exito:
                 messagebox.showinfo("Éxito", "Entrada registrada y precios actualizados correctamente.")
@@ -160,8 +183,11 @@ class VistaEntrada:
                 self.actualizar_tabla()  # Refresca la tabla
             else:
                 messagebox.showerror("Error", "Ocurrió un error al guardar la entrada.")
+        except ValueError:
+            messagebox.showerror("Error", "La fecha ingresada no es válida.")
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al guardar la entrada: {e}")
+
 
     def eliminar_producto(self):
         selected_item = self.tree.selection()

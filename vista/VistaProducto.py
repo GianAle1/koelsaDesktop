@@ -55,11 +55,11 @@ class VistaProducto:
         self.precio_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
         self.precio_entry.grid(row=7, column=1, pady=5)
 
-        # Campo SMCS
-        self.smcs_label = tk.Label(self.frame, text="SMCS:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
-        self.smcs_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
-        self.smcs_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
-        self.smcs_entry.grid(row=8, column=1, pady=5)
+        # Campo codigoInterno
+        self.codigoInterno_label = tk.Label(self.frame, text="Codigo Interno:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
+        self.codigoInterno_label.grid(row=8, column=0, sticky="w", padx=15, pady=5)
+        self.codigoInterno_entry = tk.Entry(self.frame, width=40, font=("Arial", 12), relief="solid", bd=2)
+        self.codigoInterno_entry.grid(row=8, column=1, pady=5)
 
         # Campo Ubicación
         self.ubicacion_label = tk.Label(self.frame, text="Ubicación:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
@@ -114,7 +114,7 @@ class VistaProducto:
         descripcion = self.descripcion_entry.get()
         cantidad = self.cantidad_entry.get()
         precio = self.precio_entry.get()
-        smcs = self.smcs_entry.get()
+        smcs = self.codigoInterno_entry.get()
         ubicacion = self.ubicacion_entry.get()
 
         marca_seleccionada = self.marca_combobox.get()
@@ -171,7 +171,7 @@ class VistaProducto:
         self.descripcion_entry.delete(0, tk.END)
         self.cantidad_entry.delete(0, tk.END)
         self.precio_entry.delete(0, tk.END)
-        self.smcs_entry.delete(0, tk.END)
+        self.codigoInterno_entry.delete(0, tk.END)
         self.ubicacion_entry.delete(0, tk.END)
         self.marca_combobox.set("")
         self.unidadMedida_combobox.set("")

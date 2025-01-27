@@ -4,17 +4,17 @@ class Producto:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def registrar_producto(self, nombre, descripcion, cantidad, precio, smcs, sap, marca_id, idalmacenDetalle, und_medida, familia):
+    def registrar_producto(self, nombre, descripcion, cantidad, precio, codigoInterno, sap, marca_id, idalmacenDetalle, und_medida, familia):
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
                 query = """
                     INSERT INTO producto 
-                    (partname, descripcion, cantidad, precio, smcs,ubicacion, idmarca, idalmacen, idunidadMedida, idfamilia) 
+                    (partname, descripcion, cantidad, precio, codigoInterno,ubicacion, idmarca, idalmacen, idunidadMedida, idfamilia) 
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-                cursor.execute(query, (nombre, descripcion, cantidad, precio, smcs, sap, marca_id, idalmacenDetalle, und_medida, familia))
+                cursor.execute(query, (nombre, descripcion, cantidad, precio, codigoInterno, sap, marca_id, idalmacenDetalle, und_medida, familia))
                 connection.commit()             
                 return True 
             except Exception as e:
@@ -41,7 +41,7 @@ class Producto:
                     u.nomUnidad AS UnidadMedida,
                     p.cantidad AS Cantidad,
                     p.precio AS Precio,
-                    p.smcs AS SMCS,
+                    p.codigoInterno AS CodigoInterno,
                     p.ubicacion AS Ubicacion,
                     a.nombre AS Almacen
                     FROM producto p
@@ -80,7 +80,7 @@ class Producto:
                         u.nomUnidad AS UnidadMedida, 
                         p.cantidad, 
                         p.precio, 
-                        p.smcs, 
+                        p.codigoInterno, 
                         a.nombre AS Almacen,
                         p.ubicacion AS Ubicacion
                     FROM producto p

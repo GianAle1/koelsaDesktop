@@ -5,9 +5,9 @@ class ControladorProducto:
     def __init__(self):
         self.modelo_producto = Producto()
 
-    def registrar_producto(self, nombre, descripcion, cantidad, precio, smcs, sap, marca_id, almacen_id, und_medida, familia):
+    def registrar_producto(self, nombre, descripcion, cantidad, precio, codigoInterno, sap, marca_id, almacen_id, und_medida, familia):
         return self.modelo_producto.registrar_producto(
-            nombre, descripcion, cantidad, precio, smcs, sap, marca_id, almacen_id, und_medida, familia
+            nombre, descripcion, cantidad, precio, codigoInterno, sap, marca_id, almacen_id, und_medida, familia
         )
 
     def listar_productos(self):

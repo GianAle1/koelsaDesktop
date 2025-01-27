@@ -109,8 +109,9 @@ class Salida:
                 SELECT 
                     p.idproducto,
                     p.partname,
-                    p.smcs,
+                    p.codigoInterno,
                     p.descripcion,
+                    p.precio,
                     f.nomfamilia,
                     s.fecha,
                     d.cantidad,
@@ -144,8 +145,9 @@ class Salida:
                     SELECT 
                         p.idproducto,
                         p.partname,
-                        p.smcs,
+                        p.codigoInterno,
                         p.descripcion,
+                        p.precio,
                         f.nomfamilia,
                         s.fecha,
                         d.cantidad,
