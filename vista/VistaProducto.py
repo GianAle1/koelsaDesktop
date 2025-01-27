@@ -32,7 +32,7 @@ class VistaProducto:
 
         self.familia_label = tk.Label(self.frame, text="Familia:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
         self.familia_label.grid(row=3, column=0, sticky="w", padx=15, pady=5)
-        self.familia_combobox = ttk.Combobox(self.frame, width=40, font=("Arial", 12), state="readonly")
+        self.familia_combobox = AutocompleteCombobox(self.frame, width=40, font=("Arial", 12))
         self.familia_combobox.grid(row=3, column=1, pady=5)
 
         self.descripcion_label = tk.Label(self.frame, text="Descripción:", font=("Arial", 12), bg="#f4f4f9", anchor="w")
@@ -102,11 +102,12 @@ class VistaProducto:
         self.almacen_combobox['values'] = almacen_nombres
         self.almacen_combobox.current(0)
 
+   
     def listar_familias(self):
         familias = self.controlador.listar_familias()
         familia_nombres = [familia[1] for familia in familias]
-        self.familia_combobox['values'] = familia_nombres
-        self.familia_combobox.current(0)
+        self.familia_combobox.set_completion_list(familia_nombres)
+        self.familia_combobox.set("")
 
     def registrar_producto(self):
         # Obtener valores de entrada
