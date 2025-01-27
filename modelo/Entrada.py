@@ -22,13 +22,14 @@ class Entrada:
 
                 # Insertar en la tabla entradaDetalle y actualizar la cantidad en producto
                 query_detalle = """
-                    INSERT INTO entradaDetalle (identrada, idproducto, cantidad) 
-                    VALUES (%s, %s, %s)
+                    INSERT INTO entradaDetalle (identrada, idproducto, cantidad, idproveedor) 
+                VALUES (%s, %s, %s, %s)
                 """
                 query_actualizar_producto = """
                     UPDATE producto 
-                    SET cantidad = cantidad + %s, 
-                        precio = ((precio * cantidad) + (%s * %s)) / (cantidad + %s)
+                    SET 
+                        precio = ((precio * cantidad) + (%s * %s)) / (cantidad + %s),
+                        cantidad = cantidad + %s
                     WHERE idproducto = %s
                 """
 
@@ -40,16 +41,19 @@ class Entrada:
                         raise ValueError(f"La cantidad debe ser un número positivo: {producto[2]}")
                     if not isinstance(producto[3], (int, float, Decimal)) or producto[3] <= 0:
                         raise ValueError(f"El precio debe ser un número positivo: {producto[3]}")
+                    if not isinstance(producto[4], int):
+                        raise ValueError(f"El ID del proveedor no es válido: {producto[4]}")
 
                     idproducto = producto[0]  # ID del producto
                     cantidad = int(producto[2])  # Cantidad ingresada
                     precio_nuevo = Decimal(producto[3])  # Convertir el precio a Decimal
+                    idproveedor = producto[4]  # ID del proveedor
 
                     # Validación adicional de datos
-                    print(f"Procesando producto - ID: {idproducto}, Cantidad: {cantidad}, Precio: {precio_nuevo}")
+                    print(f"Procesando producto - ID: {idproducto}, Cantidad: {cantidad}, Precio: {precio_nuevo}, Proveedor: {idproveedor}")
 
                     # Insertar en entradaDetalle
-                    cursor.execute(query_detalle, (identrada, idproducto, cantidad))
+                    cursor.execute(query_detalle, (identrada, idproducto, cantidad, idproveedor))
 
                     # Actualizar la cantidad y calcular el nuevo precio promedio
                     cursor.execute(query_actualizar_producto, (cantidad, precio_nuevo, cantidad, cantidad, idproducto))
@@ -67,6 +71,7 @@ class Entrada:
         else:
             print("No se pudo establecer conexión con la base de datos.")
             return None
+
 
     def obtener_entradas_por_producto(self, producto_id):
         connection = self.conexion_db.conectar()
@@ -108,18 +113,21 @@ class Entrada:
                 cursor = connection.cursor()
                 query = """
                     SELECT 
-                    p.idproducto,
-                    p.partname,
-                    p.codigoInterno,
-                    p.descripcion,
-                    p.precio,
-                    f.nomfamilia,
-                    e.fecha,
-                    d.cantidad
+                    p.idproducto AS ID_Producto,
+                    p.partname AS Nombre_Producto,
+                    p.codigoInterno AS Codigo_Interno,
+                    p.descripcion AS Descripcion,
+                    p.precio AS Precio,
+                    f.nomfamilia AS Familia,
+                    e.fecha AS Fecha_Entrada,
+                    d.cantidad AS Cantidad,
+                    prov.nombre AS Proveedor
                 FROM entradaDetalle d
                 JOIN entrada e ON e.identrada = d.identrada
                 JOIN producto p ON p.idproducto = d.idproducto
-                LEFT JOIN familia f ON p.idfamilia = f.idfamilia;
+                LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                LEFT JOIN proveedor prov ON d.idproveedor = prov.idproveedor;
+
                 """
                 cursor.execute(query)
                 entradas = cursor.fetchall()

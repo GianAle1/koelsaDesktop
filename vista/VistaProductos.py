@@ -245,7 +245,8 @@ class VistaProductos:
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción", "Precio", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
+        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción", "Precio", "Familia", "Tipo", "Fecha", "Cantidad", "Proveedor", "Detalles")
+
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
         for col in columnas:
@@ -264,13 +265,26 @@ class VistaProductos:
             salidas = registros["salidas"]
 
             for entrada in entradas:
-                idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad = entrada
-                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, "Entrada", fecha, cantidad, "-"))
+                idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad, proveedor = entrada
+                tree.insert(
+                    "", tk.END,
+                    values=(
+                        idproducto, partname, codigoInterno, descripcion, precio, nomfamilia,
+                        "Entrada", fecha, cantidad, proveedor, "-"
+                    )
+                )
+
 
             for salida in salidas:
                 idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
                 detalles = f"{tipo} {modelo} {marca}"
-                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, "Salida", fecha, cantidad, detalles))
+                tree.insert(
+        "", tk.END,
+        values=(
+            idproducto, partname, codigoInterno, descripcion, precio, nomfamilia,
+            "Salida", fecha, cantidad, "-", detalles
+        )
+    )
         else:
             tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
 
