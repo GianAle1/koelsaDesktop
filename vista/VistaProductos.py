@@ -275,7 +275,41 @@ class VistaProductos:
         else:
             tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
 
+        def exportar_a_excel():
+            datos = [tree.item(child)["values"] for child in tree.get_children()]
+            if not datos:
+                messagebox.showwarning("Advertencia", "No hay datos para exportar.")
+                return
+
+            filepath = filedialog.asksaveasfilename(
+                defaultextension=".xlsx",
+                filetypes=[("Archivos de Excel", "*.xlsx")],
+            )
+            if not filepath:
+                return
+
+            # Crear archivo Excel
+            workbook = openpyxl.Workbook()
+            sheet = workbook.active
+            sheet.title = "Entradas y Salidas"
+
+            # Agregar encabezados
+            sheet.append(columnas)
+
+            # Agregar datos
+            for fila in datos:
+                sheet.append(fila)
+
+            # Guardar archivo
+            workbook.save(filepath)
+            messagebox.showinfo("Éxito", f"Datos exportados exitosamente a {filepath}")
+
+        tk.Button(
+            ventana_historial, text="Exportar a Excel", font=("Arial", 12), bg="#007ACC", fg="white",
+            command=exportar_a_excel
+        ).pack(pady=10, side=tk.LEFT, padx=10)
+
         tk.Button(
             ventana_historial, text="Cerrar", font=("Arial", 12), bg="#f44336", fg="white",
             command=ventana_historial.destroy
-        ).pack(pady=10)
+        ).pack(pady=10, side=tk.LEFT, padx=10)
