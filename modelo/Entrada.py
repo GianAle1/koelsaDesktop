@@ -108,18 +108,18 @@ class Entrada:
                 cursor = connection.cursor()
                 query = """
                     SELECT 
-                        p.idproducto,
-                        p.partname,
-                        p.codigoInterno,
-                        p.descripcion,
-                        p.precio,
-                        f.nomfamilia,
-                        e.fecha,
-                        d.cantidad
-                    FROM entradaDetalle d
-                    JOIN entrada e ON e.identrada = d.identrada
-                    JOIN producto p ON p.idproducto = d.idproducto
-                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia;
+                    p.idproducto,
+                    p.partname,
+                    p.codigoInterno,
+                    p.descripcion,
+                    p.precio,
+                    f.nomfamilia,
+                    e.fecha,
+                    d.cantidad
+                FROM entradaDetalle d
+                JOIN entrada e ON e.identrada = d.identrada
+                JOIN producto p ON p.idproducto = d.idproducto
+                LEFT JOIN familia f ON p.idfamilia = f.idfamilia;
                 """
                 cursor.execute(query)
                 entradas = cursor.fetchall()

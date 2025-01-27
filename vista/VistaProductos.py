@@ -245,7 +245,7 @@ class VistaProductos:
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción","Precio", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
+        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción", "Precio", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
         for col in columnas:
@@ -264,17 +264,17 @@ class VistaProductos:
             salidas = registros["salidas"]
 
             for entrada in entradas:
-                idproducto, partname, codigoInterno, descripcion, nomfamilia, fecha, cantidad = entrada
-                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion, nomfamilia, "Entrada", fecha, cantidad, "-"))
+                idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad = entrada
+                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, "Entrada", fecha, cantidad, "-"))
 
             for salida in salidas:
-                idproducto, partname, codigoInterno, descripcion, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
+                idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
                 detalles = f"{tipo} {modelo} {marca}"
-                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion, nomfamilia, "Salida", fecha, cantidad, detalles))
+                tree.insert("", tk.END, values=(idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, "Salida", fecha, cantidad, detalles))
         else:
             tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
 
-        def exportar_a_excel():
+        def exportar_todas_entradas_salidas_a_excel():
             datos = [tree.item(child)["values"] for child in tree.get_children()]
             if not datos:
                 messagebox.showwarning("Advertencia", "No hay datos para exportar.")
@@ -305,7 +305,7 @@ class VistaProductos:
 
         tk.Button(
             ventana_historial, text="Exportar a Excel", font=("Arial", 12), bg="#007ACC", fg="white",
-            command=exportar_a_excel
+            command=exportar_todas_entradas_salidas_a_excel
         ).pack(pady=10, side=tk.LEFT, padx=10)
 
         tk.Button(
