@@ -14,11 +14,11 @@ class ConexionDB:
             if not self.connection or not self.connection.is_connected():
                 # Establece la conexión a la base de datos MySQL
                 self.connection = mysql.connector.connect(
-                    host='192.168.63.137',        # viaduct.proxy.rlwy.net
-                    user='new_user',             # Usuario de MySQL
-                    password='new_password',       # pkQikqArGUtZEzZlTyncdHgXAAnkLBnr
+                    host='localhost',        # viaduct.proxy.rlwy.net
+                    user='root',             # new_user
+                    password='0803',       # root
                     database='koelsa',       # Nombre de tu base de datos
-                    port=3310                # 17447
+                    port=3306                # 17447
                 )
                 if self.connection.is_connected():
                     print("Conexión exitosa a la base de datos MySQL")
