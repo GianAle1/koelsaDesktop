@@ -4,7 +4,6 @@ from tkinter import messagebox
 from datetime import date
 from tkinter import ttk
 
-
 class CustomAutocompleteCombobox(AutocompleteCombobox):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,7 +31,6 @@ class CustomAutocompleteCombobox(AutocompleteCombobox):
         self["values"] = self._completion_matches
         if self._completion_matches:
             self.event_generate("<Down>")  # Abre el desplegable si hay coincidencias
-
 
 
 class VistaEntrada:

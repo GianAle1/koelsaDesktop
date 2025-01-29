@@ -1,7 +1,6 @@
 from modelo.conexion import ConexionDB
 from decimal import Decimal
 
-
 class Entrada:
     def __init__(self):
         self.conexion_db = ConexionDB()
@@ -71,7 +70,6 @@ class Entrada:
         else:
             print("No se pudo establecer conexión con la base de datos.")
             return None
-
 
     def obtener_entradas_por_producto(self, producto_id):
         connection = self.conexion_db.conectar()
