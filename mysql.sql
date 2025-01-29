@@ -440,6 +440,42 @@ SELECT
                     LEFT JOIN almacenDetalle ad ON p.idalmacenDetalle = ad.idalmacenDetalle 
                     INNER JOIN almacen a ON a.idalmacen = ad.idalmacen;
 use koelsa;
-select * from producto;
-select * from almacen;
+select * from usuario;
+select * from  familia
 
+SELECT p.idproducto,p.partname,p.smcs,p.descripcion,f.nomfamilia, s.fecha, d.cantidad, m.tipo, m.modelo, m.marca
+                FROM salidaDetalle d
+                JOIN salida s ON s.idsalida = d.idsalida
+                JOIN producto p ON p.idproducto = d.idproducto
+                LEFT JOIN maquinaria m ON m.idmaquinaria = d.idmaquinaria;
+
+SELECT p.idproducto,p.partname,p.smcs,p.descripcion, e.fecha, d.cantidad
+                FROM entradaDetalle d
+                JOIN entrada e ON e.identrada = d.identrada
+                JOIN producto p ON p.idproducto = d.idproducto;
+
+use koelsa;
+select * from usuario;
+
+
+SELECT 
+                        p.idproducto, 
+                        p.partname, 
+                        p.descripcion, 
+                        m.nombre AS Marca,
+                        f.nomfamilia AS Familia,
+                        u.nomUnidad AS UnidadMedida, 
+                        p.cantidad, 
+                        p.precio, 
+                        p.smcs, 
+                        a.nombre AS Almacen,
+                        p.ubicacion AS Ubicacion
+                    FROM producto p
+                    LEFT JOIN marca m ON p.idmarca = m.idmarca
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
+                    LEFT JOIN almacen a ON p.idalmacen = a.idalmacen;
+                    
+
+
+select * from usuario
