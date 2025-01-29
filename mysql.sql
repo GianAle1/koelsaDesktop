@@ -88,9 +88,49 @@ CREATE TABLE maquinaria (
 CREATE TABLE salida (
     idsalida INT AUTO_INCREMENT PRIMARY KEY,
     fecha DATE,
-    responsable VARCHAR(50),
-    observacion VARCHAR(250)
+    idresponsable INT,
+    idproyecto INT,
+    observacion VARCHAR(250),
+    FOREIGN KEY (idresponsable) REFERENCES responsable(idresponsable),
+    FOREIGN KEY (idproyecto) REFERENCES proyecto(idproyecto) 
 );
+
+CREATE TABLE proyecto (
+    idproyecto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50),
+    ubicacion VARCHAR(50)
+);
+
+CREATE TABLE responsable (
+    idresponsable INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(100)  
+);
+
+select * from responsable;
+
+INSERT INTO responsable (Nombre) VALUES ('Alejandro Santaria Gian');
+INSERT INTO responsable (Nombre) VALUES ('Bonifacio Vilcamichi Henry');
+INSERT INTO responsable (Nombre) VALUES ('Camacho Silverio Brenda');
+INSERT INTO responsable (Nombre) VALUES ('Diaz Vargas Diego');
+INSERT INTO responsable (Nombre) VALUES ('Dios Rojas Gianfrank');
+INSERT INTO responsable (Nombre) VALUES ('Lazaro Milla Carlos');
+INSERT INTO responsable (Nombre) VALUES ('Mayta Mollohuanca Elias');
+INSERT INTO responsable (Nombre) VALUES ('Vásquez Mendoza Edgar');
+INSERT INTO responsable (Nombre) VALUES ('Cabanillas Carranza');
+INSERT INTO responsable (Nombre) VALUES ('Caja Ayay Miller');
+INSERT INTO responsable (Nombre) VALUES ('Chuquipoma Soto Carlos');
+INSERT INTO responsable (Nombre) VALUES ('Guzman Cieza Alex');
+INSERT INTO responsable (Nombre) VALUES ('Morales Cusquisiban Wilmer');
+INSERT INTO responsable (Nombre) VALUES ('Mostacero Quispe Henry');
+INSERT INTO responsable (Nombre) VALUES ('Osorio Valverde Jose');
+INSERT INTO responsable (Nombre) VALUES ('Pisco Gaona  Roberto');
+INSERT INTO responsable (Nombre) VALUES ('Portilla Torres Roger');
+INSERT INTO responsable (Nombre) VALUES ('Ruiton Cueva Luis Francisco');
+INSERT INTO responsable (Nombre) VALUES ('Sáenz Ocas Jean');
+INSERT INTO responsable (Nombre) VALUES ('Sanchez Tacilla Luis');
+INSERT INTO responsable (Nombre) VALUES ('Tirado Huaman Neiser');
+INSERT INTO responsable (Nombre) VALUES ('Valencia Tacilla Raul');
+
 CREATE TABLE salidaDetalle (
     idsalidaDetalle INT AUTO_INCREMENT PRIMARY KEY,
     idsalida INT,
@@ -477,5 +517,11 @@ SELECT
                     LEFT JOIN almacen a ON p.idalmacen = a.idalmacen;
                     
 
+use koelsa;
+select * from proyecto;
+INSERT INTO proyecto (nombre,ubicacion) VALUES
+('Taller Lima','Lurion');
+INSERT INTO proyecto (nombre,ubicacion) VALUES
+('Shougang','Ica');
 
-select * from usuario
+DELETE FROM Salida;

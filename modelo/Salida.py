@@ -4,14 +4,18 @@ class Salida:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def guardar_salida(self, fecha, responsable, productos, observaciones):
+    def guardar_salida(self, fecha, idresponsable, idproyecto, productos, observaciones):
+        """Guarda una salida de productos en la base de datos."""
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                # Insertar en la tabla salida
-                query_salida = "INSERT INTO salida (fecha, responsable, observacion) VALUES (%s, %s, %s)"
-                cursor.execute(query_salida, (fecha, responsable, observaciones))
+                # Insertar en la tabla salida con idproyecto
+                query_salida = """
+                    INSERT INTO salida (fecha, idresponsable, idproyecto, observacion) 
+                    VALUES (%s, %s, %s, %s)
+                """
+                cursor.execute(query_salida, (fecha, idresponsable, idproyecto, observaciones))
                 connection.commit()
 
                 # Obtener el idsalida recién generado
@@ -19,11 +23,16 @@ class Salida:
                 idsalida = cursor.fetchone()[0]
 
                 # Insertar en la tabla salidaDetalle y actualizar la cantidad en producto
-                query_detalle = "INSERT INTO salidaDetalle (idsalida, idproducto, cantidad, idmaquinaria) VALUES (%s, %s, %s, %s)"
-                query_actualizar_producto = "UPDATE producto SET cantidad = cantidad - %s WHERE idproducto = %s"
+                query_detalle = """
+                    INSERT INTO salidaDetalle (idsalida, idproducto, cantidad, idmaquinaria) 
+                    VALUES (%s, %s, %s, %s)
+                """
+                query_actualizar_producto = """
+                    UPDATE producto SET cantidad = cantidad - %s WHERE idproducto = %s
+                """
 
                 for producto in productos:
-                    idproducto, cantidad, idmaquinaria = producto  # Asegurarse de que `idproducto` es un entero
+                    idproducto, cantidad, idmaquinaria = producto
 
                     # Verificar el stock actual
                     cursor.execute("SELECT cantidad FROM producto WHERE idproducto = %s", (idproducto,))
@@ -53,15 +62,34 @@ class Salida:
                 connection.rollback()
                 return None
             finally:
+                cursor.close()
                 self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer conexión con la base de datos.")
             return None
 
+    def listar_proyectos(self):
+        """Obtiene la lista de proyectos desde la base de datos."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                query = "SELECT idproyecto, nombre, ubicacion FROM proyecto"
+                cursor.execute(query)
+                proyectos = cursor.fetchall()
+                return proyectos
+            except Exception as e:
+                print(f"Error al obtener proyectos: {e}")
+                return []
+            finally:
+                cursor.close()
+                self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo establecer conexión con la base de datos.")
+            return []
+
     def listar_maquinarias(self):
-        """
-        Obtiene todas las maquinarias disponibles de la base de datos.
-        """
+        """Obtiene todas las maquinarias disponibles de la base de datos."""
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
@@ -74,15 +102,14 @@ class Salida:
                 print(f"Error al obtener maquinarias: {e}")
                 return []
             finally:
+                cursor.close()
                 self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer conexión con la base de datos.")
             return []
 
     def listar_productos(self):
-        """
-        Obtiene todos los productos disponibles de la base de datos.
-        """
+        """Obtiene todos los productos disponibles de la base de datos."""
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
@@ -95,80 +122,8 @@ class Salida:
                 print(f"Error al obtener productos: {e}")
                 return []
             finally:
+                cursor.close()
                 self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer conexión con la base de datos.")
-            return []
-    
-    def obtener_todas_las_salidas(self):
-        connection = self.conexion_db.conectar()
-        if connection:
-            try:
-                cursor = connection.cursor()
-                query = """
-                SELECT 
-                    p.idproducto,
-                    p.partname,
-                    p.codigoInterno,
-                    p.descripcion,
-                    p.precio,
-                    f.nomfamilia,
-                    s.fecha,
-                    d.cantidad,
-                    m.tipo,
-                    m.modelo,
-                    m.marca
-                FROM salidaDetalle d
-                JOIN salida s ON s.idsalida = d.idsalida
-                JOIN producto p ON p.idproducto = d.idproducto
-                LEFT JOIN familia f ON p.idfamilia = f.idfamilia
-                LEFT JOIN maquinaria m ON m.idmaquinaria = d.idmaquinaria;
-                """
-                cursor.execute(query)
-                salidas = cursor.fetchall()
-                return salidas
-            except Exception as e:
-                print(f"Error al obtener todas las salidas: {e}")
-                return []
-            finally:
-                self.conexion_db.cerrar_conexion()
-        else:
-            print("No se pudo conectar a la base de datos.")
-            return []
-
-    def obtener_salidas_por_producto(self, producto_id):
-        connection = self.conexion_db.conectar()
-        if connection:
-            try:
-                cursor = connection.cursor()
-                query = """
-                    SELECT 
-                        p.idproducto,
-                        p.partname,
-                        p.codigoInterno,
-                        p.descripcion,
-                        p.precio,
-                        f.nomfamilia,
-                        s.fecha,
-                        d.cantidad,
-                        m.tipo,
-                        m.modelo,
-                        m.marca
-                    FROM salidaDetalle d
-                    JOIN salida s ON s.idsalida = d.idsalida
-                    JOIN producto p ON p.idproducto = d.idproducto
-                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
-                    LEFT JOIN maquinaria m ON m.idmaquinaria = d.idmaquinaria
-                    WHERE p.idproducto = %s;
-                """
-                cursor.execute(query, (producto_id,))
-                salidas = cursor.fetchall()
-                return salidas
-            except Exception as e:
-                print(f"Error al obtener salidas para el producto {producto_id}: {e}")
-                return []
-            finally:
-                self.conexion_db.cerrar_conexion()
-        else:
-            print("No se pudo conectar a la base de datos.")
             return []

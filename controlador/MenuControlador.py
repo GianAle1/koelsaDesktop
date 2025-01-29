@@ -11,7 +11,7 @@ from controlador.ControladorMaquinaria import ControladorMaquinaria
 from controlador.ControladorSalida import ControladorSalida
 from controlador.ControladorRequerimiento import ControladorRequerimiento
 from controlador.ControladorBacklog import ControladorBacklog
-
+from controlador.ControladorResponsable import ControladorResponsable
 class MenuControlador:
     def __init__(self):
         
@@ -28,7 +28,7 @@ class MenuControlador:
         self.controlador_salida = ControladorSalida()
         self.controlador_requerimiento = ControladorRequerimiento()
         self.controlador_backlog = ControladorBacklog()
-        
+        self.controlador_responsable = ControladorResponsable()
     def registrar_marca(self, nombre_marca):
         return self.controlador_marca.registrar_marca(nombre_marca)
 
@@ -135,4 +135,5 @@ class MenuControlador:
         """Elimina una familia de la base de datos"""
         return self.controlador_familia.eliminar_familia(idfamilia)
 
-
+    def listar_responsables(self):
+        return self.controlador_responsable.listar_responsables()
