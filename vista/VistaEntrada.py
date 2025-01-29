@@ -9,6 +9,7 @@ class CustomAutocompleteCombobox(AutocompleteCombobox):
         super().__init__(*args, **kwargs)
         self.completion_list = []
         self._completion_matches = []
+        self._after_id = None  # ID del after para cancelarlo si es necesario
         self.bind("<KeyRelease>", self._on_keyrelease)
 
     def set_completion_list(self, completion_list):
@@ -16,7 +17,14 @@ class CustomAutocompleteCombobox(AutocompleteCombobox):
         self.completion_list = completion_list
 
     def _on_keyrelease(self, event):
-        """Filtra valores que coincidan con cualquier parte de la cadena."""
+        """Filtra valores que coincidan con cualquier parte de la cadena con un retraso."""
+        if self._after_id:
+            self.after_cancel(self._after_id)  # Cancela la llamada anterior si se sigue escribiendo
+
+        self._after_id = self.after(1000, self._filter_matches)  # Espera 300ms antes de filtrar
+
+    def _filter_matches(self):
+        """Realiza la búsqueda después del retraso."""
         text = self.get().lower()
         if text == "":
             self._completion_matches = self.completion_list
@@ -25,6 +33,12 @@ class CustomAutocompleteCombobox(AutocompleteCombobox):
             self._completion_matches = [item for item in self.completion_list if text in item.lower()]
 
         self._update_listbox()
+
+    def _update_listbox(self):
+        """Actualiza los elementos desplegables."""
+        self["values"] = self._completion_matches
+        if self._completion_matches:
+            self.event_generate("<Down>")  # Abre el desplegable si hay coincidencias
 
     def _update_listbox(self):
         """Actualiza los elementos desplegables."""
@@ -133,7 +147,7 @@ class VistaEntrada:
         """Carga los proveedores en el combobox de proveedores."""
         proveedores = self.controlador.listar_proveedores()
         if proveedores:
-            values = [f"{proveedor[0]} - {proveedor[1]}" for proveedor in proveedores]
+            values = [f"{proveedor[0]} - {proveedor[1]} - {proveedor[2]}" for proveedor in proveedores]
             self.proveedor_combobox.set_completion_list(values)
             self.proveedores_info = {proveedor[0]: proveedor for proveedor in proveedores}
 
@@ -192,7 +206,6 @@ class VistaEntrada:
                 messagebox.showerror("Error", "Ocurrió un error al guardar la entrada.")
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al guardar la entrada: {e}")
-
 
     def eliminar_producto(self):
         """Elimina un producto de la lista temporal."""

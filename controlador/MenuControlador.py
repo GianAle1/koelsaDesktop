@@ -10,7 +10,7 @@ from controlador.ControladorEntrada import ControladorEntrada
 from controlador.ControladorMaquinaria import ControladorMaquinaria
 from controlador.ControladorSalida import ControladorSalida
 from controlador.ControladorRequerimiento import ControladorRequerimiento
-from controlador.ControladorBacklog import ControladorBacklog  
+from controlador.ControladorBacklog import ControladorBacklog
 
 class MenuControlador:
     def __init__(self):
@@ -126,5 +126,13 @@ class MenuControlador:
         except Exception as e:
             print(f"Error al obtener el historial general: {e}")
             return {"entradas": [], "salidas": []}
+
+    def registrar_familia(self, nombre_familia):
+        """Registra una nueva familia en la base de datos"""
+        return self.controlador_familia.registrar_familia(nombre_familia)
+
+    def eliminar_familia(self, idfamilia):
+        """Elimina una familia de la base de datos"""
+        return self.controlador_familia.eliminar_familia(idfamilia)
 
 

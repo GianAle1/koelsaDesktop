@@ -26,7 +26,10 @@ class VistaSalida:
         # Crear campos
         self.fecha_entry = self._crear_campo("Fecha:", 0)
         self.fecha_entry.insert(0, date.today().strftime('%Y-%m-%d'))
-        self.responsable_entry = self._crear_campo("Responsable:", 1)
+
+        # Aquí cambiamos el campo Responsable de Entry a Combobox
+        self.responsable_combobox = self._crear_combobox("Responsable:", 1)
+
         self.maquinaria_combobox = self._crear_combobox("Maquinaria:", 2)
         self.producto_combobox = self._crear_combobox("Producto:", 3)
         self.cantidad_entry = self._crear_campo("Cantidad:", 4)
@@ -48,6 +51,7 @@ class VistaSalida:
         self.productos_temporales = []
         self.cargar_maquinarias()
         self.cargar_productos()
+        self.cargar_responsables()  # Cargar responsables en el combobox
 
     def _crear_campo(self, texto, row):
         tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
@@ -92,130 +96,57 @@ class VistaSalida:
         self.tree.column("Maquinaria Destino", anchor="center", width=200)
         self.tree.pack(fill=tk.BOTH, expand=True)
 
-    def cargar_maquinarias(self):
-        maquinarias = self.controlador.listar_maquinarias()
-        self.maquinaria_combobox['values'] = [
-            f"{maq[0]} - {maq[1]} {maq[2]} ({maq[3]})" for maq in maquinarias
-        ] if maquinarias else []
-
-    def cargar_productos(self):
+    def cargar_responsables(self):
+        """Carga los responsables en el combobox desde la base de datos."""
         try:
-            productos = self.controlador.listar_productos()
-            if productos:
-                # Asegurarse de incluir el precio en el formato
-                self.producto_combobox['values'] = [
-                    f"{prod[0]} - {prod[2]} ({prod[3] if prod[3] else 'Sin marca'}) - Precio: {prod[7]:.2f}" for prod in productos
+            responsables = self.controlador.listar_responsables()
+            if responsables:
+                self.responsable_combobox["values"] = [
+                    f"{resp[0]} - {resp[1]}" for resp in responsables
                 ]
-                print("Productos cargados:", self.producto_combobox['values'])
+                print("Responsables cargados:", self.responsable_combobox["values"])
             else:
-                self.producto_combobox['values'] = []
-                print("No se encontraron productos en la base de datos.")
+                self.responsable_combobox["values"] = []
+                print("No se encontraron responsables en la base de datos.")
         except Exception as e:
-            print(f"Error al cargar productos: {e}")
-
-
-    def agregar_producto(self):
-        """Agrega un producto seleccionado a la lista temporal."""
-        producto_seleccionado = self.producto_combobox.get()
-        cantidad = self.cantidad_entry.get()
-        maquinaria_seleccionada = self.maquinaria_combobox.get()
-
-        # Validaciones
-        if not producto_seleccionado or not cantidad.isdigit() or int(cantidad) <= 0:
-            messagebox.showerror("Error", "Debe seleccionar un producto y una cantidad válida.")
-            return
-
-        if not maquinaria_seleccionada:
-            messagebox.showerror("Error", "Debe seleccionar una maquinaria.")
-            return
-
-        try:
-            # Extraer ID, nombre, y precio del producto
-            partes_producto = producto_seleccionado.split(" - ")
-            id_producto = int(partes_producto[0].strip())
-            nombre_producto = partes_producto[1].strip()
-            
-            # Asegurarse de que el precio es numérico
-            precio_parte = partes_producto[-1].split(":")
-            if len(precio_parte) > 1:
-                precio = float(precio_parte[1].strip())
-            else:
-                raise ValueError("El formato del precio en el producto no es válido.")
-
-            # Extraer ID y nombre de la maquinaria
-            id_maquinaria, maquinaria_nombre = maquinaria_seleccionada.split(" - ", 1)
-
-            # Guardar datos en la lista temporal
-            self.productos_temporales.append({
-                "id_producto": id_producto,
-                "producto": nombre_producto,
-                "cantidad": int(cantidad),
-                "precio": precio,
-                "idmaquinaria": int(id_maquinaria),
-                "maquinaria_destino": maquinaria_nombre
-            })
-
-            # Actualizar la tabla
-            self.actualizar_tabla()
-
-        except Exception as e:
-            messagebox.showerror("Error", f"Ocurrió un error al procesar el producto: {e}")
-
-
-
-    def actualizar_tabla(self):
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-        for producto in self.productos_temporales:
-            self.tree.insert(
-                "", tk.END, 
-                values=(producto["producto"], producto["cantidad"], f"{producto['precio']:.2f}", producto["idmaquinaria"], producto["maquinaria_destino"])
-            )
-
-    def eliminar_producto(self):
-        selected_item = self.tree.selection()
-        if selected_item:
-            for item in selected_item:
-                values = self.tree.item(item, "values")
-                producto, cantidad, idmaquinaria = values[0], int(values[1]), int(values[3])
-                self.productos_temporales = [
-                    prod for prod in self.productos_temporales if not (
-                        prod["producto"] == producto and prod["cantidad"] == cantidad and prod["idmaquinaria"] == idmaquinaria)
-                ]
-                self.tree.delete(item)
-            messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
-        else:
-            messagebox.showwarning("Advertencia", "Debe seleccionar un producto para eliminar.")
+            print(f"Error al cargar responsables: {e}")
 
     def guardar_salida(self):
+        """Guarda la salida de productos en la base de datos."""
         fecha = self.fecha_entry.get()
-        responsable = self.responsable_entry.get()
+        responsable = self.responsable_combobox.get()
         observaciones = self.observaciones_entry.get("1.0", tk.END).strip()
 
         if not responsable:
-            messagebox.showerror("Error", "Debe ingresar un responsable.")
+            messagebox.showerror("Error", "Debe seleccionar un responsable.")
             return
+
         if not self.productos_temporales:
             messagebox.showerror("Error", "Debe agregar al menos un producto a la salida.")
+            return
+
+        # Extraer ID del responsable
+        try:
+            id_responsable = int(responsable.split(" - ")[0])  # Extrae el ID del formato "ID - Nombre"
+        except ValueError:
+            messagebox.showerror("Error", "El formato del responsable no es válido.")
             return
 
         productos_para_bd = [
             (prod["id_producto"], prod["cantidad"], prod["idmaquinaria"]) for prod in self.productos_temporales
         ]
 
-        productos_para_reporte = self.productos_temporales.copy()
-
         try:
-            salida_id = self.controlador.guardar_salida(fecha, responsable, productos_para_bd, observaciones)
+            salida_id = self.controlador.guardar_salida(fecha, id_responsable, productos_para_bd, observaciones)
             if salida_id:
                 messagebox.showinfo("Éxito", f"Salida registrada con ID: {salida_id}")
                 self.productos_temporales = []
                 self.actualizar_tabla()
-                self.generar_reporte_pdf(salida_id, fecha, responsable, observaciones, productos_para_reporte)
             else:
                 messagebox.showerror("Error", "Ocurrió un error al guardar la salida.")
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al guardar la salida: {e}")
+
 
     def generar_reporte_pdf(self, salida_id, fecha, responsable, observaciones, productos):
         pdf = FPDF()
@@ -250,22 +181,22 @@ class VistaSalida:
         pdf.multi_cell(0, 10, f"Observaciones: {observaciones}")
         pdf.ln(10)
 
-        pdf.set_font("Arial", style="B", size=12)
+        pdf.set_font("Arial", style="B", size=11)
         pdf.set_fill_color(220, 220, 220)
-        pdf.cell(20, 10, "# Ítem", border=1, align="C", fill=True)
-        pdf.cell(60, 10, "Producto", border=1, align="C", fill=True)
-        pdf.cell(30, 10, "Cantidad", border=1, align="C", fill=True)
-        pdf.cell(30, 10, "Precio", border=1, align="C", fill=True)
-        pdf.cell(60, 10, "Maquinaria Destino", border=1, align="C", fill=True)
+        pdf.cell(10, 10, "N°", border=1, align="C", fill=True)
+        pdf.cell(80, 10, "Producto", border=1, align="C", fill=True)
+        pdf.cell(10, 10, "Cant", border=1, align="C", fill=True)
+        pdf.cell(15, 10, "Precio", border=1, align="C", fill=True)
+        pdf.cell(75, 10, "Maquinaria Destino", border=1, align="C", fill=True)
         pdf.ln()
 
         pdf.set_font("Arial", size=10)
         for idx, prod in enumerate(productos, start=1):
-            pdf.cell(20, 10, str(idx), border=1, align="C")
-            pdf.cell(60, 10, prod["producto"], border=1, align="C")
-            pdf.cell(30, 10, str(prod["cantidad"]), border=1, align="C")
-            pdf.cell(30, 10, f"{prod['precio']:.2f}", border=1, align="C")
-            pdf.cell(60, 10, prod["maquinaria_destino"], border=1, align="C")
+            pdf.cell(10, 10, str(idx), border=1, align="C")
+            pdf.cell(80, 10, prod["producto"], border=1, align="C")
+            pdf.cell(10, 10, str(prod["cantidad"]), border=1, align="C")
+            pdf.cell(15, 10, f"{prod['precio']:.2f}", border=1, align="C")
+            pdf.cell(75, 10, prod["maquinaria_destino"], border=1, align="C")
             pdf.ln()
 
         pdf.ln(20)

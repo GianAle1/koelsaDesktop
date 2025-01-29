@@ -10,6 +10,7 @@ from vista.VistaSalida import VistaSalida
 from vista.VistaRequerimiento import VistaRequerimiento
 from vista.VistaRequerimientos import VistaRequerimientos
 from vista.VistaBacklog import VistaBacklog
+from vista.VistaFamilia import VistaFamilia  
 from tkinter.font import Font
 
 
@@ -42,6 +43,7 @@ class VistaMenu:
             ("Gestionar Marcas", self.abrir_ventana_marcas, "#4CAF50", "📦"),
             ("Gestionar Proveedores", self.abrir_ventana_proveedores, "#2196F3", "🤝"),
             ("Gestionar Almacenes", self.abrir_ventana_almacenes, "#673AB7", "🏢"),
+            ("Gestionar Familias", self.abrir_ventana_familias, "#8D6E63", "🏷️"),  # Nuevo botón
             ("Gestionar Inventario", self.abrir_ventana_inventario, "#FF9800", "📊"),
             ("Gestionar Productos", self.abrir_ventana_productos, "#009688", "🛒"),
             ("Entrada de Productos", self.abrir_ventana_entrada_productos, "#FFC107", "📥"),
@@ -105,32 +107,29 @@ class VistaMenu:
         vista_entrada = VistaEntrada(ventana_entrada, self.controlador)
 
     def abrir_ventana_salida_productos(self):
-        """Abre la ventana de salida de productos."""
         ventana_salida = tk.Toplevel(self.root)
         vista_salida = VistaSalida(ventana_salida, self.controlador)
-    
+
     def abrir_ventana_requerimiento(self):
-        """Abre la ventana de gestión de requerimientos."""
         ventana_requerimiento = tk.Toplevel(self.root)
         vista_requerimiento = VistaRequerimiento(ventana_requerimiento, self.controlador)
         vista_requerimiento.mostrar_requerimiento()
-    
+
     def abrir_ventana_requerimientos(self):
-        """Abre la ventana de lista de requerimientos."""
         ventana_requerimientos = tk.Toplevel(self.root)
         vista_requerimientos = VistaRequerimientos(ventana_requerimientos, self.controlador)
         vista_requerimientos.mostrar_requerimientos()
 
     def abrir_ventana_backlogs(self):
-        """Abre la ventana de gestión de backlogs."""
         ventana_backlogs = tk.Toplevel(self.root)
         vista_backlog = VistaBacklog(ventana_backlogs, self.controlador)
         vista_backlog.mostrar_backlogs()
 
-    def abrir_ventana_backlogs(self):
-        ventana_backlogs = tk.Toplevel(self.root)
-        vista_backlog = VistaBacklog(ventana_backlogs, self.controlador)
-        vista_backlog.mostrar_backlogs()
+    def abrir_ventana_familias(self):
+        """Abre la ventana de gestión de familias."""
+        ventana_familias = tk.Toplevel(self.root)
+        vista_familias = VistaFamilia(ventana_familias, self.controlador)
+        vista_familias.mostrar_familia()
 
     def cerrar_sesion(self):
         self.root.withdraw()
