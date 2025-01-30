@@ -146,24 +146,26 @@ class Salida:
             try:
                 cursor = connection.cursor()
                 query = """
-                    SELECT 
-                        p.idproducto AS ID_Producto,
-                        p.partname AS Nombre_Producto,
-                        p.codigoInterno AS Codigo_Interno,
-                        p.descripcion AS Descripcion,
-                        p.precio AS Precio,
-                        f.nomfamilia AS Familia,
-                        s.fecha AS Fecha_Salida,  
-                        d.cantidad AS Cantidad,
-                        'Salida' AS Tipo,
-                        m.serie AS Maquinaria_Serie,  -- ✅ Se obtiene la SERIE
-                        m.marca AS Marca              -- ✅ Se obtiene la MARCA
-                    FROM salidaDetalle d
-                    JOIN salida s ON s.idsalida = d.idsalida
-                    JOIN producto p ON p.idproducto = d.idproducto
-                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
-                    LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria;  -- ✅ Se une con maquinaria
-                """
+                SELECT 
+                    p.idproducto AS ID_Producto,
+                    p.partname AS Nombre_Producto,
+                    p.codigoInterno AS Codigo_Interno,
+                    p.descripcion AS Descripcion,
+                    p.precio AS Precio,
+                    f.nomfamilia AS Familia,
+                    s.fecha AS Fecha_Salida,  
+                    d.cantidad AS Cantidad,
+                    'Salida' AS Tipo,
+                    COALESCE(m.serie, 'N/A') AS Maquinaria_Serie,  -- ✅ Se obtiene la SERIE
+                    COALESCE(m.marca, 'N/A') AS Marca,             -- ✅ Se obtiene la MARCA
+                    r.nombre AS Responsable  -- ✅ Agregamos el Responsable
+                FROM salidaDetalle d
+                JOIN salida s ON s.idsalida = d.idsalida
+                JOIN producto p ON p.idproducto = d.idproducto
+                LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria
+                LEFT JOIN responsable r ON s.idresponsable = r.idresponsable;  -- ✅ Relacionamos con responsable
+            """
                 cursor.execute(query)
                 salidas = cursor.fetchall()
                 return salidas

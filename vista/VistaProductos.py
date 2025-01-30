@@ -71,11 +71,12 @@ class VistaProductos:
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="ridge")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Configuración de la tabla
         columnas = (
-            "ID", "Part Name", "Descripción", "Marca", "Familia",
-            "Unidad de Medida", "Cantidad", "Precio","Codigo Interno","Ubicaion", "Almacén"
+            "ID Producto", "Part Name", "Descripción", "Marca", "Familia",
+            "Unidad de Medida", "Cantidad", "Precio", "Código Interno", "Ubicación", "Almacén"
         )
+
+
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=20)
 
         # Estilo de encabezados de la tabla
@@ -88,7 +89,7 @@ class VistaProductos:
             self.tree.heading(col, text=col)
 
         # Configurar las columnas
-        self.tree.column("ID", anchor="center", width=60)
+        self.tree.column("ID Producto", anchor="center", width=60)
         self.tree.column("Part Name", anchor="center", width=150)
         self.tree.column("Descripción", anchor="w", width=300)
         self.tree.column("Marca", anchor="center", width=120)
@@ -96,9 +97,10 @@ class VistaProductos:
         self.tree.column("Unidad de Medida", anchor="center", width=120)
         self.tree.column("Cantidad", anchor="center", width=100)
         self.tree.column("Precio", anchor="center", width=100)
-        self.tree.column("Codigo Interno", anchor="center", width=100)
-        self.tree.column("Ubicaion", anchor="center", width=100)
+        self.tree.column("Código Interno", anchor="center", width=100)
+        self.tree.column("Ubicación", anchor="center", width=100)
         self.tree.column("Almacén", anchor="center", width=150)
+
         # Scrollbars
         scroll_y = ttk.Scrollbar(self.frame_tabla, orient="vertical", command=self.tree.yview)
         scroll_x = ttk.Scrollbar(self.frame_tabla, orient="horizontal", command=self.tree.xview)
@@ -168,7 +170,10 @@ class VistaProductos:
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción","Precio", "Familia", "Tipo", "Fecha", "Cantidad", "Detalles")
+        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción", "Precio",
+            "Familia", "Tipo", "Fecha", "Cantidad", "Proveedor", "Detalles", "Responsable")
+
+
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
         for col in columnas:
@@ -245,7 +250,10 @@ class VistaProductos:
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción", "Precio", "Familia", "Tipo", "Fecha", "Cantidad", "Proveedor", "Detalles")
+        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción", "Precio",
+            "Familia", "Tipo", "Fecha", "Cantidad", "Proveedor", "Detalles", "Responsable")
+
+
 
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
@@ -276,15 +284,16 @@ class VistaProductos:
 
 
             for salida in salidas:
-                idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad, tipo, modelo, marca = salida
+                idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad, tipo, modelo, marca, responsable = salida
                 detalles = f"{tipo} {modelo} {marca}"
                 tree.insert(
-        "", tk.END,
-        values=(
-            idproducto, partname, codigoInterno, descripcion, precio, nomfamilia,
-            "Salida", fecha, cantidad, "-", detalles
-        )
-    )
+                    "", tk.END,
+                    values=(
+                        idproducto, partname, codigoInterno, descripcion, precio, nomfamilia,
+                        "Salida", fecha, cantidad, "-", detalles, responsable  # ✅ Agregamos el Responsable
+                    )
+                )
+
         else:
             tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
 
