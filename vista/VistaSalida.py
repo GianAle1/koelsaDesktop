@@ -34,6 +34,8 @@ class VistaSalida:
         self.producto_combobox = self._crear_combobox("Producto:", 3)
         self.cantidad_entry = self._crear_campo("Cantidad:", 4)
         self.observaciones_entry = self._crear_textarea("Observaciones:", 5)
+        # Proyecto como combobox con datos de la tabla proyecto
+        self.proyecto_combobox = self._crear_combobox("Proyecto:", 6)
 
         # Botón para agregar a la lista
         self._crear_boton("Agregar Producto", self.agregar_producto, "#4CAF50")
@@ -45,13 +47,17 @@ class VistaSalida:
         self._crear_boton("Eliminar Producto", self.eliminar_producto, "#f44336", pady=10)
 
         # Botón para guardar la salida
-        self._crear_boton("Guardar Salida", self.guardar_salida, "#4CAF50", pady=10)
+        self._crear_boton("Guardar Salida", lambda: self.guardar_salida(), "#4CAF50", pady=10)
+
+
 
         # Inicializar listas y cargar datos
         self.productos_temporales = []
         self.cargar_maquinarias()
         self.cargar_productos()
         self.cargar_responsables()  # Cargar responsables en el combobox
+        self.cargar_proyectos()
+
 
     def _crear_campo(self, texto, row):
         tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
@@ -79,16 +85,20 @@ class VistaSalida:
         return boton
 
     def _crear_tabla(self):
+        """Crea la tabla para visualizar los productos agregados sin mostrar el ID de la maquinaria."""
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("Producto", "Cantidad", "Precio", "ID Maquinaria", "Maquinaria Destino")
+        # Se eliminó "ID Maquinaria"
+        columnas = ("Producto", "Cantidad", "Precio", "Ubicación", "Maquinaria Destino")
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=10)
+
         for col in columnas:
             self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center", width=200)
+            self.tree.column(col, anchor="center", width=180)  # Ajusta el ancho si es necesario
 
         self.tree.pack(fill=tk.BOTH, expand=True)
+
 
     def cargar_responsables(self):
         """Carga los responsables en el combobox desde la base de datos."""
@@ -115,53 +125,109 @@ class VistaSalida:
             print(f"Error al cargar maquinarias: {e}")
 
     def cargar_productos(self):
-        """Carga los productos en el combobox desde la base de datos."""
+        """Carga los productos en el combobox desde la base de datos, incluyendo PartName y Ubicación específica."""
         try:
             productos = self.controlador.listar_productos()
             if productos:
                 self.producto_combobox["values"] = [
-                    f"{prod[0]} - {prod[2]} ({prod[3]}) - Precio: {prod[7]:.2f}" for prod in productos
+                    f"{prod[0]} - {prod[1]} ({prod[3]}) - Precio: {float(prod[7]):.2f} - Ubicación: {prod[-2]}"
+                    for prod in productos
                 ]
+            else:
+                self.producto_combobox["values"] = []
         except Exception as e:
             print(f"Error al cargar productos: {e}")
 
+    def cargar_proyectos(self):
+        """Carga los proyectos en el combobox desde la base de datos."""
+        try:
+            proyectos = self.controlador.listar_proyectos()  # Llama al controlador
+            if proyectos:
+                self.proyecto_combobox["values"] = [
+                    f"{proy[0]} - {proy[1]} ({proy[2]})" for proy in proyectos  # Formato: "ID - Nombre (Ubicación)"
+                ]
+            else:
+                self.proyecto_combobox["values"] = []
+        except Exception as e:
+            print(f"Error al cargar proyectos: {e}")
+
+
     def agregar_producto(self):
-        """Agrega un producto seleccionado a la lista temporal."""
+        """Agrega un producto seleccionado a la lista temporal sin mostrar el ID de la maquinaria."""
         producto_seleccionado = self.producto_combobox.get()
-        cantidad = self.cantidad_entry.get()
+        cantidad = self.cantidad_entry.get().strip()
         maquinaria_seleccionada = self.maquinaria_combobox.get()
 
-        if not producto_seleccionado or not cantidad.isdigit() or int(cantidad) <= 0:
-            messagebox.showerror("Error", "Debe seleccionar un producto y una cantidad válida.")
+        if not producto_seleccionado:
+            messagebox.showerror("Error", "Debe seleccionar un producto.")
             return
 
         if not maquinaria_seleccionada:
             messagebox.showerror("Error", "Debe seleccionar una maquinaria.")
             return
 
-        id_producto = int(producto_seleccionado.split(" - ")[0])
-        id_maquinaria = int(maquinaria_seleccionada.split(" - ")[0])
-        nombre_producto = producto_seleccionado.split(" - ")[1]
-        maquinaria_destino = maquinaria_seleccionada.split(" - ")[1]
+        if not cantidad.isdigit() or int(cantidad) <= 0:
+            messagebox.showerror("Error", "Debe ingresar una cantidad válida (número mayor a 0).")
+            return
 
-        self.productos_temporales.append({
-            "id_producto": id_producto,
-            "producto": nombre_producto,
-            "cantidad": int(cantidad),
-            "idmaquinaria": id_maquinaria,
-            "maquinaria_destino": maquinaria_destino
-        })
+        try:
+            # Extraer datos del producto seleccionado
+            partes_producto = producto_seleccionado.split(" - ")
+            id_producto = int(partes_producto[0].strip())
+            nombre_producto = partes_producto[1].strip()
 
-        self.actualizar_tabla()
-        messagebox.showinfo("Éxito", "Producto agregado correctamente.")
+            # Extraer ubicación desde la cadena
+            ubicacion_producto = ""
+            for parte in partes_producto:
+                if "Ubicación" in parte:
+                    ubicacion_producto = parte.replace("Ubicación:", "").strip()
+
+            # Extraer datos de la maquinaria
+            partes_maquinaria = maquinaria_seleccionada.split(" - ")
+            id_maquinaria = int(partes_maquinaria[0].strip())
+            maquinaria_destino = partes_maquinaria[2].strip()  # ✅ Ahora toma la serie en lugar del modelo
+
+            # Verificar si el producto ya fue agregado
+            for prod in self.productos_temporales:
+                if prod["id_producto"] == id_producto and prod["idmaquinaria"] == id_maquinaria:
+                    messagebox.showwarning("Advertencia", "Este producto ya ha sido agregado para esta maquinaria.")
+                    return
+
+            # Agregar el producto a la lista temporal con el ID de maquinaria oculto
+            self.productos_temporales.append({
+                "id_producto": id_producto,
+                "producto": nombre_producto,
+                "cantidad": int(cantidad),
+                "precio": 1,  # Si el precio está disponible, reemplazar con el correcto
+                "ubicacion": ubicacion_producto,
+                "idmaquinaria": id_maquinaria,  # Se almacena en la lista pero no se mostrará
+                "maquinaria_destino": maquinaria_destino  # ✅ Ahora almacena la serie de la maquinaria
+            })
+
+            self.actualizar_tabla()
+            messagebox.showinfo("Éxito", "Producto agregado correctamente.")
+
+        except (ValueError, IndexError) as e:
+            messagebox.showerror("Error", f"Ocurrió un error al procesar el producto: {e}")
+
+
+
 
     def actualizar_tabla(self):
+        """Actualiza la tabla de productos agregados sin mostrar el ID de maquinaria."""
         for item in self.tree.get_children():
             self.tree.delete(item)
+
         for producto in self.productos_temporales:
             self.tree.insert("", tk.END, values=(
-                producto["producto"], producto["cantidad"], producto["idmaquinaria"], producto["maquinaria_destino"]
+                producto["producto"], 
+                producto["cantidad"], 
+                producto["precio"], 
+                producto["ubicacion"],  # ✅ Mostramos la ubicación del producto
+                producto["maquinaria_destino"]  # ✅ Mostramos la SERIE de la maquinaria en lugar del modelo
             ))
+
+
 
     def eliminar_producto(self):
         selected_item = self.tree.selection()
@@ -173,42 +239,70 @@ class VistaSalida:
             messagebox.showwarning("Advertencia", "Debe seleccionar un producto para eliminar.")
 
     def guardar_salida(self):
+        """Guarda la salida de productos en la base de datos y genera automáticamente el reporte PDF."""
         fecha = self.fecha_entry.get()
         responsable = self.responsable_combobox.get()
+        proyecto = self.proyecto_combobox.get()
+        observaciones = self.observaciones_entry.get("1.0", tk.END).strip()
 
+        # Validaciones
         if not responsable:
             messagebox.showerror("Error", "Debe seleccionar un responsable.")
             return
+        if not proyecto:
+            messagebox.showerror("Error", "Debe seleccionar un proyecto.")
+            return
+        if not self.productos_temporales:
+            messagebox.showerror("Error", "Debe agregar al menos un producto a la salida.")
+            return
 
-        id_responsable = int(responsable.split(" - ")[0])
-        self.controlador.guardar_salida(fecha, id_responsable, self.productos_temporales)
-        messagebox.showinfo("Éxito", "Salida registrada correctamente.")
-
-    def cargar_responsables(self):
-        """Carga los responsables en el combobox desde la base de datos."""
+        # Extraer ID del responsable y proyecto
         try:
-            responsables = self.controlador.listar_responsables()  # Llamamos al controlador
-            if responsables:
-                self.responsable_combobox["values"] = [
-                    f"{resp[0]} - {resp[1]}" for resp in responsables
-                ]
+            id_responsable = int(responsable.split(" - ")[0])
+            id_proyecto = int(proyecto.split(" - ")[0])  # Extrae el ID del ComboBox
+        except ValueError:
+            messagebox.showerror("Error", "El formato del responsable o proyecto no es válido.")
+            return
+
+        # Extraer solo los valores correctos (idproducto, cantidad, idmaquinaria) para la BD
+        productos_para_bd = [
+            (prod["id_producto"], prod["cantidad"], prod["idmaquinaria"]) for prod in self.productos_temporales
+        ]
+
+        # Llamar al controlador para guardar en la base de datos
+        try:
+            salida_id = self.controlador.guardar_salida(fecha, id_responsable, id_proyecto, productos_para_bd, observaciones)
+
+            if salida_id:
+                # Generar automáticamente el reporte PDF con el nombre del ID de la salida
+                self.generar_reporte_pdf(salida_id, fecha, responsable, proyecto, observaciones, self.productos_temporales)
+
+                messagebox.showinfo("Éxito", f"Salida registrada con ID: {salida_id}. Reporte generado correctamente.")
+                self.productos_temporales.clear()
+                self.actualizar_tabla()
             else:
-                self.responsable_combobox["values"] = []
+                messagebox.showerror("Error", "No se pudo guardar la salida en la base de datos.")
+
         except Exception as e:
-            print(f"Error al cargar responsables: {e}")
+            messagebox.showerror("Error", f"Ocurrió un error al guardar la salida: {e}")
+            print(f"Error al guardar salida: {e}")
 
 
-    def generar_reporte_pdf(self, salida_id, fecha, responsable, observaciones, productos):
+    def generar_reporte_pdf(self, salida_id, fecha, responsable, proyecto, observaciones, productos):
+        """Genera un PDF con la información de la salida de productos y permite seleccionar la ruta de guardado."""
         pdf = FPDF()
         pdf.add_page()
 
+        # Configuración general de la fuente
         pdf.set_font("Arial", size=12)
 
+        # Agregar logo
         try:
             pdf.image("vista/imagen/marca.png", x=170, y=10, w=30)
         except FileNotFoundError:
-            pass
+            print("No se encontró la imagen del logo.")
 
+        # Encabezado de la empresa
         pdf.set_xy(10, 20)
         pdf.set_font("Arial", style="B", size=16)
         pdf.cell(0, 10, "KOELSA PERU S.R.L.", ln=True, align="L")
@@ -218,43 +312,62 @@ class VistaSalida:
         pdf.cell(0, 10, "Distrito: Lurín, Lima, Perú", ln=True, align="L")
         pdf.ln(15)
 
+        # Título del reporte
         pdf.set_font("Arial", style="B", size=14)
         pdf.set_text_color(50, 50, 255)
-        pdf.cell(0, 10, "REPORTE DE SALIDA DE PRODUCTOS", ln=True, align="C")
+        pdf.cell(0, 10, "REPORTE DE SALIDA DE PRODUCTOS - Taller Lima", ln=True, align="C")
         pdf.set_text_color(0, 0, 0)
         pdf.ln(5)
 
+        # Información General
         pdf.set_font("Arial", size=12)
         pdf.cell(0, 10, f"ID Salida: {salida_id}", ln=True)
         pdf.cell(0, 10, f"Fecha: {fecha}", ln=True)
         pdf.cell(0, 10, f"Responsable: {responsable}", ln=True)
+        pdf.cell(0, 10, f"Proyecto: {proyecto}", ln=True)
         pdf.multi_cell(0, 10, f"Observaciones: {observaciones}")
         pdf.ln(10)
 
+        # Tabla de productos
         pdf.set_font("Arial", style="B", size=12)
         pdf.set_fill_color(220, 220, 220)
-        pdf.cell(10, 10, "N°", border=1, align="C", fill=True)
-        pdf.cell(60, 10, "Producto", border=1, align="C", fill=True)
-        pdf.cell(30, 10, "Cantidad", border=1, align="C", fill=True)
-        pdf.cell(30, 10, "Precio", border=1, align="C", fill=True)
-        pdf.cell(60, 10, "Maquinaria Destino", border=1, align="C", fill=True)
+
+        columnas = ["N°", "Producto", "Cantidad", "Precio", "Ubicación", "Maquinaria Destino"]
+        anchos = [10, 50, 20, 30, 40, 40]  # Ancho de cada columna
+
+        for col, width in zip(columnas, anchos):
+            pdf.cell(width, 10, col, border=1, align="C", fill=True)
         pdf.ln()
 
+        # Agregar productos
         pdf.set_font("Arial", size=10)
         for idx, prod in enumerate(productos, start=1):
             pdf.cell(10, 10, str(idx), border=1, align="C")
-            pdf.cell(60, 10, prod["producto"], border=1, align="C")
-            pdf.cell(30, 10, str(prod["cantidad"]), border=1, align="C")
-            pdf.cell(30, 10, f"{prod['precio']:.2f}", border=1, align="C")
-            pdf.cell(60, 10, prod["maquinaria_destino"], border=1, align="C")
+            pdf.cell(50, 10, prod["producto"], border=1, align="C")
+            pdf.cell(20, 10, str(prod["cantidad"]), border=1, align="C")
+            pdf.cell(30, 10, f"{prod.get('precio', 0):.2f}", border=1, align="C")
+            pdf.cell(40, 10, prod["ubicacion"], border=1, align="C")
+            pdf.cell(40, 10, prod["maquinaria_destino"], border=1, align="C")
             pdf.ln()
 
+        # Espacio y firma del responsable
         pdf.ln(20)
         pdf.set_font("Arial", size=12)
         pdf.cell(0, 10, "_________________________", ln=True, align="C")
         pdf.cell(0, 10, "Firma del Responsable", ln=True, align="C")
 
-        filename = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
+        # ✅ Mostrar cuadro de diálogo para seleccionar la ruta de guardado
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF files", "*.pdf")],
+            initialfile=f"salida_{salida_id}.pdf",  # Pre-carga el nombre con el ID
+            title="Guardar Reporte de Salida"
+        )
+
+        # Si el usuario selecciona una ruta, se guarda el archivo
         if filename:
-            pdf.output(filename)
-            messagebox.showinfo("Éxito", f"Reporte guardado como {filename}")
+            try:
+                pdf.output(filename)
+                messagebox.showinfo("Éxito", f"Reporte guardado correctamente en:\n{filename}")
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo guardar el reporte: {e}")

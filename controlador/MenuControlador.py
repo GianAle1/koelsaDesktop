@@ -84,9 +84,11 @@ class MenuControlador:
         """Obtiene la lista de maquinarias del modelo."""
         return self.controlador_maquinaria.listar_maquinarias()
     
-    def guardar_salida(self, fecha, responsable, productos_temporales,observaciones):
-        """Llama al controlador de salidas para registrar la salida."""
-        return self.controlador_salida.guardar_salida(fecha, responsable, productos_temporales,observaciones)
+    def guardar_salida(self, fecha, id_responsable, id_proyecto, productos, observaciones):
+        """Llama al controlador de salida para registrar la salida."""
+        return self.controlador_salida.guardar_salida(fecha, id_responsable, id_proyecto, productos, observaciones)
+
+
     
     def obtener_historial_producto(self, producto_id):
         """Obtiene el historial de entradas y salidas para un producto específico."""
@@ -137,3 +139,6 @@ class MenuControlador:
 
     def listar_responsables(self):
         return self.controlador_responsable.listar_responsables()
+
+    def listar_proyectos(self):
+        return self.controlador_salida.listar_proyectos()

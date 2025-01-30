@@ -4,37 +4,33 @@ class Salida:
     def __init__(self):
         self.conexion_db = ConexionDB()
 
-    def guardar_salida(self, fecha, idresponsable, idproyecto, productos, observaciones):
-        """Guarda una salida de productos en la base de datos."""
+    def guardar_salida(self, fecha, id_responsable, id_proyecto, productos, observaciones):
+        """Guarda una nueva salida en la base de datos."""
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                # Insertar en la tabla salida con idproyecto
-                query_salida = """
-                    INSERT INTO salida (fecha, idresponsable, idproyecto, observacion) 
-                    VALUES (%s, %s, %s, %s)
-                """
-                cursor.execute(query_salida, (fecha, idresponsable, idproyecto, observaciones))
+                # Insertar en la tabla salida
+                query_salida = "INSERT INTO salida (fecha, idresponsable, idproyecto, observacion) VALUES (%s, %s, %s, %s)"
+                cursor.execute(query_salida, (fecha, id_responsable, id_proyecto, observaciones))
                 connection.commit()
 
-                # Obtener el idsalida recién generado
+                # Obtener el ID de la salida recién creada
                 cursor.execute("SELECT LAST_INSERT_ID()")
                 idsalida = cursor.fetchone()[0]
 
-                # Insertar en la tabla salidaDetalle y actualizar la cantidad en producto
-                query_detalle = """
-                    INSERT INTO salidaDetalle (idsalida, idproducto, cantidad, idmaquinaria) 
-                    VALUES (%s, %s, %s, %s)
-                """
-                query_actualizar_producto = """
-                    UPDATE producto SET cantidad = cantidad - %s WHERE idproducto = %s
-                """
+                # Insertar los productos en salidaDetalle
+                query_detalle = "INSERT INTO salidaDetalle (idsalida, idproducto, cantidad, idmaquinaria) VALUES (%s, %s, %s, %s)"
+                query_actualizar_producto = "UPDATE producto SET cantidad = cantidad - %s WHERE idproducto = %s"
 
                 for producto in productos:
-                    idproducto, cantidad, idmaquinaria = producto
+                    if len(producto) != 3:
+                        print(f"Error en el formato del producto: {producto}")
+                        continue  # Saltar el producto si no tiene el formato correcto
 
-                    # Verificar el stock actual
+                    idproducto, cantidad, idmaquinaria = producto
+                    
+                    # Verificar stock actual
                     cursor.execute("SELECT cantidad FROM producto WHERE idproducto = %s", (idproducto,))
                     resultado = cursor.fetchone()
 
@@ -42,28 +38,26 @@ class Salida:
                         stock_actual = resultado[0]
 
                         if stock_actual < cantidad:
-                            print(f"No hay suficiente stock para el producto con ID '{idproducto}'. Stock actual: {stock_actual}")
-                            raise ValueError(f"Stock insuficiente para el producto con ID '{idproducto}'")
+                            raise ValueError(f"Stock insuficiente para el producto con ID {idproducto}. Disponible: {stock_actual}")
 
                         # Insertar en salidaDetalle
                         cursor.execute(query_detalle, (idsalida, idproducto, cantidad, idmaquinaria))
 
-                        # Actualizar el stock del producto
+                        # Actualizar stock del producto
                         cursor.execute(query_actualizar_producto, (cantidad, idproducto))
-                    else:
-                        print(f"El producto con ID '{idproducto}' no fue encontrado en la base de datos.")
-                        continue
 
-                # Confirmar cambios
+                # Confirmar cambios en la base de datos
                 connection.commit()
                 return idsalida
+
             except Exception as e:
                 print(f"Error al guardar la salida: {e}")
                 connection.rollback()
                 return None
+
             finally:
-                cursor.close()
                 self.conexion_db.cerrar_conexion()
+
         else:
             print("No se pudo establecer conexión con la base de datos.")
             return None
@@ -126,4 +120,99 @@ class Salida:
                 self.conexion_db.cerrar_conexion()
         else:
             print("No se pudo establecer conexión con la base de datos.")
+            return []
+
+    def listar_proyectos(self):
+        """Obtiene la lista de proyectos desde la base de datos."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                query = "SELECT idproyecto, nombre, ubicacion FROM proyecto"
+                cursor.execute(query)
+                proyectos = cursor.fetchall()
+                return proyectos
+            except Exception as e:
+                print(f"Error al listar proyectos: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        return []
+
+    def obtener_todas_las_salidas(self):
+        """Obtiene todas las salidas de productos, incluyendo la SERIE de la maquinaria."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                query = """
+                    SELECT 
+                        p.idproducto AS ID_Producto,
+                        p.partname AS Nombre_Producto,
+                        p.codigoInterno AS Codigo_Interno,
+                        p.descripcion AS Descripcion,
+                        p.precio AS Precio,
+                        f.nomfamilia AS Familia,
+                        s.fecha AS Fecha_Salida,  
+                        d.cantidad AS Cantidad,
+                        'Salida' AS Tipo,
+                        m.serie AS Maquinaria_Serie,  -- ✅ Se obtiene la SERIE
+                        m.marca AS Marca              -- ✅ Se obtiene la MARCA
+                    FROM salidaDetalle d
+                    JOIN salida s ON s.idsalida = d.idsalida
+                    JOIN producto p ON p.idproducto = d.idproducto
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria;  -- ✅ Se une con maquinaria
+                """
+                cursor.execute(query)
+                salidas = cursor.fetchall()
+                return salidas
+            except Exception as e:
+                print(f"Error al obtener todas las salidas: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo conectar a la base de datos.")
+            return []
+
+
+
+    def obtener_salidas_por_producto(self, producto_id):
+        """Obtiene el historial de salidas de un producto específico desde la base de datos."""
+        connection = self.conexion_db.conectar()
+        if connection:
+            cursor = self.conexion_db.obtener_cursor()
+            try:
+                query = query = """
+                    SELECT 
+                        p.idproducto,
+                        p.partname,
+                        p.codigoInterno,
+                        p.descripcion,
+                        p.precio,
+                        f.nomfamilia,
+                        s.fecha,
+                        d.cantidad,
+                        'Salida' AS Tipo,  -- ✅ Agregar la etiqueta 'Salida'
+                        COALESCE(m.serie, 'N/A') AS Modelo,  -- ✅ Ahora devuelve la serie
+                        COALESCE(m.marca, 'N/A') AS Marca   -- ✅ Asegura que siempre haya un valor
+                    FROM salidaDetalle d
+                    JOIN salida s ON s.idsalida = d.idsalida
+                    JOIN producto p ON p.idproducto = d.idproducto
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria  -- ✅ LEFT JOIN en caso de no tener maquinaria
+                    WHERE p.idproducto = %s;
+                """
+
+                cursor.execute(query, (producto_id,))
+                salidas = cursor.fetchall()
+                return salidas
+            except Exception as e:
+                print(f"Error al obtener salidas para el producto {producto_id}: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo conectar a la base de datos.")
             return []
