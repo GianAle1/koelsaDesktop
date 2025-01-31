@@ -49,6 +49,7 @@ class Producto:
                     LEFT JOIN unidadMedida u ON p.idunidadMedida = u.idunidadMedida
                     LEFT JOIN familia f ON p.idfamilia = f.idfamilia
                     LEFT JOIN almacen a ON p.idalmacen = a.idalmacen
+                    ORDER BY p.descripcion ASC;
                 """
                 cursor.execute(query)
                 productos = cursor.fetchall()
@@ -72,23 +73,24 @@ class Producto:
             try:
                 query = """
                     SELECT 
-                        p.idproducto, 
-                        p.partname, 
-                        p.descripcion, 
-                        m.nombre AS Marca,
-                        f.nomfamilia AS Familia,
-                        u.nomUnidad AS UnidadMedida, 
-                        p.cantidad, 
-                        p.precio, 
-                        p.codigoInterno, 
-                        a.nombre AS Almacen,
-                        p.ubicacion AS Ubicacion
-                    FROM producto p
-                    LEFT JOIN marca m ON p.idmarca = m.idmarca
-                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
-                    LEFT JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
-                    LEFT JOIN almacen a ON p.idalmacen = a.idalmacen 
-                    WHERE f.nomfamilia = %s
+                    p.idproducto, 
+                    p.partname, 
+                    p.descripcion, 
+                    m.nombre AS Marca,
+                    f.nomfamilia AS Familia,
+                    u.nomUnidad AS UnidadMedida, 
+                    p.cantidad, 
+                    p.precio,
+                    p.codigoInterno, 
+                    a.nombre AS Almacen,
+                    p.ubicacion AS Ubicacion
+                FROM producto p
+                LEFT JOIN marca m ON p.idmarca = m.idmarca
+                LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                LEFT JOIN UnidadMedida u ON p.idunidadMedida = u.idunidadMedida
+                LEFT JOIN almacen a ON p.idalmacen = a.idalmacen 
+                WHERE f.nomfamilia = %s
+                ORDER BY p.descripcion ASC;
                 """
                 cursor.execute(query, (familia,))
                 productos = cursor.fetchall()

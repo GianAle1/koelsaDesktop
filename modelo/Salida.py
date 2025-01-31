@@ -122,22 +122,7 @@ class Salida:
             print("No se pudo establecer conexión con la base de datos.")
             return []
 
-    def listar_proyectos(self):
-        """Obtiene la lista de proyectos desde la base de datos."""
-        connection = self.conexion_db.conectar()
-        if connection:
-            cursor = self.conexion_db.obtener_cursor()
-            try:
-                query = "SELECT idproyecto, nombre, ubicacion FROM proyecto"
-                cursor.execute(query)
-                proyectos = cursor.fetchall()
-                return proyectos
-            except Exception as e:
-                print(f"Error al listar proyectos: {e}")
-                return []
-            finally:
-                self.conexion_db.cerrar_conexion()
-        return []
+
 
     def obtener_todas_las_salidas(self):
         """Obtiene todas las salidas de productos, ordenadas por fecha de mayor a menor."""
@@ -156,22 +141,62 @@ class Salida:
                         s.fecha AS Fecha_Salida,  
                         d.cantidad AS Cantidad,
                         'Salida' AS Tipo,
-                        COALESCE(m.serie, 'N/A') AS Maquinaria_Serie,  -- ✅ Se obtiene la SERIE
-                        COALESCE(m.marca, 'N/A') AS Marca,             -- ✅ Se obtiene la MARCA
-                        r.nombre AS Responsable  -- ✅ Se agrega el Responsable
+                        COALESCE(m.serie, 'N/A') AS Maquinaria_Serie,
+                        COALESCE(m.marca, 'N/A') AS Marca,
+                        r.nombre AS Responsable  
                     FROM salidaDetalle d
                     JOIN salida s ON s.idsalida = d.idsalida
                     JOIN producto p ON p.idproducto = d.idproducto
                     LEFT JOIN familia f ON p.idfamilia = f.idfamilia
                     LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria
                     LEFT JOIN responsable r ON s.idresponsable = r.idresponsable
-                    ORDER BY s.fecha DESC;  -- ✅ Ordenado de mayor a menor fecha
+                    ORDER BY s.fecha DESC;  --  Ordenado de mayor a menor fecha
                 """
                 cursor.execute(query)
                 salidas = cursor.fetchall()
                 return salidas
             except Exception as e:
                 print(f"Error al obtener todas las salidas: {e}")
+                return []
+            finally:
+                self.conexion_db.cerrar_conexion()
+        else:
+            print("No se pudo conectar a la base de datos.")
+            return []
+
+    def obtener_salidas_por_producto(self, producto_id):
+        connection = self.conexion_db.conectar()
+        if connection:
+            try:
+                cursor = connection.cursor()
+                query = """
+                    SELECT 
+                        p.idproducto AS ID_Producto,
+                        p.partname AS Nombre_Producto,
+                        p.codigoInterno AS Codigo_Interno,
+                        p.descripcion AS Descripcion,
+                        p.precio AS Precio,
+                        f.nomfamilia AS Familia,
+                        s.fecha AS Fecha_Salida,  
+                        d.cantidad AS Cantidad,
+                        'Salida' AS Tipo,
+                        COALESCE(m.serie, 'N/A') AS Maquinaria_Serie,
+                        COALESCE(m.marca, 'N/A') AS Marca,
+                        r.nombre AS Responsable  
+                    FROM salidaDetalle d
+                    JOIN salida s ON s.idsalida = d.idsalida
+                    JOIN producto p ON p.idproducto = d.idproducto
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria
+                    LEFT JOIN responsable r ON s.idresponsable = r.idresponsable
+                    WHERE p.idproducto = %s  -- 🔹 Filtramos por el ID del producto
+                    ORDER BY s.fecha DESC;
+                """
+                cursor.execute(query, (producto_id,))
+                salidas = cursor.fetchall()
+                return salidas
+            except Exception as e:
+                print(f"Error al obtener salidas para el producto {producto_id}: {e}")
                 return []
             finally:
                 self.conexion_db.cerrar_conexion()

@@ -62,14 +62,17 @@ class Entrada:
                         p.partname,
                         p.codigoInterno,
                         p.descripcion,
-                        d.precioDetalle,
+                        d.precioEntrada,  -- ✅ Usamos precioEntrada de entradaDetalle
                         f.nomfamilia,
                         e.fecha,
-                        d.cantidad
+                        e.docuIngreso,  -- ✅ Se añade el campo Documento de Ingreso
+                        d.cantidad,
+                        prov.nombre AS Proveedor
                     FROM entradaDetalle d
                     JOIN entrada e ON e.identrada = d.identrada
                     JOIN producto p ON p.idproducto = d.idproducto
                     LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN proveedor prov ON d.idproveedor = prov.idproveedor
                     WHERE p.idproducto = %s;
                 """
                 cursor.execute(query, (producto_id,))
@@ -83,6 +86,7 @@ class Entrada:
         else:
             print("No se pudo conectar a la base de datos.")
             return []
+
 
     def obtener_todas_las_entradas(self):
         connection = self.conexion_db.conectar()
