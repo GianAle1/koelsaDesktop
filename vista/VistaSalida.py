@@ -183,7 +183,12 @@ class VistaSalida:
             # Extraer datos de la maquinaria
             partes_maquinaria = maquinaria_seleccionada.split(" - ")
             id_maquinaria = int(partes_maquinaria[0].strip())
-            maquinaria_destino = partes_maquinaria[2].strip()  # ✅ Ahora toma la serie en lugar del modelo
+
+            # Asegurarse de obtener correctamente el nombre o la serie de la maquinaria
+            if len(partes_maquinaria) >= 3:
+                maquinaria_destino = partes_maquinaria[1].strip()  # ✅ Toma el nombre correcto de la maquinaria
+            else:
+                maquinaria_destino = "Desconocido"  # ✅ Fallback en caso de error
 
             # Verificar si el producto ya fue agregado
             for prod in self.productos_temporales:
@@ -199,7 +204,7 @@ class VistaSalida:
                 "precio": 1,  # Si el precio está disponible, reemplazar con el correcto
                 "ubicacion": ubicacion_producto,
                 "idmaquinaria": id_maquinaria,  # Se almacena en la lista pero no se mostrará
-                "maquinaria_destino": maquinaria_destino  # ✅ Ahora almacena la serie de la maquinaria
+                "maquinaria_destino": maquinaria_destino  # ✅ Ahora almacena el nombre/serie de la maquinaria correctamente
             })
 
             self.actualizar_tabla()
@@ -207,9 +212,6 @@ class VistaSalida:
 
         except (ValueError, IndexError) as e:
             messagebox.showerror("Error", f"Ocurrió un error al procesar el producto: {e}")
-
-
-
 
     def actualizar_tabla(self):
         """Actualiza la tabla de productos agregados sin mostrar el ID de maquinaria."""
@@ -220,11 +222,9 @@ class VistaSalida:
             self.tree.insert("", tk.END, values=(
                 producto["producto"], 
                 producto["cantidad"], 
-                producto["precio"], 
-                producto["ubicacion"],  # ✅ Mostramos la ubicación del producto
-                producto["maquinaria_destino"]  # ✅ Mostramos la SERIE de la maquinaria en lugar del modelo
+                producto["ubicacion"],  #  Mostramos la ubicación del producto
+                producto["maquinaria_destino"]  #  Ahora muestra la serie de la maquinaria correctamente
             ))
-
 
 
     def eliminar_producto(self):
@@ -330,23 +330,23 @@ class VistaSalida:
         pdf.set_font("Arial", style="B", size=12)
         pdf.set_fill_color(220, 220, 220)
 
-        columnas = ["N°", "Producto", "Cantidad", "Precio", "Ubicación", "Maquinaria Destino"]
-        anchos = [10, 50, 20, 30, 40, 40]  # Ancho de cada columna
+        columnas = ["N°", "Producto", "Cantidad", "Ubicación", "Maquinaria Destino"]
+        anchos = [10, 60, 30, 50, 50]  # Ajustamos los anchos sin la columna de precio
 
         for col, width in zip(columnas, anchos):
             pdf.cell(width, 10, col, border=1, align="C", fill=True)
         pdf.ln()
 
-        # Agregar productos
+        # Agregar productos SIN PRECIO
         pdf.set_font("Arial", size=10)
         for idx, prod in enumerate(productos, start=1):
             pdf.cell(10, 10, str(idx), border=1, align="C")
-            pdf.cell(50, 10, prod["producto"], border=1, align="C")
-            pdf.cell(20, 10, str(prod["cantidad"]), border=1, align="C")
-            pdf.cell(30, 10, f"{prod.get('precio', 0):.2f}", border=1, align="C")
-            pdf.cell(40, 10, prod["ubicacion"], border=1, align="C")
-            pdf.cell(40, 10, prod["maquinaria_destino"], border=1, align="C")
+            pdf.cell(60, 10, prod["producto"], border=1, align="C")
+            pdf.cell(30, 10, str(prod["cantidad"]), border=1, align="C")
+            pdf.cell(50, 10, prod["ubicacion"], border=1, align="C")
+            pdf.cell(50, 10, prod["maquinaria_destino"], border=1, align="C")
             pdf.ln()
+
 
         # Espacio y firma del responsable
         pdf.ln(20)
