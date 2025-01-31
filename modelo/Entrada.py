@@ -19,10 +19,10 @@ class Entrada:
                 cursor.execute("SELECT LAST_INSERT_ID()")  # Para MySQL
                 identrada = cursor.fetchone()[0]
 
-                # Insertar en la tabla entradaDetalle y actualizar la cantidad en producto
+                # Consultas SQL
                 query_detalle = """
-                    INSERT INTO entradaDetalle (identrada, idproducto, cantidad, idproveedor) 
-                VALUES (%s, %s, %s, %s)
+                    INSERT INTO entradaDetalle (identrada, idproducto, cantidad, idproveedor, precioEntrada) 
+                    VALUES (%s, %s, %s, %s, %s)
                 """
                 query_actualizar_producto = """
                     UPDATE producto 
@@ -45,22 +45,23 @@ class Entrada:
 
                     idproducto = producto[0]  # ID del producto
                     cantidad = int(producto[2])  # Cantidad ingresada
-                    precio_nuevo = Decimal(producto[3])  # Convertir el precio a Decimal
+                    precio_nuevo = Decimal(str(producto[3]))  # Convertir a Decimal
                     idproveedor = producto[4]  # ID del proveedor
 
                     # Validación adicional de datos
                     print(f"Procesando producto - ID: {idproducto}, Cantidad: {cantidad}, Precio: {precio_nuevo}, Proveedor: {idproveedor}")
 
-                    # Insertar en entradaDetalle
-                    cursor.execute(query_detalle, (identrada, idproducto, cantidad, idproveedor))
+                    # Insertar en entradaDetalle (✅ Corregido: precio_nuevo es el precioEntrada)
+                    cursor.execute(query_detalle, (identrada, idproducto, cantidad, idproveedor, precio_nuevo))
 
                     # Actualizar la cantidad y calcular el nuevo precio promedio
-                    cursor.execute(query_actualizar_producto, (cantidad, precio_nuevo, cantidad, cantidad, idproducto))
+                    cursor.execute(query_actualizar_producto, (precio_nuevo, cantidad, cantidad, cantidad, idproducto))
 
                 # Confirmar todos los cambios
                 connection.commit()
                 print("Entrada guardada exitosamente.")
                 return identrada  # Retorna el ID de la entrada creada
+
             except Exception as e:
                 print(f"Error al guardar la entrada: {e}")
                 connection.rollback()
@@ -82,7 +83,7 @@ class Entrada:
                         p.partname,
                         p.codigoInterno,
                         p.descripcion,
-                        p.precio,
+                        d.precioDetalle,
                         f.nomfamilia,
                         e.fecha,
                         d.cantidad
@@ -115,7 +116,7 @@ class Entrada:
                     p.partname AS Nombre_Producto,
                     p.codigoInterno AS Codigo_Interno,
                     p.descripcion AS Descripcion,
-                    p.precio AS Precio,
+                    d.precioEntrada,
                     f.nomfamilia AS Familia,
                     e.fecha AS Fecha_Entrada,
                     d.cantidad AS Cantidad,
