@@ -9,22 +9,14 @@ class CustomAutocompleteCombobox(AutocompleteCombobox):
         super().__init__(*args, **kwargs)
         self.completion_list = []
         self._completion_matches = []
-        self._after_id = None  # ID del after para cancelarlo si es necesario
-        self.bind("<KeyRelease>", self._on_keyrelease)
+        self.bind("<Return>", self._filter_matches)  # ✅ Ahora filtra al presionar Enter
 
     def set_completion_list(self, completion_list):
         """Actualiza la lista de valores disponibles para autocompletar."""
         self.completion_list = completion_list
 
-    def _on_keyrelease(self, event):
-        """Filtra valores que coincidan con cualquier parte de la cadena con un retraso."""
-        if self._after_id:
-            self.after_cancel(self._after_id)  # Cancela la llamada anterior si se sigue escribiendo
-
-        self._after_id = self.after(1000, self._filter_matches)  # Espera 300ms antes de filtrar
-
-    def _filter_matches(self):
-        """Realiza la búsqueda después del retraso."""
+    def _filter_matches(self, event=None):
+        """Filtra valores que coincidan con cualquier parte de la cadena cuando se presiona Enter."""
         text = self.get().lower()
         if text == "":
             self._completion_matches = self.completion_list
@@ -40,11 +32,6 @@ class CustomAutocompleteCombobox(AutocompleteCombobox):
         if self._completion_matches:
             self.event_generate("<Down>")  # Abre el desplegable si hay coincidencias
 
-    def _update_listbox(self):
-        """Actualiza los elementos desplegables."""
-        self["values"] = self._completion_matches
-        if self._completion_matches:
-            self.event_generate("<Down>")  # Abre el desplegable si hay coincidencias
 
 
 class VistaEntrada:

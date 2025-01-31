@@ -518,10 +518,10 @@ SELECT
                     
 
 use koelsa;
-select * from proyecto;
+select * from usuario;
 INSERT INTO proyecto (nombre,ubicacion) VALUES
-('Taller Lima','Lurion');
+('Taller Lima','Lurin');
 INSERT INTO proyecto (nombre,ubicacion) VALUES
 ('Shougang','Ica');
 
-DELETE FROM Salida;
+select * from entradaDetalle

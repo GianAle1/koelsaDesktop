@@ -1,7 +1,29 @@
+from ttkwidgets.autocomplete import AutocompleteCombobox
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from datetime import date
 from fpdf import FPDF
+
+class CustomAutocompleteCombobox(AutocompleteCombobox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.completion_list = []
+        self.bind("<Return>", self._filter_matches)  # ✅ Filtra solo al presionar Enter
+
+    def set_completion_list(self, completion_list):
+        """Actualiza la lista de valores disponibles para autocompletar."""
+        self.completion_list = completion_list
+
+    def _filter_matches(self, event=None):
+        """Filtra valores que coincidan con la cadena ingresada cuando se presiona Enter."""
+        text = self.get().lower()
+        if text == "":
+            self["values"] = self.completion_list
+        else:
+            self["values"] = [item for item in self.completion_list if text in item.lower()]
+        
+        if self["values"]:
+            self.event_generate("<Down>")  # Abre el desplegable si hay coincidencias
 
 
 class VistaSalida:
@@ -27,15 +49,13 @@ class VistaSalida:
         self.fecha_entry = self._crear_campo("Fecha:", 0)
         self.fecha_entry.insert(0, date.today().strftime('%Y-%m-%d'))
 
-        # Responsable como combobox con datos de la tabla responsable
-        self.responsable_combobox = self._crear_combobox("Responsable:", 1)
-
-        self.maquinaria_combobox = self._crear_combobox("Maquinaria:", 2)
-        self.producto_combobox = self._crear_combobox("Producto:", 3)
+        # Combobox con autocompletado
+        self.responsable_combobox = self._crear_autocomplete_combobox("Responsable:", 1)
+        self.maquinaria_combobox = self._crear_autocomplete_combobox("Maquinaria:", 2)
+        self.producto_combobox = self._crear_autocomplete_combobox("Producto:", 3)
         self.cantidad_entry = self._crear_campo("Cantidad:", 4)
         self.observaciones_entry = self._crear_textarea("Observaciones:", 5)
-        # Proyecto como combobox con datos de la tabla proyecto
-        self.proyecto_combobox = self._crear_combobox("Proyecto:", 6)
+        self.proyecto_combobox = self._crear_autocomplete_combobox("Proyecto:", 6)
 
         # Botón para agregar a la lista
         self._crear_boton("Agregar Producto", self.agregar_producto, "#4CAF50")
@@ -47,17 +67,14 @@ class VistaSalida:
         self._crear_boton("Eliminar Producto", self.eliminar_producto, "#f44336", pady=10)
 
         # Botón para guardar la salida
-        self._crear_boton("Guardar Salida", lambda: self.guardar_salida(), "#4CAF50", pady=10)
-
-
+        self._crear_boton("Guardar Salida", self.guardar_salida, "#4CAF50", pady=10)
 
         # Inicializar listas y cargar datos
         self.productos_temporales = []
         self.cargar_maquinarias()
         self.cargar_productos()
-        self.cargar_responsables()  # Cargar responsables en el combobox
+        self.cargar_responsables()
         self.cargar_proyectos()
-
 
     def _crear_campo(self, texto, row):
         tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
@@ -65,9 +82,9 @@ class VistaSalida:
         entry.grid(row=row, column=1, padx=5)
         return entry
 
-    def _crear_combobox(self, texto, row):
+    def _crear_autocomplete_combobox(self, texto, row):
         tk.Label(self.frame_entrada, text=texto, font=("Arial", 12), bg="#f4f4f9").grid(row=row, column=0, sticky="w", padx=5)
-        combobox = ttk.Combobox(self.frame_entrada, font=("Arial", 12), state="readonly", width=40)
+        combobox = CustomAutocompleteCombobox(self.frame_entrada, font=("Arial", 12), width=40, completevalues=[])
         combobox.grid(row=row, column=1, padx=5)
         return combobox
 
@@ -78,76 +95,57 @@ class VistaSalida:
         return textarea
 
     def _crear_boton(self, texto, command, bg_color, pady=0):
-        boton = tk.Button(
-            self.root, text=texto, font=("Arial", 12), bg=bg_color, fg="white", command=command
-        )
+        boton = tk.Button(self.root, text=texto, font=("Arial", 12), bg=bg_color, fg="white", command=command)
         boton.pack(pady=pady)
         return boton
 
     def _crear_tabla(self):
-        """Crea la tabla para visualizar los productos agregados sin mostrar el ID de la maquinaria."""
+        """Crea la tabla para visualizar los productos agregados."""
         self.frame_tabla = tk.Frame(self.root, bg="white", bd=2, relief="groove")
         self.frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Se eliminó "ID Maquinaria"
-        columnas = ("Producto", "Cantidad", "Precio", "Ubicación", "Maquinaria Destino")
+        columnas = ("Producto", "Cantidad", "Ubicación", "Maquinaria Destino")
         self.tree = ttk.Treeview(self.frame_tabla, columns=columnas, show="headings", height=10)
 
         for col in columnas:
             self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center", width=180)  # Ajusta el ancho si es necesario
+            self.tree.column(col, anchor="center", width=180)
 
         self.tree.pack(fill=tk.BOTH, expand=True)
 
-
     def cargar_responsables(self):
-        """Carga los responsables en el combobox desde la base de datos."""
+        """Carga los responsables en el combobox con autocompletado."""
         try:
             responsables = self.controlador.listar_responsables()
-            if responsables:
-                self.responsable_combobox["values"] = [
-                    f"{resp[0]} - {resp[1]}" for resp in responsables
-                ]
-            else:
-                self.responsable_combobox["values"] = []
+            values = [f"{resp[0]} - {resp[1]}" for resp in responsables]
+            self.responsable_combobox.set_completion_list(values)
         except Exception as e:
             print(f"Error al cargar responsables: {e}")
 
     def cargar_maquinarias(self):
-        """Carga las maquinarias en el combobox desde la base de datos."""
+        """Carga las maquinarias en el combobox con autocompletado."""
         try:
             maquinarias = self.controlador.listar_maquinarias()
-            if maquinarias:
-                self.maquinaria_combobox["values"] = [
-                    f"{maq[0]} - {maq[1]} - {maq[2]}" for maq in maquinarias
-                ]
+            values = [f"{maq[0]} - {maq[1]} - {maq[2]}" for maq in maquinarias]
+            self.maquinaria_combobox.set_completion_list(values)
         except Exception as e:
             print(f"Error al cargar maquinarias: {e}")
 
     def cargar_productos(self):
-        """Carga los productos en el combobox desde la base de datos, incluyendo PartName y Ubicación específica."""
+        """Carga los productos en el combobox con autocompletado."""
         try:
             productos = self.controlador.listar_productos()
-            if productos:
-                self.producto_combobox["values"] = [
-                    f"{prod[0]} - {prod[1]} ({prod[3]}) - Precio: {float(prod[7]):.2f} - Ubicación: {prod[-2]}"
-                    for prod in productos
-                ]
-            else:
-                self.producto_combobox["values"] = []
+            values = [f"{prod[0]} - {prod[1]} ({prod[3]}) - Ubicación: {prod[-2]}" for prod in productos]
+            self.producto_combobox.set_completion_list(values)
         except Exception as e:
             print(f"Error al cargar productos: {e}")
 
     def cargar_proyectos(self):
-        """Carga los proyectos en el combobox desde la base de datos."""
+        """Carga los proyectos en el combobox con autocompletado."""
         try:
-            proyectos = self.controlador.listar_proyectos()  # Llama al controlador
-            if proyectos:
-                self.proyecto_combobox["values"] = [
-                    f"{proy[0]} - {proy[1]} ({proy[2]})" for proy in proyectos  # Formato: "ID - Nombre (Ubicación)"
-                ]
-            else:
-                self.proyecto_combobox["values"] = []
+            proyectos = self.controlador.listar_proyectos()
+            values = [f"{proy[0]} - {proy[1]} ({proy[2]})" for proy in proyectos]
+            self.proyecto_combobox.set_completion_list(values)
         except Exception as e:
             print(f"Error al cargar proyectos: {e}")
 
