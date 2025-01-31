@@ -12,7 +12,7 @@ class UnidadMedida:
             cursor = self.conexion_db.obtener_cursor()
             if cursor:
                 try:
-                    query = "SELECT * FROM unidadMedida"
+                    query = "SELECT * FROM unidadMedida ORDER BY unidadMedida ASC"
                     cursor.execute(query)
                     unidadMedidas = cursor.fetchall()
                     return unidadMedidas

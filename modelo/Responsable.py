@@ -14,7 +14,7 @@ class Responsable:
             cursor = self.conexion_db.obtener_cursor()
             if cursor:
                 try:
-                    query = "SELECT idresponsable, Nombre FROM responsable"
+                    query = "SELECT idresponsable, Nombre FROM responsable ORDER BY Nombre ASC"
                     cursor.execute(query)
                     responsables = cursor.fetchall()
                 except Exception as e:

@@ -27,7 +27,7 @@ class Proveedor:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "SELECT idproveedor, nombre,ruc,direccion,telefono, correo FROM proveedor"
+                query = "SELECT idproveedor, nombre,ruc,direccion,telefono, correo FROM proveedor ORDER BY nombre ASC"
                 cursor.execute(query)
                 proveedores = cursor.fetchall()
                 return proveedores  # Retorna la lista de proveedores
@@ -40,7 +40,6 @@ class Proveedor:
             return []
 
     def eliminar_proveedor(self, id_proveedor):
-        """Elimina un proveedor por ID."""
         connection = self.conexion_db.conectar()
         if connection:
             cursor = self.conexion_db.obtener_cursor()
@@ -48,13 +47,14 @@ class Proveedor:
                 query = "DELETE FROM proveedor WHERE idproveedor = %s"
                 cursor.execute(query, (id_proveedor,))
                 connection.commit()
-                return True
+                return cursor.rowcount > 0  # Retorna True si se eliminó al menos un registro
             except Exception as e:
-                print(f"Error al eliminar el proveedor: {e}")
-                self.conexion_db.cerrar_conexion()
+                print(f"Error al eliminar proveedor: {e}")
                 return False
+            finally:
+                self.conexion_db.cerrar_conexion()
         else:
-            print("No se pudo establecer una conexión a la base de datos.")
+            print("No se pudo conectar a la base de datos.")
             return False
     
     

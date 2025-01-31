@@ -11,7 +11,7 @@ class Equipo:
             cursor = self.conexion_db.obtener_cursor()
             if cursor:
                 try:
-                    query = "SELECT * FROM equipo"
+                    query = "SELECT * FROM equipo ORDER BY Nombre ASC"
                     cursor.execute(query)
                     usos = cursor.fetchall()
                     return usos

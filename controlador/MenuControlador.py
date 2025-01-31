@@ -143,3 +143,6 @@ class MenuControlador:
 
     def listar_proyectos(self):
         return self.controlador_salida.listar_proyectos()
+    
+    def eliminar_proveedor(self, id_proveedor):
+        return self.controlador_proveedor.eliminar_proveedor(id_proveedor)

@@ -12,7 +12,7 @@ class Familia:
             cursor = self.conexion_db.obtener_cursor()
             if cursor:
                 try:
-                    query = "SELECT idfamilia, nomfamilia FROM familia"
+                    query = "SELECT idfamilia, nomfamilia FROM familia ORDER BY nomfamilia ASC"
                     cursor.execute(query)
                     familias = cursor.fetchall()
                     return familias

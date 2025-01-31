@@ -9,7 +9,7 @@ class Maquinaria:
         if connection:
             cursor = self.conexion_db.obtener_cursor()
             try:
-                query = "SELECT idmaquinaria, modelo, serie FROM maquinaria"
+                query = "SELECT idmaquinaria, modelo, serie FROM maquinaria ORDER BY serie ASC"
                 cursor.execute(query)
                 maquinarias = cursor.fetchall()
                 return maquinarias

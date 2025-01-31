@@ -14,7 +14,7 @@ class ControladorProveedor:
             return None  # En caso de error, retornamos None
 
     def eliminar_proveedor(self, id_proveedor):
-        """Elimina un proveedor a través del modelo."""
+        """Elimina un proveedor por su ID"""
         return self.modelo_proveedor.eliminar_proveedor(id_proveedor)
 
     def listar_proveedores(self):
