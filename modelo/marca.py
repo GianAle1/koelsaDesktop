@@ -32,7 +32,7 @@ class Marca:
             cursor = self.conexion_db.obtener_cursor()
             if cursor:
                 try:
-                    query = "SELECT * FROM marca ORDER BY marca ASC"
+                    query = "SELECT * FROM marca ORDER BY nombre ASC"
                     cursor.execute(query)
                     marcas = cursor.fetchall()
                     return marcas
