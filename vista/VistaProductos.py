@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import openpyxl
-
+from datetime import datetime 
 class VistaProductos:
     def __init__(self, root, controlador):
         self.root = root
@@ -309,9 +309,16 @@ class VistaProductos:
                 messagebox.showwarning("Advertencia", "No hay datos para exportar.")
                 return
 
+            # 🔹 Obtener la fecha de hoy en formato YYYY-MM-DD
+            fecha_hoy = datetime.today().strftime('%Y-%m-%d')
+
+            # 🔹 Nombre predeterminado del archivo
+            default_filename = f"Entradas_Salidas_{fecha_hoy}.xlsx"
+
             filepath = filedialog.asksaveasfilename(
                 defaultextension=".xlsx",
                 filetypes=[("Archivos de Excel", "*.xlsx")],
+                initialfile=default_filename  # ✅ Se usa la fecha como nombre de archivo por defecto
             )
             if not filepath:
                 return
@@ -332,12 +339,8 @@ class VistaProductos:
             workbook.save(filepath)
             messagebox.showinfo("Éxito", f"Datos exportados exitosamente a {filepath}")
 
+        # 🔹 Asegurar que el botón use la función corregida
         tk.Button(
             ventana_historial, text="Exportar a Excel", font=("Arial", 12), bg="#007ACC", fg="white",
             command=exportar_todas_entradas_salidas_a_excel
-        ).pack(pady=10, side=tk.LEFT, padx=10)
-
-        tk.Button(
-            ventana_historial, text="Cerrar", font=("Arial", 12), bg="#f44336", fg="white",
-            command=ventana_historial.destroy
         ).pack(pady=10, side=tk.LEFT, padx=10)
