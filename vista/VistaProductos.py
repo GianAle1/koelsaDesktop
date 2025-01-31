@@ -239,7 +239,7 @@ class VistaProductos:
     def mostrar_todas_entradas_salidas(self):
         ventana_historial = tk.Toplevel(self.root)
         ventana_historial.title("Todas las Entradas y Salidas")
-        ventana_historial.geometry("1000x500")
+        ventana_historial.geometry("1200x500")
         ventana_historial.configure(bg="#f4f4f9")
 
         tk.Label(
@@ -250,10 +250,10 @@ class VistaProductos:
         frame_tabla = tk.Frame(ventana_historial, bg="white", bd=2, relief="ridge")
         frame_tabla.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        columnas = ("ID Producto", "Part Name", "Codigo Interno", "Descripción", "Precio",
-            "Familia", "Tipo", "Fecha", "Cantidad", "Proveedor", "Detalles", "Responsable")
-
-
+        columnas = (
+            "ID Producto", "Part Name", "Código Interno", "Descripción", "Precio",
+            "Familia", "Tipo", "Fecha", "Documento Ingreso", "Cantidad", "Proveedor", "Detalles", "Responsable"
+        )
 
         tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", height=15)
 
@@ -272,30 +272,35 @@ class VistaProductos:
             entradas = registros["entradas"]
             salidas = registros["salidas"]
 
+            # ✅ Ordenamos por la fecha en orden descendente
+            datos_completos = []
+
+            # 🔹 Procesamos las ENTRADAS
             for entrada in entradas:
-                idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad, proveedor = entrada
-                tree.insert(
-                    "", tk.END,
-                    values=(
-                        idproducto, partname, codigoInterno, descripcion, precio, nomfamilia,
-                        "Entrada", fecha, cantidad, proveedor, "-"
-                    )
-                )
+                idproducto, partname, codigoInterno, descripcion, precio_entrada, nomfamilia, fecha, docu_ingreso, cantidad, proveedor = entrada
+                datos_completos.append((
+                    idproducto, partname, codigoInterno, descripcion, precio_entrada, 
+                    nomfamilia, "Entrada", fecha, docu_ingreso, cantidad, proveedor, "-", "-"
+                ))
 
-
+            # 🔹 Procesamos las SALIDAS
             for salida in salidas:
                 idproducto, partname, codigoInterno, descripcion, precio, nomfamilia, fecha, cantidad, tipo, modelo, marca, responsable = salida
                 detalles = f"{tipo} {modelo} {marca}"
-                tree.insert(
-                    "", tk.END,
-                    values=(
-                        idproducto, partname, codigoInterno, descripcion, precio, nomfamilia,
-                        "Salida", fecha, cantidad, "-", detalles, responsable  # ✅ Agregamos el Responsable
-                    )
-                )
+                datos_completos.append((
+                    idproducto, partname, codigoInterno, descripcion, precio, 
+                    nomfamilia, "Salida", fecha, "-", cantidad, "-", detalles, responsable
+                ))
+
+            # 🔹 Aplicamos ordenación manual por la fecha en orden DESCENDENTE
+            datos_completos.sort(key=lambda x: x[7], reverse=True)  # El índice 7 es la columna "Fecha"
+
+            # 🔹 Insertamos los datos ordenados en el Treeview
+            for fila in datos_completos:
+                tree.insert("", tk.END, values=fila)
 
         else:
-            tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", ""))
+            tree.insert("", tk.END, values=("No hay datos", "", "", "", "", "", "", "", "", "", "", "", ""))
 
         def exportar_todas_entradas_salidas_a_excel():
             datos = [tree.item(child)["values"] for child in tree.get_children()]

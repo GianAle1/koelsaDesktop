@@ -140,78 +140,38 @@ class Salida:
         return []
 
     def obtener_todas_las_salidas(self):
-        """Obtiene todas las salidas de productos, incluyendo la SERIE de la maquinaria."""
+        """Obtiene todas las salidas de productos, ordenadas por fecha de mayor a menor."""
         connection = self.conexion_db.conectar()
         if connection:
             try:
                 cursor = connection.cursor()
                 query = """
-                SELECT 
-                    p.idproducto AS ID_Producto,
-                    p.partname AS Nombre_Producto,
-                    p.codigoInterno AS Codigo_Interno,
-                    p.descripcion AS Descripcion,
-                    p.precio AS Precio,
-                    f.nomfamilia AS Familia,
-                    s.fecha AS Fecha_Salida,  
-                    d.cantidad AS Cantidad,
-                    'Salida' AS Tipo,
-                    COALESCE(m.serie, 'N/A') AS Maquinaria_Serie,  -- ✅ Se obtiene la SERIE
-                    COALESCE(m.marca, 'N/A') AS Marca,             -- ✅ Se obtiene la MARCA
-                    r.nombre AS Responsable  -- ✅ Agregamos el Responsable
-                FROM salidaDetalle d
-                JOIN salida s ON s.idsalida = d.idsalida
-                JOIN producto p ON p.idproducto = d.idproducto
-                LEFT JOIN familia f ON p.idfamilia = f.idfamilia
-                LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria
-                LEFT JOIN responsable r ON s.idresponsable = r.idresponsable;  -- ✅ Relacionamos con responsable
-            """
+                    SELECT 
+                        p.idproducto AS ID_Producto,
+                        p.partname AS Nombre_Producto,
+                        p.codigoInterno AS Codigo_Interno,
+                        p.descripcion AS Descripcion,
+                        p.precio AS Precio,
+                        f.nomfamilia AS Familia,
+                        s.fecha AS Fecha_Salida,  
+                        d.cantidad AS Cantidad,
+                        'Salida' AS Tipo,
+                        COALESCE(m.serie, 'N/A') AS Maquinaria_Serie,  -- ✅ Se obtiene la SERIE
+                        COALESCE(m.marca, 'N/A') AS Marca,             -- ✅ Se obtiene la MARCA
+                        r.nombre AS Responsable  -- ✅ Se agrega el Responsable
+                    FROM salidaDetalle d
+                    JOIN salida s ON s.idsalida = d.idsalida
+                    JOIN producto p ON p.idproducto = d.idproducto
+                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
+                    LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria
+                    LEFT JOIN responsable r ON s.idresponsable = r.idresponsable
+                    ORDER BY s.fecha DESC;  -- ✅ Ordenado de mayor a menor fecha
+                """
                 cursor.execute(query)
                 salidas = cursor.fetchall()
                 return salidas
             except Exception as e:
                 print(f"Error al obtener todas las salidas: {e}")
-                return []
-            finally:
-                self.conexion_db.cerrar_conexion()
-        else:
-            print("No se pudo conectar a la base de datos.")
-            return []
-
-
-
-    def obtener_salidas_por_producto(self, producto_id):
-        """Obtiene el historial de salidas de un producto específico desde la base de datos."""
-        connection = self.conexion_db.conectar()
-        if connection:
-            cursor = self.conexion_db.obtener_cursor()
-            try:
-                query = query = """
-                    SELECT 
-                        p.idproducto,
-                        p.partname,
-                        p.codigoInterno,
-                        p.descripcion,
-                        p.precio,
-                        f.nomfamilia,
-                        s.fecha,
-                        d.cantidad,
-                        'Salida' AS Tipo,  -- ✅ Agregar la etiqueta 'Salida'
-                        COALESCE(m.serie, 'N/A') AS Modelo,  -- ✅ Ahora devuelve la serie
-                        COALESCE(m.marca, 'N/A') AS Marca   -- ✅ Asegura que siempre haya un valor
-                    FROM salidaDetalle d
-                    JOIN salida s ON s.idsalida = d.idsalida
-                    JOIN producto p ON p.idproducto = d.idproducto
-                    LEFT JOIN familia f ON p.idfamilia = f.idfamilia
-                    LEFT JOIN maquinaria m ON d.idmaquinaria = m.idmaquinaria  -- ✅ LEFT JOIN en caso de no tener maquinaria
-                    WHERE p.idproducto = %s;
-                """
-
-                cursor.execute(query, (producto_id,))
-                salidas = cursor.fetchall()
-                return salidas
-            except Exception as e:
-                print(f"Error al obtener salidas para el producto {producto_id}: {e}")
                 return []
             finally:
                 self.conexion_db.cerrar_conexion()

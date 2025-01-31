@@ -313,7 +313,7 @@ class VistaSalida:
         # Título del reporte
         pdf.set_font("Arial", style="B", size=14)
         pdf.set_text_color(50, 50, 255)
-        pdf.cell(0, 10, "REPORTE DE SALIDA DE PRODUCTOS - Taller Lima", ln=True, align="C")
+        pdf.cell(0, 10, "REPORTE DE SALIDA DE PRODUCTOS - TALLER LIMA", ln=True, align="C")
         pdf.set_text_color(0, 0, 0)
         pdf.ln(5)
 

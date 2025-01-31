@@ -77,8 +77,9 @@ class MenuControlador:
     def listar_productos_por_familia(self, familia):
         return self.controlador_producto.listar_productos_por_familia(familia)
     
-    def guardar_entrada(self, fecha, productos):
-        return self.controlador_entrada.guardar_entrada(fecha, productos)
+    def guardar_entrada(self, fecha, docu_ingreso, productos):
+        return self.controlador_entrada.guardar_entrada(fecha, docu_ingreso, productos)
+
     
     def listar_maquinarias(self):
         """Obtiene la lista de maquinarias del modelo."""
